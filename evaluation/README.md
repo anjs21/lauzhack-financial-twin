@@ -1,7 +1,7 @@
 
 Evaluation — AI Financial Twin Challenge
 LauzHack 2026 | Proposed, technology-neutral evaluation framework
-Status: Draft for organizer approval. This is not an official judging policy until confirmed by the event organizers.
+Status: rules established by challenge owner however additional jury members considerations would be include.
 
 Purpose
 Evaluate how effectively a prototype helps a person explore financial decisions under explicit assumptions. A Financial Twin is not defined by forecasting accuracy, an LLM, a dashboard, or a specific technology.
