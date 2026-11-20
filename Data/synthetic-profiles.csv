@@ -1,8 +1,305 @@
 
-profile_id,name,age,city,country,employment_status,household_type,currency,initial_savings,monthly_net_income,monthly_expenses,financial_goal
-P001,Alexia,20,Lausanne,Switzerland,Student,Single,CHF,8000,1200,1800,Education and career planning
-P002,Noah,26,Zurich,Switzerland,Employed,Single,CHF,18000,5200,3500,Home purchase
-P003,Maya,33,Geneva,Switzerland,Employed,Couple,CHF,42000,7800,5600,Family financial planning
-P004,Leo,42,Bern,Switzerland,Self-employed,Family,CHF,65000,9200,7100,Financial resilience
-P005,Nina,58,Basel,Switzerland,Employed,Single,CHF,125000,6800,4900,Retirement planning
 
+profile_id,display_name,age_at_start,city,canton,country,currency,employment_status,household_type,opening_cash_chf,reference_monthly_net_income_chf,reference_monthly_rent_chf,as_of_date,synthetic
+P00001,Alexia,20,Lausanne,VD,CH,CHF,student,single,8000,1200,900,2025-01-01,true
+P00002,Rafael,70,Geneva,GE,CH,CHF,retired,single,48587.53,3087.46,1327.8,2025-01-01,true
+P00003,Samir,58,Lugano,TI,CH,CHF,employed,single,143962.55,9558.84,1400.94,2025-01-01,true
+P00004,Yara,24,Fribourg,FR,CH,CHF,employed,single,41807.0,5206.83,1403.82,2025-01-01,true
+P00005,Maya,73,Fribourg,FR,CH,CHF,retired,single,146675.09,2554.35,1318.6,2025-01-01,true
+P00006,Leo,75,Lugano,TI,CH,CHF,retired,single,147023.69,4928.79,1576.73,2025-01-01,true
+P00007,Samir,74,Basel,BS,CH,CHF,retired,single,103265.82,4135.61,1866.43,2025-01-01,true
+P00008,David,47,Lugano,TI,CH,CHF,employed,couple,79051.43,3701.62,2101.85,2025-01-01,true
+P00009,Ava,58,Neuchatel,NE,CH,CHF,employed,single,113870.74,5177.47,1070.0,2025-01-01,true
+P00010,Elena,61,Biel,BE,CH,CHF,employed,couple,107073.63,4192.97,2688.04,2025-01-01,true
+P00011,Nina,50,Zurich,ZH,CH,CHF,employed,single,42817.08,4274.15,1729.71,2025-01-01,true
+P00012,Felix,45,Zurich,ZH,CH,CHF,employed,family,115841.08,10906.78,2158.65,2025-01-01,true
+P00013,Yara,74,Biel,BE,CH,CHF,retired,shared_housing,8139.79,2673.56,1257.42,2025-01-01,true
+P00014,Elena,25,Biel,BE,CH,CHF,part_time,couple,41225.41,5892.25,2573.16,2025-01-01,true
+P00015,Lina,48,Lucerne,LU,CH,CHF,employed,couple,51677.21,9858.37,3194.37,2025-01-01,true
+P00016,Oscar,36,Lugano,TI,CH,CHF,part_time,couple,117765.55,4441.48,2804.16,2025-01-01,true
+P00017,Yara,18,St Gallen,SG,CH,CHF,employed,couple,24887.39,3998.47,1657.49,2025-01-01,true
+P00018,Luca,39,Fribourg,FR,CH,CHF,employed,couple,145988.86,8270.14,1472.54,2025-01-01,true
+P00019,David,68,Biel,BE,CH,CHF,retired,couple,147782.36,3645.21,2508.05,2025-01-01,true
+P00020,Samir,20,Fribourg,FR,CH,CHF,employed,single,49575.79,10908.06,1928.65,2025-01-01,true
+P00021,Elena,42,Zurich,ZH,CH,CHF,employed,family,78162.2,11217.66,2494.04,2025-01-01,true
+P00022,Mara,48,Lausanne,VD,CH,CHF,employed,shared_housing,130649.8,7459.97,1009.79,2025-01-01,true
+P00023,Lea,49,Lausanne,VD,CH,CHF,self_employed,couple,118484.46,10293.26,2043.16,2025-01-01,true
+P00024,Rafael,39,Biel,BE,CH,CHF,self_employed,single,146660.4,8744.0,1709.89,2025-01-01,true
+P00025,Alexia,39,Lucerne,LU,CH,CHF,employed,shared_housing,125877.86,5866.87,1506.45,2025-01-01,true
+P00026,Oscar,68,Bern,BE,CH,CHF,retired,couple,143343.62,4811.2,2400.39,2025-01-01,true
+P00027,Gabriel,56,Zurich,ZH,CH,CHF,employed,single,48839.81,9944.14,1887.16,2025-01-01,true
+P00028,Leo,65,Lugano,TI,CH,CHF,employed,family,100950.21,5131.26,2149.51,2025-01-01,true
+P00029,Sofia,45,Zurich,ZH,CH,CHF,employed,couple,84692.54,7046.41,3332.3,2025-01-01,true
+P00030,David,45,Geneva,GE,CH,CHF,employed,family,94358.89,4791.93,2898.28,2025-01-01,true
+P00031,Gabriel,18,Lugano,TI,CH,CHF,student,couple,43941.47,1910.6,1871.98,2025-01-01,true
+P00032,Sofia,35,Geneva,GE,CH,CHF,employed,family,67044.47,10299.97,3668.18,2025-01-01,true
+P00033,Luca,24,Bern,BE,CH,CHF,employed,family,15277.78,5206.5,2949.08,2025-01-01,true
+P00034,Samir,53,Neuchatel,NE,CH,CHF,employed,family,65943.67,11754.03,2737.32,2025-01-01,true
+P00035,Timo,33,Lucerne,LU,CH,CHF,self_employed,single,37282.97,5437.59,1894.74,2025-01-01,true
+P00036,Nora,55,Basel,BS,CH,CHF,employed,single,30650.72,7380.64,1982.9,2025-01-01,true
+P00037,Gabriel,64,Biel,BE,CH,CHF,self_employed,single,119923.71,12293.14,1211.92,2025-01-01,true
+P00038,Ines,31,Geneva,GE,CH,CHF,employed,couple,51667.79,9887.66,2696.8,2025-01-01,true
+P00039,Ava,26,Biel,BE,CH,CHF,employed,family,13006.17,9305.14,2478.31,2025-01-01,true
+P00040,Nina,62,Basel,BS,CH,CHF,employed,couple,21094.83,9691.25,3119.21,2025-01-01,true
+P00041,Amira,54,Lucerne,LU,CH,CHF,employed,shared_housing,86145.4,5813.3,1196.31,2025-01-01,true
+P00042,Lina,32,Bern,BE,CH,CHF,employed,couple,52414.46,7789.86,2759.84,2025-01-01,true
+P00043,Lea,38,Geneva,GE,CH,CHF,employed,couple,136932.36,10467.86,2028.18,2025-01-01,true
+P00044,Elias,49,St Gallen,SG,CH,CHF,employed,single,14009.09,4888.49,1584.74,2025-01-01,true
+P00045,Alexia,32,Zurich,ZH,CH,CHF,unemployed,shared_housing,24365.65,939.87,1294.96,2025-01-01,true
+P00046,Sofia,46,Lugano,TI,CH,CHF,employed,single,79252.19,9488.55,2212.84,2025-01-01,true
+P00047,Aline,52,Fribourg,FR,CH,CHF,employed,couple,112729.67,9377.15,1717.55,2025-01-01,true
+P00048,David,67,St Gallen,SG,CH,CHF,retired,single,92390.98,3610.07,1176.77,2025-01-01,true
+P00049,Nora,70,Fribourg,FR,CH,CHF,retired,couple,130417.11,2933.56,1715.81,2025-01-01,true
+P00050,Nora,47,Zurich,ZH,CH,CHF,part_time,shared_housing,19521.65,5374.11,1348.37,2025-01-01,true
+P00051,Amira,48,Winterthur,ZH,CH,CHF,employed,single,52529.68,4615.89,1730.02,2025-01-01,true
+P00052,Felix,37,Fribourg,FR,CH,CHF,self_employed,single,100510.27,9907.64,1580.89,2025-01-01,true
+P00053,David,54,Basel,BS,CH,CHF,employed,single,57594.13,5051.02,1864.77,2025-01-01,true
+P00054,Emil,60,Neuchatel,NE,CH,CHF,employed,shared_housing,63693.83,11879.48,970.24,2025-01-01,true
+P00055,Oscar,30,Zurich,ZH,CH,CHF,employed,single,17688.71,4121.18,2086.03,2025-01-01,true
+P00056,Aline,42,Zurich,ZH,CH,CHF,employed,shared_housing,27602.63,10648.18,1143.96,2025-01-01,true
+P00057,Lea,64,Geneva,GE,CH,CHF,employed,shared_housing,24640.48,9564.17,1718.98,2025-01-01,true
+P00058,Ines,27,St Gallen,SG,CH,CHF,part_time,single,53427.89,3062.23,1477.22,2025-01-01,true
+P00059,Emil,64,Fribourg,FR,CH,CHF,employed,single,131045.86,11086.23,1547.33,2025-01-01,true
+P00060,Gabriel,68,St Gallen,SG,CH,CHF,retired,shared_housing,51833.85,3593.24,1322.41,2025-01-01,true
+P00061,Maya,38,Neuchatel,NE,CH,CHF,employed,single,51492.39,4872.06,1388.73,2025-01-01,true
+P00062,Timo,41,Lausanne,VD,CH,CHF,employed,couple,140232.85,11095.28,2822.7,2025-01-01,true
+P00063,Maya,42,St Gallen,SG,CH,CHF,employed,single,63732.81,8130.73,1445.42,2025-01-01,true
+P00064,Isabelle,42,Neuchatel,NE,CH,CHF,part_time,family,90851.6,4447.34,1775.48,2025-01-01,true
+P00065,Rafael,55,Zurich,ZH,CH,CHF,self_employed,single,44236.99,4913.89,1974.16,2025-01-01,true
+P00066,Jonas,71,Basel,BS,CH,CHF,retired,single,41236.21,5016.98,1498.68,2025-01-01,true
+P00067,Luca,30,Zurich,ZH,CH,CHF,part_time,couple,22655.36,2845.08,2890.42,2025-01-01,true
+P00068,Felix,34,St Gallen,SG,CH,CHF,employed,single,50684.42,4259.55,1322.17,2025-01-01,true
+P00069,Rafael,60,St Gallen,SG,CH,CHF,unemployed,couple,23581.48,1160.37,1552.49,2025-01-01,true
+P00070,Oscar,60,Bern,BE,CH,CHF,employed,couple,25689.91,7469.5,1697.82,2025-01-01,true
+P00071,Amira,22,Lausanne,VD,CH,CHF,self_employed,shared_housing,16496.2,10470.95,1065.42,2025-01-01,true
+P00072,David,26,Winterthur,ZH,CH,CHF,student,couple,49470.38,940.64,1929.38,2025-01-01,true
+P00073,Samir,47,Fribourg,FR,CH,CHF,employed,shared_housing,111916.41,5826.15,1285.11,2025-01-01,true
+P00074,Ines,74,Basel,BS,CH,CHF,retired,couple,48363.55,3581.56,2600.28,2025-01-01,true
+P00075,Ines,76,Basel,BS,CH,CHF,retired,couple,135967.64,4921.2,2161.94,2025-01-01,true
+P00076,Elena,35,Fribourg,FR,CH,CHF,unemployed,single,145840.31,533.09,1834.4,2025-01-01,true
+P00077,Elena,26,Geneva,GE,CH,CHF,student,couple,22109.38,1765.44,2295.34,2025-01-01,true
+P00078,Maya,49,Lucerne,LU,CH,CHF,employed,single,7196.71,3933.3,2075.6,2025-01-01,true
+P00079,Milo,32,Fribourg,FR,CH,CHF,part_time,couple,36127.74,5495.44,1607.45,2025-01-01,true
+P00080,Timo,72,St Gallen,SG,CH,CHF,retired,single,86859.31,4851.24,1422.08,2025-01-01,true
+P00081,Mara,18,Neuchatel,NE,CH,CHF,student,family,25285.68,1618.49,2654.95,2025-01-01,true
+P00082,Timo,18,Bern,BE,CH,CHF,self_employed,family,44527.55,4718.91,1976.06,2025-01-01,true
+P00083,Milo,36,St Gallen,SG,CH,CHF,employed,family,14132.91,5560.33,2183.41,2025-01-01,true
+P00084,Leo,52,Basel,BS,CH,CHF,employed,single,122016.9,6699.48,2126.34,2025-01-01,true
+P00085,Timo,50,Bern,BE,CH,CHF,employed,couple,98595.47,6415.59,2785.79,2025-01-01,true
+P00086,Elena,29,Lugano,TI,CH,CHF,employed,couple,46130.87,6784.54,2108.19,2025-01-01,true
+P00087,Samir,28,Lugano,TI,CH,CHF,employed,family,54710.36,8212.06,3080.29,2025-01-01,true
+P00088,Milo,41,Winterthur,ZH,CH,CHF,self_employed,couple,134806.23,3366.78,2461.1,2025-01-01,true
+P00089,Aline,66,Biel,BE,CH,CHF,employed,family,99433.63,4633.04,2180.28,2025-01-01,true
+P00090,Luca,30,Lugano,TI,CH,CHF,student,couple,31287.08,1499.77,1727.55,2025-01-01,true
+P00091,Aline,42,Neuchatel,NE,CH,CHF,employed,single,132054.08,4347.09,1261.99,2025-01-01,true
+P00092,Yara,69,St Gallen,SG,CH,CHF,retired,single,134737.89,4002.6,1913.98,2025-01-01,true
+P00093,Timo,58,Bern,BE,CH,CHF,employed,single,84692.67,8458.96,1570.24,2025-01-01,true
+P00094,Mara,73,Winterthur,ZH,CH,CHF,retired,single,122038.47,3658.57,1610.09,2025-01-01,true
+P00095,Timo,74,Winterthur,ZH,CH,CHF,retired,shared_housing,73636.88,3300.84,1567.56,2025-01-01,true
+P00096,Leo,29,Lugano,TI,CH,CHF,employed,couple,31407.16,4195.23,2380.56,2025-01-01,true
+P00097,Yara,44,Basel,BS,CH,CHF,employed,single,130529.75,7264.35,1816.29,2025-01-01,true
+P00098,Amira,37,Lucerne,LU,CH,CHF,employed,shared_housing,140316.91,9139.13,1237.4,2025-01-01,true
+P00099,Leo,55,St Gallen,SG,CH,CHF,employed,single,102674.64,6721.92,1375.14,2025-01-01,true
+P00100,Emil,44,Fribourg,FR,CH,CHF,employed,couple,73871.84,4052.51,2011.69,2025-01-01,true
+
+P00101,Luca,38,Zurich,ZH,CH,CHF,employed,couple,117503.53,9008.32,2696.35,2025-01-01,true
+P00102,Leo,74,Winterthur,ZH,CH,CHF,retired,couple,78701.9,2604.27,2389.92,2025-01-01,true
+P00103,Aline,53,Lugano,TI,CH,CHF,employed,shared_housing,7071.22,4688.75,1090.0,2025-01-01,true
+P00104,Elena,74,Basel,BS,CH,CHF,retired,single,126868.81,4247.0,1938.09,2025-01-01,true
+P00105,Leo,24,Zurich,ZH,CH,CHF,student,single,54378.17,697.89,2072.19,2025-01-01,true
+P00106,Elias,50,Biel,BE,CH,CHF,employed,shared_housing,135831.47,4838.85,1195.43,2025-01-01,true
+P00107,David,55,Lucerne,LU,CH,CHF,employed,couple,105687.81,7736.3,2744.39,2025-01-01,true
+P00108,Sofia,22,Biel,BE,CH,CHF,employed,single,22903.36,5397.14,1398.17,2025-01-01,true
+P00109,Mara,34,Neuchatel,NE,CH,CHF,employed,family,40308.79,8946.57,2774.04,2025-01-01,true
+P00110,Leo,38,Lugano,TI,CH,CHF,employed,shared_housing,94698.56,4134.28,1199.72,2025-01-01,true
+P00111,Milo,57,Geneva,GE,CH,CHF,employed,couple,94960.26,4192.85,2602.82,2025-01-01,true
+P00112,David,57,St Gallen,SG,CH,CHF,employed,single,126406.39,11674.02,1139.02,2025-01-01,true
+P00113,Mara,74,St Gallen,SG,CH,CHF,retired,family,42249.15,4220.29,1974.89,2025-01-01,true
+P00114,Mara,25,Bern,BE,CH,CHF,employed,family,27691.06,6540.08,2074.49,2025-01-01,true
+P00115,Mara,51,Biel,BE,CH,CHF,employed,couple,32492.3,4761.98,2211.3,2025-01-01,true
+P00116,Leo,23,Basel,BS,CH,CHF,employed,couple,52588.41,11146.16,2185.69,2025-01-01,true
+P00117,Amira,62,Fribourg,FR,CH,CHF,employed,couple,123026.63,6302.07,1412.83,2025-01-01,true
+P00118,Amira,22,Neuchatel,NE,CH,CHF,part_time,couple,33944.24,5055.99,2777.92,2025-01-01,true
+P00119,David,21,Lucerne,LU,CH,CHF,employed,couple,48723.38,4663.18,2492.76,2025-01-01,true
+P00120,Jonas,74,Zurich,ZH,CH,CHF,retired,shared_housing,41833.88,4147.84,1107.0,2025-01-01,true
+P00121,Jonas,45,Winterthur,ZH,CH,CHF,employed,single,104428.41,8940.13,1440.27,2025-01-01,true
+P00122,Mara,33,Neuchatel,NE,CH,CHF,employed,couple,3867.13,8589.65,2228.37,2025-01-01,true
+P00123,Luca,76,Geneva,GE,CH,CHF,retired,single,41278.04,4498.72,2022.06,2025-01-01,true
+P00124,Lea,61,Zurich,ZH,CH,CHF,part_time,couple,139518.05,3223.92,2519.26,2025-01-01,true
+P00125,Emil,38,Basel,BS,CH,CHF,employed,single,47976.89,5978.66,1698.62,2025-01-01,true
+P00126,David,33,Bern,BE,CH,CHF,self_employed,single,16069.16,5233.69,1389.3,2025-01-01,true
+P00127,Lea,36,Biel,BE,CH,CHF,employed,couple,95299.16,10977.72,2766.99,2025-01-01,true
+P00128,Sofia,72,Neuchatel,NE,CH,CHF,retired,single,77187.79,3340.01,1097.41,2025-01-01,true
+P00129,Nora,33,Geneva,GE,CH,CHF,part_time,single,52647.12,4677.16,2681.6,2025-01-01,true
+P00130,Elena,44,Geneva,GE,CH,CHF,unemployed,single,120085.33,9.4,1452.03,2025-01-01,true
+P00131,Lina,22,Lugano,TI,CH,CHF,employed,couple,49850.02,9432.38,2676.52,2025-01-01,true
+P00132,Emil,72,Lugano,TI,CH,CHF,retired,single,55974.88,4467.17,1265.16,2025-01-01,true
+P00133,Aline,62,Lugano,TI,CH,CHF,part_time,single,100986.24,3983.98,2046.2,2025-01-01,true
+P00134,Lina,42,Fribourg,FR,CH,CHF,employed,single,114283.52,9485.85,1842.66,2025-01-01,true
+P00135,Clara,52,Biel,BE,CH,CHF,part_time,single,139126.08,4428.49,2024.75,2025-01-01,true
+P00136,Luca,73,Zurich,ZH,CH,CHF,retired,couple,122008.74,4697.46,2183.71,2025-01-01,true
+P00137,Amira,27,Neuchatel,NE,CH,CHF,self_employed,couple,30166.76,3210.21,1644.42,2025-01-01,true
+P00138,Timo,31,Basel,BS,CH,CHF,self_employed,single,31908.46,9569.73,1454.12,2025-01-01,true
+P00139,Lina,37,Biel,BE,CH,CHF,employed,shared_housing,69095.83,5360.95,1101.61,2025-01-01,true
+P00140,Ines,22,Zurich,ZH,CH,CHF,student,single,39916.44,957.94,1636.44,2025-01-01,true
+P00141,Luca,76,Bern,BE,CH,CHF,retired,couple,133947.53,2914.34,3082.51,2025-01-01,true
+P00142,Ines,37,Geneva,GE,CH,CHF,self_employed,family,146406.11,4105.84,2268.59,2025-01-01,true
+P00143,Mara,49,Basel,BS,CH,CHF,employed,single,16867.24,3981.57,1194.22,2025-01-01,true
+P00144,Alexia,52,Biel,BE,CH,CHF,part_time,family,113699.88,4660.39,2298.71,2025-01-01,true
+P00145,Nina,28,Fribourg,FR,CH,CHF,employed,couple,53263.62,10349.4,2743.84,2025-01-01,true
+P00146,Clara,63,Winterthur,ZH,CH,CHF,part_time,single,93279.27,3464.38,2102.93,2025-01-01,true
+P00147,Ava,64,Lugano,TI,CH,CHF,employed,family,70441.68,11561.44,2260.83,2025-01-01,true
+P00148,Maya,33,Zurich,ZH,CH,CHF,employed,shared_housing,25775.88,6635.27,1116.91,2025-01-01,true
+P00149,Maya,59,Fribourg,FR,CH,CHF,employed,couple,14084.06,7031.61,2061.18,2025-01-01,true
+P00150,Milo,40,Zurich,ZH,CH,CHF,part_time,family,126077.94,3077.63,2179.73,2025-01-01,true
+P00151,Lea,22,Zurich,ZH,CH,CHF,self_employed,couple,42789.4,9885.05,3181.71,2025-01-01,true
+P00152,Rafael,28,St Gallen,SG,CH,CHF,employed,single,14283.96,8980.8,1683.75,2025-01-01,true
+P00153,Isabelle,57,Basel,BS,CH,CHF,employed,couple,137260.72,6440.67,2546.53,2025-01-01,true
+P00154,Elena,42,Lausanne,VD,CH,CHF,part_time,shared_housing,143339.18,3658.08,784.5,2025-01-01,true
+P00155,Alexia,24,Fribourg,FR,CH,CHF,student,single,39892.68,1988.15,1289.38,2025-01-01,true
+P00156,Elena,76,Biel,BE,CH,CHF,retired,shared_housing,65078.51,2687.58,1117.51,2025-01-01,true
+P00157,Maya,59,Fribourg,FR,CH,CHF,employed,family,122372.32,9789.71,1939.95,2025-01-01,true
+P00158,Oscar,52,Lugano,TI,CH,CHF,self_employed,single,38278.08,2943.49,2024.49,2025-01-01,true
+P00159,Elias,40,Biel,BE,CH,CHF,employed,couple,51711.55,11311.12,2560.51,2025-01-01,true
+P00160,Luca,46,St Gallen,SG,CH,CHF,employed,family,33543.88,9436.05,1792.45,2025-01-01,true
+P00161,Alexia,23,Lucerne,LU,CH,CHF,employed,family,46130.62,8069.78,2856.43,2025-01-01,true
+P00162,Timo,53,Geneva,GE,CH,CHF,employed,single,123168.99,8412.36,1409.79,2025-01-01,true
+P00163,Milo,53,Neuchatel,NE,CH,CHF,self_employed,family,116431.72,9929.96,2952.54,2025-01-01,true
+P00164,Aline,76,St Gallen,SG,CH,CHF,retired,single,51293.52,3634.17,1262.28,2025-01-01,true
+P00165,Lina,65,Winterthur,ZH,CH,CHF,employed,couple,146479.81,3683.35,1887.99,2025-01-01,true
+P00166,Noah,44,Lugano,TI,CH,CHF,part_time,single,71011.62,2741.2,1994.06,2025-01-01,true
+P00167,Nina,56,Geneva,GE,CH,CHF,employed,family,80991.28,4321.86,3620.23,2025-01-01,true
+P00168,Leo,34,St Gallen,SG,CH,CHF,self_employed,couple,41453.31,3487.82,1936.53,2025-01-01,true
+P00169,Mara,59,Geneva,GE,CH,CHF,part_time,family,56154.53,3031.49,2219.13,2025-01-01,true
+P00170,Sofia,56,Biel,BE,CH,CHF,employed,couple,35476.69,6082.42,1875.27,2025-01-01,true
+P00171,Nora,24,St Gallen,SG,CH,CHF,employed,family,27335.88,5047.43,2391.72,2025-01-01,true
+P00172,Sofia,43,Basel,BS,CH,CHF,employed,shared_housing,127285.2,8845.28,1108.67,2025-01-01,true
+P00173,Jonas,65,Basel,BS,CH,CHF,employed,couple,70054.2,9962.63,2939.65,2025-01-01,true
+P00174,Jonas,46,Lausanne,VD,CH,CHF,employed,family,110014.5,8453.73,2603.89,2025-01-01,true
+P00175,Isabelle,52,Neuchatel,NE,CH,CHF,self_employed,family,65642.36,10150.38,2536.41,2025-01-01,true
+P00176,Leo,22,Winterthur,ZH,CH,CHF,student,shared_housing,24295.4,1150.18,1106.81,2025-01-01,true
+P00177,Yara,65,Zurich,ZH,CH,CHF,employed,single,111767.73,7438.44,1965.52,2025-01-01,true
+P00178,Emil,57,Zurich,ZH,CH,CHF,employed,couple,24475.21,11326.77,3618.14,2025-01-01,true
+P00179,Sofia,62,Lugano,TI,CH,CHF,self_employed,single,57512.49,4450.57,1652.66,2025-01-01,true
+P00180,Elena,58,Bern,BE,CH,CHF,employed,single,111501.23,4565.99,1409.8,2025-01-01,true
+P00181,Oscar,27,Fribourg,FR,CH,CHF,employed,couple,53176.07,10549.68,1707.34,2025-01-01,true
+P00182,Yara,59,Geneva,GE,CH,CHF,student,single,10083.8,1395.08,1568.85,2025-01-01,true
+P00183,Leo,56,Winterthur,ZH,CH,CHF,employed,single,113222.57,6948.25,2227.95,2025-01-01,true
+P00184,Oscar,71,Bern,BE,CH,CHF,retired,shared_housing,51678.39,2979.82,1424.03,2025-01-01,true
+P00185,Timo,37,Winterthur,ZH,CH,CHF,student,single,35165.95,858.71,1893.15,2025-01-01,true
+P00186,Nina,43,Lucerne,LU,CH,CHF,employed,family,50608.09,5961.61,1652.9,2025-01-01,true
+P00187,Maya,39,Fribourg,FR,CH,CHF,employed,single,77880.25,6591.8,1150.85,2025-01-01,true
+P00188,Aline,36,Fribourg,FR,CH,CHF,part_time,couple,23618.04,5373.1,2175.09,2025-01-01,true
+P00189,Amira,70,Zurich,ZH,CH,CHF,retired,single,39432.55,3422.03,2651.07,2025-01-01,true
+P00190,Alexia,65,Zurich,ZH,CH,CHF,self_employed,single,41398.27,9363.35,1946.99,2025-01-01,true
+P00191,Ines,35,Lausanne,VD,CH,CHF,employed,couple,118756.28,7199.02,1987.3,2025-01-01,true
+P00192,Emil,61,Geneva,GE,CH,CHF,employed,couple,123596.23,7029.35,2723.91,2025-01-01,true
+P00193,Maya,76,Basel,BS,CH,CHF,retired,family,20559.08,3274.26,2507.87,2025-01-01,true
+P00194,Nora,52,Winterthur,ZH,CH,CHF,employed,family,27832.47,11245.91,2238.11,2025-01-01,true
+P00195,David,26,Neuchatel,NE,CH,CHF,self_employed,shared_housing,44942.22,11695.02,721.8,2025-01-01,true
+P00196,Maya,37,Bern,BE,CH,CHF,employed,single,148407.83,6646.11,2216.91,2025-01-01,true
+P00197,Sofia,33,Geneva,GE,CH,CHF,part_time,shared_housing,22106.2,2821.85,1713.8,2025-01-01,true
+P00198,Samir,59,Neuchatel,NE,CH,CHF,employed,couple,74165.94,8584.3,2349.09,2025-01-01,true
+P00199,Isabelle,45,Winterthur,ZH,CH,CHF,employed,family,112122.93,4199.52,2302.26,2025-01-01,true
+P00200,Nina,47,Biel,BE,CH,CHF,employed,couple,112002.27,9797.2,1789.2,2025-01-01,true
+
+P00201,Rafael,69,Neuchatel,NE,CH,CHF,retired,single,58138.55,3168.32,1940.99,2025-01-01,true
+P00202,Oscar,33,Winterthur,ZH,CH,CHF,employed,family,28931.62,10679.28,2577.43,2025-01-01,true
+P00203,Oscar,24,Zurich,ZH,CH,CHF,employed,couple,23151.45,7851.13,3251.18,2025-01-01,true
+P00204,Ava,30,Lugano,TI,CH,CHF,employed,single,32525.01,4456.73,2136.06,2025-01-01,true
+P00205,Leo,49,Geneva,GE,CH,CHF,employed,couple,118359.18,11022.02,3729.48,2025-01-01,true
+P00206,Ines,48,Biel,BE,CH,CHF,employed,shared_housing,27992.77,5640.08,1198.65,2025-01-01,true
+P00207,Clara,18,Biel,BE,CH,CHF,self_employed,family,19883.68,4627.35,2771.23,2025-01-01,true
+P00208,Ava,30,Lugano,TI,CH,CHF,self_employed,single,43516.68,7384.17,1573.06,2025-01-01,true
+P00209,Maya,49,Lausanne,VD,CH,CHF,employed,couple,56051.23,5631.21,3186.86,2025-01-01,true
+P00210,Gabriel,32,Biel,BE,CH,CHF,self_employed,couple,44427.56,10710.25,1996.67,2025-01-01,true
+P00211,Aline,18,Geneva,GE,CH,CHF,student,single,1608.73,1021.66,2186.83,2025-01-01,true
+P00212,Elias,53,Biel,BE,CH,CHF,employed,single,106915.07,5896.31,1428.24,2025-01-01,true
+P00213,Timo,46,Geneva,GE,CH,CHF,employed,family,112280.68,11742.27,2623.92,2025-01-01,true
+P00214,Lea,76,Fribourg,FR,CH,CHF,retired,single,99961.59,4825.6,1881.87,2025-01-01,true
+P00215,Elias,20,Lausanne,VD,CH,CHF,self_employed,single,49008.76,3164.94,2244.86,2025-01-01,true
+P00216,Clara,47,Neuchatel,NE,CH,CHF,employed,family,36493.73,8441.14,2244.95,2025-01-01,true
+P00217,Clara,74,Neuchatel,NE,CH,CHF,retired,couple,92859.34,4545.6,2298.1,2025-01-01,true
+P00218,Isabelle,41,Basel,BS,CH,CHF,self_employed,shared_housing,138416.57,5279.25,834.22,2025-01-01,true
+P00219,Sofia,70,Lausanne,VD,CH,CHF,retired,family,42625.52,3452.36,2451.52,2025-01-01,true
+P00220,Nina,31,Geneva,GE,CH,CHF,employed,family,49857.41,7218.6,2178.03,2025-01-01,true
+P00221,Mara,60,Biel,BE,CH,CHF,unemployed,couple,130356.16,1080.46,2123.95,2025-01-01,true
+P00222,Emil,46,Fribourg,FR,CH,CHF,employed,single,87973.81,5699.66,999.73,2025-01-01,true
+P00223,Rafael,67,Lucerne,LU,CH,CHF,retired,shared_housing,30224.69,4142.6,1197.05,2025-01-01,true
+P00224,Nina,69,Fribourg,FR,CH,CHF,retired,single,144681.1,3610.55,1396.4,2025-01-01,true
+P00225,Samir,38,Biel,BE,CH,CHF,employed,couple,52964.63,5609.12,2700.87,2025-01-01,true
+P00226,Amira,20,Basel,BS,CH,CHF,employed,couple,33588.26,9971.74,2603.46,2025-01-01,true
+P00227,Milo,72,Biel,BE,CH,CHF,retired,single,82924.83,3454.24,1138.64,2025-01-01,true
+P00228,Felix,53,Fribourg,FR,CH,CHF,employed,single,23545.28,6274.83,1530.43,2025-01-01,true
+P00229,Milo,65,Bern,BE,CH,CHF,employed,couple,146907.41,8738.21,3019.78,2025-01-01,true
+P00230,Ines,30,Lausanne,VD,CH,CHF,part_time,single,14328.34,5381.6,2128.51,2025-01-01,true
+P00231,Luca,46,Geneva,GE,CH,CHF,employed,shared_housing,67117.16,9790.91,1326.87,2025-01-01,true
+P00232,Amira,63,Biel,BE,CH,CHF,part_time,shared_housing,13523.54,5427.52,992.77,2025-01-01,true
+P00233,Isabelle,45,Geneva,GE,CH,CHF,employed,family,73290.31,8625.22,3116.8,2025-01-01,true
+P00234,Luca,23,Bern,BE,CH,CHF,student,single,18405.35,1822.97,1721.61,2025-01-01,true
+P00235,Elena,20,Geneva,GE,CH,CHF,student,family,4619.6,574.6,1930.35,2025-01-01,true
+P00236,Ines,42,Zurich,ZH,CH,CHF,employed,single,95935.57,7817.46,2642.95,2025-01-01,true
+P00237,Sofia,56,Bern,BE,CH,CHF,part_time,shared_housing,70919.65,3874.46,789.34,2025-01-01,true
+P00238,Nora,35,St Gallen,SG,CH,CHF,employed,family,27894.77,5932.03,2570.91,2025-01-01,true
+P00239,Luca,47,Bern,BE,CH,CHF,employed,single,57514.72,10505.57,2277.94,2025-01-01,true
+P00240,Isabelle,64,Bern,BE,CH,CHF,unemployed,couple,23650.53,418.85,2719.96,2025-01-01,true
+P00241,Gabriel,42,Lugano,TI,CH,CHF,part_time,couple,21693.35,5377.58,2418.68,2025-01-01,true
+P00242,Emil,53,Lucerne,LU,CH,CHF,self_employed,couple,21914.25,10861.0,2422.57,2025-01-01,true
+P00243,Sofia,56,Biel,BE,CH,CHF,employed,family,6836.78,9307.56,2909.26,2025-01-01,true
+P00244,Felix,40,St Gallen,SG,CH,CHF,employed,single,51913.44,4712.88,1371.62,2025-01-01,true
+P00245,Nora,71,St Gallen,SG,CH,CHF,retired,single,120334.95,5124.97,1111.57,2025-01-01,true
+P00246,Nina,34,Zurich,ZH,CH,CHF,employed,couple,21728.63,6678.81,2258.81,2025-01-01,true
+P00247,Nina,18,Biel,BE,CH,CHF,employed,single,20290.93,11727.32,1875.77,2025-01-01,true
+P00248,Timo,46,Lugano,TI,CH,CHF,employed,single,64015.62,3908.33,1637.28,2025-01-01,true
+P00249,Rafael,61,Winterthur,ZH,CH,CHF,employed,shared_housing,84495.44,8035.83,1124.83,2025-01-01,true
+P00250,Felix,70,Geneva,GE,CH,CHF,retired,single,141127.57,2940.67,1429.45,2025-01-01,true
+P00251,Felix,64,Lausanne,VD,CH,CHF,employed,couple,134013.04,5255.47,2213.51,2025-01-01,true
+P00252,Ines,76,Biel,BE,CH,CHF,retired,couple,77286.31,4913.79,1844.11,2025-01-01,true
+P00253,Ava,29,St Gallen,SG,CH,CHF,employed,single,1042.3,5873.29,1198.96,2025-01-01,true
+P00254,Leo,30,Geneva,GE,CH,CHF,self_employed,single,30467.3,4563.17,1684.27,2025-01-01,true
+P00255,Ava,44,Biel,BE,CH,CHF,employed,family,10722.45,6242.87,2808.92,2025-01-01,true
+P00256,Gabriel,39,Geneva,GE,CH,CHF,part_time,single,92655.19,2756.9,2369.89,2025-01-01,true
+P00257,Milo,59,Lugano,TI,CH,CHF,employed,single,97239.06,4494.34,1398.22,2025-01-01,true
+P00258,Ines,53,Biel,BE,CH,CHF,employed,couple,9653.78,9202.63,1590.61,2025-01-01,true
+P00259,Maya,34,St Gallen,SG,CH,CHF,employed,couple,52424.8,6875.24,2745.2,2025-01-01,true
+P00260,Nora,76,Neuchatel,NE,CH,CHF,retired,couple,122447.52,3346.96,2485.14,2025-01-01,true
+P00261,Sofia,28,Lugano,TI,CH,CHF,employed,family,14826.7,8155.79,3058.31,2025-01-01,true
+P00262,Timo,61,Winterthur,ZH,CH,CHF,employed,single,40858.15,5195.65,1533.51,2025-01-01,true
+P00263,Elena,24,St Gallen,SG,CH,CHF,employed,couple,11867.97,11779.23,1703.21,2025-01-01,true
+P00264,Emil,58,Zurich,ZH,CH,CHF,employed,couple,91673.71,4852.64,2797.1,2025-01-01,true
+P00265,Clara,36,Bern,BE,CH,CHF,employed,family,123371.27,9993.88,1838.15,2025-01-01,true
+P00266,Milo,61,St Gallen,SG,CH,CHF,employed,single,47377.27,4558.71,1451.38,2025-01-01,true
+P00267,Lea,75,Neuchatel,NE,CH,CHF,retired,shared_housing,75687.41,4496.19,829.05,2025-01-01,true
+P00268,Amira,72,Bern,BE,CH,CHF,retired,couple,73817.73,3196.94,3170.03,2025-01-01,true
+P00269,Rafael,54,St Gallen,SG,CH,CHF,employed,single,93787.52,4518.08,1508.85,2025-01-01,true
+P00270,Mara,59,Geneva,GE,CH,CHF,employed,couple,91461.45,10894.8,3436.06,2025-01-01,true
+P00271,Alexia,53,Neuchatel,NE,CH,CHF,employed,single,24725.71,8543.26,2110.73,2025-01-01,true
+P00272,Nina,64,Neuchatel,NE,CH,CHF,employed,single,42064.69,7544.05,1297.73,2025-01-01,true
+P00273,Lea,68,St Gallen,SG,CH,CHF,retired,shared_housing,39045.91,4571.62,768.79,2025-01-01,true
+P00274,Ines,59,Lugano,TI,CH,CHF,employed,couple,117765.56,10000.29,2521.04,2025-01-01,true
+P00275,Elena,34,Geneva,GE,CH,CHF,self_employed,shared_housing,36034.76,9401.27,1676.19,2025-01-01,true
+P00276,Timo,60,Bern,BE,CH,CHF,employed,single,41620.4,7949.05,1589.91,2025-01-01,true
+P00277,Yara,72,Lucerne,LU,CH,CHF,retired,couple,15380.45,2838.1,2296.26,2025-01-01,true
+P00278,Nora,60,Fribourg,FR,CH,CHF,employed,single,24654.12,5822.73,1811.75,2025-01-01,true
+P00279,Leo,53,Lausanne,VD,CH,CHF,part_time,single,72630.91,3362.26,1503.0,2025-01-01,true
+P00280,Nina,72,Biel,BE,CH,CHF,retired,couple,114098.15,3198.1,2383.1,2025-01-01,true
+P00281,David,42,Fribourg,FR,CH,CHF,employed,shared_housing,35970.29,6522.06,1132.28,2025-01-01,true
+P00282,Nina,64,Lucerne,LU,CH,CHF,employed,single,7207.91,6712.26,2123.09,2025-01-01,true
+P00283,Alexia,69,Bern,BE,CH,CHF,retired,shared_housing,53357.9,3919.93,955.79,2025-01-01,true
+P00284,Sofia,76,Lausanne,VD,CH,CHF,retired,family,143260.95,4798.76,3343.45,2025-01-01,true
+P00285,Milo,32,Lucerne,LU,CH,CHF,employed,single,29304.11,9532.99,1880.0,2025-01-01,true
+P00286,Noah,35,Neuchatel,NE,CH,CHF,employed,single,35877.38,8064.39,1873.81,2025-01-01,true
+P00287,Clara,40,Lugano,TI,CH,CHF,employed,single,11709.31,7882.22,1940.64,2025-01-01,true
+P00288,David,26,Lausanne,VD,CH,CHF,employed,single,5866.98,8223.82,1260.52,2025-01-01,true
+P00289,Elena,37,Winterthur,ZH,CH,CHF,employed,couple,91357.06,4771.01,2969.99,2025-01-01,true
+P00290,Jonas,37,Biel,BE,CH,CHF,employed,single,19789.38,8201.3,1921.28,2025-01-01,true
+P00291,Gabriel,67,Geneva,GE,CH,CHF,retired,couple,22958.33,4790.05,1967.35,2025-01-01,true
+P00292,David,53,Geneva,GE,CH,CHF,employed,single,81614.17,8487.07,2497.51,2025-01-01,true
+P00293,Luca,71,Neuchatel,NE,CH,CHF,retired,single,146709.78,4073.44,1579.56,2025-01-01,true
+P00294,Alexia,57,Lausanne,VD,CH,CHF,employed,couple,7890.43,7231.93,3310.32,2025-01-01,true
+P00295,Timo,52,Lausanne,VD,CH,CHF,employed,couple,82497.96,5181.31,2491.29,2025-01-01,true
+P00296,Nina,60,Lausanne,VD,CH,CHF,employed,couple,62943.16,8711.98,2741.57,2025-01-01,true
+P00297,Luca,18,St Gallen,SG,CH,CHF,employed,shared_housing,43030.48,8837.56,1035.64,2025-01-01,true
+P00298,Nina,33,Neuchatel,NE,CH,CHF,employed,family,39194.11,11291.3,2135.13,2025-01-01,true
+P00299,Sofia,31,Bern,BE,CH,CHF,employed,couple,38956.71,8349.86,2484.61,2025-01-01,true
+P00300,Timo,47,Lausanne,VD,CH,CHF,employed,shared_housing,148868.55,7576.8,1115.84,2025-01-01,true
