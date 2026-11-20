@@ -1,1 +1,8 @@
 
+profile_id,name,age,city,country,employment_status,household_type,currency,initial_savings,monthly_net_income,monthly_expenses,financial_goal
+P001,Alexia,20,Lausanne,Switzerland,Student,Single,CHF,8000,1200,1800,Education and career planning
+P002,Noah,26,Zurich,Switzerland,Employed,Single,CHF,18000,5200,3500,Home purchase
+P003,Maya,33,Geneva,Switzerland,Employed,Couple,CHF,42000,7800,5600,Family financial planning
+P004,Leo,42,Bern,Switzerland,Self-employed,Family,CHF,65000,9200,7100,Financial resilience
+P005,Nina,58,Basel,Switzerland,Employed,Single,CHF,125000,6800,4900,Retirement planning
+
