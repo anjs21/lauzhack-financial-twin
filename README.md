@@ -47,9 +47,6 @@ There is **no prescribed programming language, AI framework, model, interface, o
 
 | Location | Purpose |
 |---|---|
-| [`CHALLENGE.md`](CHALLENGE.md) | Full challenge statement and intended outcomes |
-| [`RULES.md`](RULES.md) | Challenge-specific participation and responsible-use guidance; official event rules take precedence |
-| [`NOTICE.md`](NOTICE.md) | Authorship, attribution, and rights notices |
 | [`docs/`](docs/) | Digital-twin foundations, financial mathematics, scenario modelling, and technical approaches |
 | [`examples/`](examples/) | Sample questions, interactions, experiences, and output structures |
 | [`data/`](data/) | Fictional profiles, synthetic financial records, and scenario inputs |
