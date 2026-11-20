@@ -1,0 +1,1501 @@
+goal_id,profile_id,goal_name,target_amount_chf,target_date,priority,currency
+G-P00001-01,P00001,Emergency savings,12800.0,2029-12-31,high,CHF
+G-P00001-02,P00001,Career transition,39365.95,2032-12-31,medium,CHF
+G-P00002-01,P00002,Long-term financial resilience,77740.05,2029-12-31,high,CHF
+G-P00003-01,P00003,Long-term financial resilience,230340.08,2029-12-31,high,CHF
+G-P00004-01,P00004,Emergency savings,66891.2,2029-12-31,high,CHF
+G-P00005-01,P00005,Long-term financial resilience,234680.14,2029-12-31,high,CHF
+G-P00005-02,P00005,Career transition,45477.02,2032-12-31,medium,CHF
+G-P00006-01,P00006,Long-term financial resilience,235237.9,2029-12-31,high,CHF
+G-P00007-01,P00007,Long-term financial resilience,165225.31,2029-12-31,high,CHF
+G-P00008-01,P00008,Long-term financial resilience,126482.29,2029-12-31,high,CHF
+G-P00009-01,P00009,Long-term financial resilience,182193.18,2029-12-31,high,CHF
+G-P00009-02,P00009,Career transition,102127.6,2032-12-31,medium,CHF
+G-P00010-01,P00010,Long-term financial resilience,171317.81,2029-12-31,high,CHF
+G-P00011-01,P00011,Long-term financial resilience,68507.33,2029-12-31,high,CHF
+G-P00012-01,P00012,Long-term financial resilience,185345.73,2029-12-31,high,CHF
+G-P00013-01,P00013,Long-term financial resilience,13023.66,2029-12-31,high,CHF
+G-P00013-02,P00013,Housing deposit,65069.94,2032-12-31,medium,CHF
+G-P00014-01,P00014,Emergency savings,65960.66,2029-12-31,high,CHF
+G-P00015-01,P00015,Long-term financial resilience,82683.54,2029-12-31,high,CHF
+G-P00016-01,P00016,Emergency savings,188424.88,2029-12-31,high,CHF
+G-P00017-01,P00017,Emergency savings,39819.82,2029-12-31,high,CHF
+G-P00017-02,P00017,Career transition,26656.29,2032-12-31,medium,CHF
+G-P00018-01,P00018,Emergency savings,233582.18,2029-12-31,high,CHF
+G-P00019-01,P00019,Long-term financial resilience,236451.78,2029-12-31,high,CHF
+G-P00020-01,P00020,Emergency savings,79321.26,2029-12-31,high,CHF
+G-P00021-01,P00021,Long-term financial resilience,125059.52,2029-12-31,high,CHF
+G-P00021-02,P00021,Retirement reserve,86503.25,2032-12-31,medium,CHF
+G-P00022-01,P00022,Long-term financial resilience,209039.68,2029-12-31,high,CHF
+G-P00023-01,P00023,Long-term financial resilience,189575.14,2029-12-31,high,CHF
+G-P00024-01,P00024,Emergency savings,234656.64,2029-12-31,high,CHF
+G-P00025-01,P00025,Emergency savings,201404.58,2029-12-31,high,CHF
+G-P00025-02,P00025,Career transition,99890.72,2032-12-31,medium,CHF
+G-P00026-01,P00026,Long-term financial resilience,229349.79,2029-12-31,high,CHF
+G-P00027-01,P00027,Long-term financial resilience,78143.7,2029-12-31,high,CHF
+G-P00028-01,P00028,Long-term financial resilience,161520.34,2029-12-31,high,CHF
+G-P00029-01,P00029,Long-term financial resilience,135508.06,2029-12-31,high,CHF
+G-P00029-02,P00029,Housing deposit,102582.71,2032-12-31,medium,CHF
+G-P00030-01,P00030,Long-term financial resilience,150974.22,2029-12-31,high,CHF
+G-P00031-01,P00031,Emergency savings,70306.35,2029-12-31,high,CHF
+G-P00032-01,P00032,Emergency savings,107271.15,2029-12-31,high,CHF
+G-P00033-01,P00033,Emergency savings,24444.45,2029-12-31,high,CHF
+G-P00033-02,P00033,Career transition,90205.74,2032-12-31,medium,CHF
+G-P00034-01,P00034,Long-term financial resilience,105509.87,2029-12-31,high,CHF
+G-P00035-01,P00035,Emergency savings,59652.75,2029-12-31,high,CHF
+G-P00036-01,P00036,Long-term financial resilience,49041.15,2029-12-31,high,CHF
+G-P00037-01,P00037,Long-term financial resilience,191877.94,2029-12-31,high,CHF
+G-P00037-02,P00037,Housing deposit,65678.04,2032-12-31,medium,CHF
+G-P00038-01,P00038,Emergency savings,82668.46,2029-12-31,high,CHF
+G-P00039-01,P00039,Emergency savings,20809.87,2029-12-31,high,CHF
+G-P00040-01,P00040,Long-term financial resilience,33751.73,2029-12-31,high,CHF
+G-P00041-01,P00041,Long-term financial resilience,137832.64,2029-12-31,high,CHF
+G-P00041-02,P00041,Housing deposit,94194.59,2032-12-31,medium,CHF
+G-P00042-01,P00042,Emergency savings,83863.14,2029-12-31,high,CHF
+G-P00043-01,P00043,Emergency savings,219091.78,2029-12-31,high,CHF
+G-P00044-01,P00044,Long-term financial resilience,22414.54,2029-12-31,high,CHF
+G-P00045-01,P00045,Emergency savings,38985.04,2029-12-31,high,CHF
+G-P00045-02,P00045,Retirement reserve,36836.29,2032-12-31,medium,CHF
+G-P00046-01,P00046,Long-term financial resilience,126803.5,2029-12-31,high,CHF
+G-P00047-01,P00047,Long-term financial resilience,180367.47,2029-12-31,high,CHF
+G-P00048-01,P00048,Long-term financial resilience,147825.57,2029-12-31,high,CHF
+G-P00049-01,P00049,Long-term financial resilience,208667.38,2029-12-31,high,CHF
+G-P00049-02,P00049,Housing deposit,56617.28,2032-12-31,medium,CHF
+G-P00050-01,P00050,Long-term financial resilience,31234.64,2029-12-31,high,CHF
+G-P00051-01,P00051,Long-term financial resilience,84047.49,2029-12-31,high,CHF
+G-P00052-01,P00052,Emergency savings,160816.43,2029-12-31,high,CHF
+G-P00053-01,P00053,Long-term financial resilience,92150.61,2029-12-31,high,CHF
+G-P00053-02,P00053,Education flexibility,67277.53,2032-12-31,medium,CHF
+G-P00054-01,P00054,Long-term financial resilience,101910.13,2029-12-31,high,CHF
+G-P00055-01,P00055,Emergency savings,28301.94,2029-12-31,high,CHF
+G-P00056-01,P00056,Long-term financial resilience,44164.21,2029-12-31,high,CHF
+G-P00057-01,P00057,Long-term financial resilience,39424.77,2029-12-31,high,CHF
+G-P00057-02,P00057,Housing deposit,21326.93,2032-12-31,medium,CHF
+G-P00058-01,P00058,Emergency savings,85484.62,2029-12-31,high,CHF
+G-P00059-01,P00059,Long-term financial resilience,209673.38,2029-12-31,high,CHF
+G-P00060-01,P00060,Long-term financial resilience,82934.16,2029-12-31,high,CHF
+G-P00061-01,P00061,Emergency savings,82387.82,2029-12-31,high,CHF
+G-P00061-02,P00061,Housing deposit,75771.19,2032-12-31,medium,CHF
+G-P00062-01,P00062,Long-term financial resilience,224372.56,2029-12-31,high,CHF
+G-P00063-01,P00063,Long-term financial resilience,101972.5,2029-12-31,high,CHF
+G-P00064-01,P00064,Long-term financial resilience,145362.56,2029-12-31,high,CHF
+G-P00065-01,P00065,Long-term financial resilience,70779.18,2029-12-31,high,CHF
+G-P00065-02,P00065,Housing deposit,99187.99,2032-12-31,medium,CHF
+G-P00066-01,P00066,Long-term financial resilience,65977.94,2029-12-31,high,CHF
+G-P00067-01,P00067,Emergency savings,36248.58,2029-12-31,high,CHF
+G-P00068-01,P00068,Emergency savings,81095.07,2029-12-31,high,CHF
+G-P00069-01,P00069,Long-term financial resilience,37730.37,2029-12-31,high,CHF
+G-P00069-02,P00069,Housing deposit,75645.72,2032-12-31,medium,CHF
+G-P00070-01,P00070,Long-term financial resilience,41103.86,2029-12-31,high,CHF
+G-P00071-01,P00071,Emergency savings,26393.92,2029-12-31,high,CHF
+G-P00072-01,P00072,Emergency savings,79152.61,2029-12-31,high,CHF
+G-P00073-01,P00073,Long-term financial resilience,179066.26,2029-12-31,high,CHF
+G-P00073-02,P00073,Education flexibility,66173.99,2032-12-31,medium,CHF
+G-P00074-01,P00074,Long-term financial resilience,77381.68,2029-12-31,high,CHF
+G-P00075-01,P00075,Long-term financial resilience,217548.22,2029-12-31,high,CHF
+G-P00076-01,P00076,Emergency savings,233344.5,2029-12-31,high,CHF
+G-P00077-01,P00077,Emergency savings,35375.01,2029-12-31,high,CHF
+G-P00077-02,P00077,Career transition,96189.45,2032-12-31,medium,CHF
+G-P00078-01,P00078,Long-term financial resilience,11514.74,2029-12-31,high,CHF
+G-P00079-01,P00079,Emergency savings,57804.38,2029-12-31,high,CHF
+G-P00080-01,P00080,Long-term financial resilience,138974.9,2029-12-31,high,CHF
+G-P00081-01,P00081,Emergency savings,40457.09,2029-12-31,high,CHF
+G-P00081-02,P00081,Housing deposit,25120.0,2032-12-31,medium,CHF
+G-P00082-01,P00082,Emergency savings,71244.08,2029-12-31,high,CHF
+G-P00083-01,P00083,Emergency savings,22612.66,2029-12-31,high,CHF
+G-P00084-01,P00084,Long-term financial resilience,195227.04,2029-12-31,high,CHF
+G-P00085-01,P00085,Long-term financial resilience,157752.75,2029-12-31,high,CHF
+G-P00085-02,P00085,Housing deposit,75858.47,2032-12-31,medium,CHF
+G-P00086-01,P00086,Emergency savings,73809.39,2029-12-31,high,CHF
+G-P00087-01,P00087,Emergency savings,87536.58,2029-12-31,high,CHF
+G-P00088-01,P00088,Long-term financial resilience,215689.97,2029-12-31,high,CHF
+G-P00089-01,P00089,Long-term financial resilience,159093.81,2029-12-31,high,CHF
+G-P00089-02,P00089,Housing deposit,30780.8,2032-12-31,medium,CHF
+G-P00090-01,P00090,Emergency savings,50059.33,2029-12-31,high,CHF
+G-P00091-01,P00091,Long-term financial resilience,211286.53,2029-12-31,high,CHF
+G-P00092-01,P00092,Long-term financial resilience,215580.62,2029-12-31,high,CHF
+G-P00093-01,P00093,Long-term financial resilience,135508.27,2029-12-31,high,CHF
+G-P00093-02,P00093,Career transition,109475.27,2032-12-31,medium,CHF
+G-P00094-01,P00094,Long-term financial resilience,195261.55,2029-12-31,high,CHF
+G-P00095-01,P00095,Long-term financial resilience,117819.01,2029-12-31,high,CHF
+G-P00096-01,P00096,Emergency savings,50251.46,2029-12-31,high,CHF
+G-P00097-01,P00097,Long-term financial resilience,208847.6,2029-12-31,high,CHF
+G-P00097-02,P00097,Education flexibility,72735.0,2032-12-31,medium,CHF
+G-P00098-01,P00098,Emergency savings,224507.06,2029-12-31,high,CHF
+G-P00099-01,P00099,Long-term financial resilience,164279.42,2029-12-31,high,CHF
+G-P00100-01,P00100,Long-term financial resilience,118194.94,2029-12-31,high,CHF
+G-P00101-01,P00101,Emergency savings,188005.65,2029-12-31,high,CHF
+G-P00101-02,P00101,Education flexibility,28677.45,2032-12-31,medium,CHF
+G-P00102-01,P00102,Long-term financial resilience,125923.04,2029-12-31,high,CHF
+G-P00103-01,P00103,Long-term financial resilience,11313.95,2029-12-31,high,CHF
+G-P00104-01,P00104,Long-term financial resilience,202990.1,2029-12-31,high,CHF
+G-P00105-01,P00105,Emergency savings,87005.07,2029-12-31,high,CHF
+G-P00105-02,P00105,Career transition,74604.62,2032-12-31,medium,CHF
+G-P00106-01,P00106,Long-term financial resilience,217330.35,2029-12-31,high,CHF
+G-P00107-01,P00107,Long-term financial resilience,169100.5,2029-12-31,high,CHF
+G-P00108-01,P00108,Emergency savings,36645.38,2029-12-31,high,CHF
+G-P00109-01,P00109,Emergency savings,64494.06,2029-12-31,high,CHF
+G-P00109-02,P00109,Career transition,69637.49,2032-12-31,medium,CHF
+G-P00110-01,P00110,Emergency savings,151517.7,2029-12-31,high,CHF
+G-P00111-01,P00111,Long-term financial resilience,151936.42,2029-12-31,high,CHF
+G-P00112-01,P00112,Long-term financial resilience,202250.22,2029-12-31,high,CHF
+G-P00113-01,P00113,Long-term financial resilience,67598.64,2029-12-31,high,CHF
+G-P00113-02,P00113,Housing deposit,51274.75,2032-12-31,medium,CHF
+G-P00114-01,P00114,Emergency savings,44305.7,2029-12-31,high,CHF
+G-P00115-01,P00115,Long-term financial resilience,51987.68,2029-12-31,high,CHF
+G-P00116-01,P00116,Emergency savings,84141.46,2029-12-31,high,CHF
+G-P00117-01,P00117,Long-term financial resilience,196842.61,2029-12-31,high,CHF
+G-P00117-02,P00117,Education flexibility,104785.48,2032-12-31,medium,CHF
+G-P00118-01,P00118,Emergency savings,54310.78,2029-12-31,high,CHF
+G-P00119-01,P00119,Emergency savings,77957.41,2029-12-31,high,CHF
+G-P00120-01,P00120,Long-term financial resilience,66934.21,2029-12-31,high,CHF
+G-P00121-01,P00121,Long-term financial resilience,167085.46,2029-12-31,high,CHF
+G-P00121-02,P00121,Housing deposit,12577.32,2032-12-31,medium,CHF
+G-P00122-01,P00122,Emergency savings,10000,2029-12-31,high,CHF
+G-P00123-01,P00123,Long-term financial resilience,66044.86,2029-12-31,high,CHF
+G-P00124-01,P00124,Long-term financial resilience,223228.88,2029-12-31,high,CHF
+G-P00125-01,P00125,Emergency savings,76763.02,2029-12-31,high,CHF
+G-P00125-02,P00125,Career transition,85933.6,2032-12-31,medium,CHF
+G-P00126-01,P00126,Emergency savings,25710.66,2029-12-31,high,CHF
+G-P00127-01,P00127,Emergency savings,152478.66,2029-12-31,high,CHF
+G-P00128-01,P00128,Long-term financial resilience,123500.46,2029-12-31,high,CHF
+G-P00129-01,P00129,Emergency savings,84235.39,2029-12-31,high,CHF
+G-P00129-02,P00129,Education flexibility,71656.24,2032-12-31,medium,CHF
+G-P00130-01,P00130,Long-term financial resilience,192136.53,2029-12-31,high,CHF
+G-P00131-01,P00131,Emergency savings,79760.03,2029-12-31,high,CHF
+G-P00132-01,P00132,Long-term financial resilience,89559.81,2029-12-31,high,CHF
+G-P00133-01,P00133,Long-term financial resilience,161577.98,2029-12-31,high,CHF
+G-P00133-02,P00133,Housing deposit,88125.95,2032-12-31,medium,CHF
+G-P00134-01,P00134,Long-term financial resilience,182853.63,2029-12-31,high,CHF
+G-P00135-01,P00135,Long-term financial resilience,222601.73,2029-12-31,high,CHF
+G-P00136-01,P00136,Long-term financial resilience,195213.98,2029-12-31,high,CHF
+G-P00137-01,P00137,Emergency savings,48266.82,2029-12-31,high,CHF
+G-P00137-02,P00137,Retirement reserve,101859.17,2032-12-31,medium,CHF
+G-P00138-01,P00138,Emergency savings,51053.54,2029-12-31,high,CHF
+G-P00139-01,P00139,Emergency savings,110553.33,2029-12-31,high,CHF
+G-P00140-01,P00140,Emergency savings,63866.3,2029-12-31,high,CHF
+G-P00141-01,P00141,Long-term financial resilience,214316.05,2029-12-31,high,CHF
+G-P00141-02,P00141,Career transition,92510.36,2032-12-31,medium,CHF
+G-P00142-01,P00142,Emergency savings,234249.78,2029-12-31,high,CHF
+G-P00143-01,P00143,Long-term financial resilience,26987.58,2029-12-31,high,CHF
+G-P00144-01,P00144,Long-term financial resilience,181919.81,2029-12-31,high,CHF
+G-P00145-01,P00145,Emergency savings,85221.79,2029-12-31,high,CHF
+G-P00145-02,P00145,Housing deposit,43849.24,2032-12-31,medium,CHF
+G-P00146-01,P00146,Long-term financial resilience,149246.83,2029-12-31,high,CHF
+G-P00147-01,P00147,Long-term financial resilience,112706.69,2029-12-31,high,CHF
+G-P00148-01,P00148,Emergency savings,41241.41,2029-12-31,high,CHF
+G-P00149-01,P00149,Long-term financial resilience,22534.5,2029-12-31,high,CHF
+G-P00149-02,P00149,Education flexibility,23961.57,2032-12-31,medium,CHF
+G-P00150-01,P00150,Long-term financial resilience,201724.7,2029-12-31,high,CHF
+G-P00151-01,P00151,Emergency savings,68463.04,2029-12-31,high,CHF
+G-P00152-01,P00152,Emergency savings,22854.34,2029-12-31,high,CHF
+G-P00153-01,P00153,Long-term financial resilience,219617.15,2029-12-31,high,CHF
+G-P00153-02,P00153,Housing deposit,52314.51,2032-12-31,medium,CHF
+G-P00154-01,P00154,Long-term financial resilience,229342.69,2029-12-31,high,CHF
+G-P00155-01,P00155,Emergency savings,63828.29,2029-12-31,high,CHF
+G-P00156-01,P00156,Long-term financial resilience,104125.62,2029-12-31,high,CHF
+G-P00157-01,P00157,Long-term financial resilience,195795.71,2029-12-31,high,CHF
+G-P00157-02,P00157,Career transition,94992.92,2032-12-31,medium,CHF
+G-P00158-01,P00158,Long-term financial resilience,61244.93,2029-12-31,high,CHF
+G-P00159-01,P00159,Long-term financial resilience,82738.48,2029-12-31,high,CHF
+G-P00160-01,P00160,Long-term financial resilience,53670.21,2029-12-31,high,CHF
+G-P00161-01,P00161,Emergency savings,73808.99,2029-12-31,high,CHF
+G-P00161-02,P00161,Education flexibility,109675.72,2032-12-31,medium,CHF
+G-P00162-01,P00162,Long-term financial resilience,197070.38,2029-12-31,high,CHF
+G-P00163-01,P00163,Long-term financial resilience,186290.75,2029-12-31,high,CHF
+G-P00164-01,P00164,Long-term financial resilience,82069.63,2029-12-31,high,CHF
+G-P00165-01,P00165,Long-term financial resilience,234367.7,2029-12-31,high,CHF
+G-P00165-02,P00165,Housing deposit,24688.54,2032-12-31,medium,CHF
+G-P00166-01,P00166,Long-term financial resilience,113618.59,2029-12-31,high,CHF
+G-P00167-01,P00167,Long-term financial resilience,129586.05,2029-12-31,high,CHF
+G-P00168-01,P00168,Emergency savings,66325.3,2029-12-31,high,CHF
+G-P00169-01,P00169,Long-term financial resilience,89847.25,2029-12-31,high,CHF
+G-P00169-02,P00169,Career transition,54609.74,2032-12-31,medium,CHF
+G-P00170-01,P00170,Long-term financial resilience,56762.7,2029-12-31,high,CHF
+G-P00171-01,P00171,Emergency savings,43737.41,2029-12-31,high,CHF
+G-P00172-01,P00172,Long-term financial resilience,203656.32,2029-12-31,high,CHF
+G-P00173-01,P00173,Long-term financial resilience,112086.72,2029-12-31,high,CHF
+G-P00173-02,P00173,Education flexibility,36025.67,2032-12-31,medium,CHF
+G-P00174-01,P00174,Long-term financial resilience,176023.2,2029-12-31,high,CHF
+G-P00175-01,P00175,Long-term financial resilience,105027.78,2029-12-31,high,CHF
+G-P00176-01,P00176,Emergency savings,38872.64,2029-12-31,high,CHF
+G-P00177-01,P00177,Long-term financial resilience,178828.37,2029-12-31,high,CHF
+G-P00177-02,P00177,Career transition,54342.52,2032-12-31,medium,CHF
+G-P00178-01,P00178,Long-term financial resilience,39160.34,2029-12-31,high,CHF
+G-P00179-01,P00179,Long-term financial resilience,92019.98,2029-12-31,high,CHF
+G-P00180-01,P00180,Long-term financial resilience,178401.97,2029-12-31,high,CHF
+G-P00181-01,P00181,Emergency savings,85081.71,2029-12-31,high,CHF
+G-P00181-02,P00181,Retirement reserve,67977.13,2032-12-31,medium,CHF
+G-P00182-01,P00182,Long-term financial resilience,16134.08,2029-12-31,high,CHF
+G-P00183-01,P00183,Long-term financial resilience,181156.11,2029-12-31,high,CHF
+G-P00184-01,P00184,Long-term financial resilience,82685.42,2029-12-31,high,CHF
+G-P00185-01,P00185,Emergency savings,56265.52,2029-12-31,high,CHF
+G-P00185-02,P00185,Housing deposit,102147.77,2032-12-31,medium,CHF
+G-P00186-01,P00186,Long-term financial resilience,80972.94,2029-12-31,high,CHF
+G-P00187-01,P00187,Emergency savings,124608.4,2029-12-31,high,CHF
+G-P00188-01,P00188,Emergency savings,37788.86,2029-12-31,high,CHF
+G-P00189-01,P00189,Long-term financial resilience,63092.08,2029-12-31,high,CHF
+G-P00189-02,P00189,Retirement reserve,102576.89,2032-12-31,medium,CHF
+G-P00190-01,P00190,Long-term financial resilience,66237.23,2029-12-31,high,CHF
+G-P00191-01,P00191,Emergency savings,190010.05,2029-12-31,high,CHF
+G-P00192-01,P00192,Long-term financial resilience,197753.97,2029-12-31,high,CHF
+G-P00193-01,P00193,Long-term financial resilience,32894.53,2029-12-31,high,CHF
+G-P00193-02,P00193,Housing deposit,52934.3,2032-12-31,medium,CHF
+G-P00194-01,P00194,Long-term financial resilience,44531.95,2029-12-31,high,CHF
+G-P00195-01,P00195,Emergency savings,71907.55,2029-12-31,high,CHF
+G-P00196-01,P00196,Emergency savings,237452.53,2029-12-31,high,CHF
+G-P00197-01,P00197,Emergency savings,35369.92,2029-12-31,high,CHF
+G-P00197-02,P00197,Career transition,80109.01,2032-12-31,medium,CHF
+G-P00198-01,P00198,Long-term financial resilience,118665.5,2029-12-31,high,CHF
+G-P00199-01,P00199,Long-term financial resilience,179396.69,2029-12-31,high,CHF
+G-P00200-01,P00200,Long-term financial resilience,179203.63,2029-12-31,high,CHF
+G-P00201-01,P00201,Long-term financial resilience,93021.68,2029-12-31,high,CHF
+G-P00201-02,P00201,Retirement reserve,19496.44,2032-12-31,medium,CHF
+G-P00202-01,P00202,Emergency savings,46290.59,2029-12-31,high,CHF
+G-P00203-01,P00203,Emergency savings,37042.32,2029-12-31,high,CHF
+G-P00204-01,P00204,Emergency savings,52040.02,2029-12-31,high,CHF
+G-P00205-01,P00205,Long-term financial resilience,189374.69,2029-12-31,high,CHF
+G-P00205-02,P00205,Education flexibility,59211.82,2032-12-31,medium,CHF
+G-P00206-01,P00206,Long-term financial resilience,44788.43,2029-12-31,high,CHF
+G-P00207-01,P00207,Emergency savings,31813.89,2029-12-31,high,CHF
+G-P00208-01,P00208,Emergency savings,69626.69,2029-12-31,high,CHF
+G-P00209-01,P00209,Long-term financial resilience,89681.97,2029-12-31,high,CHF
+G-P00209-02,P00209,Retirement reserve,19769.65,2032-12-31,medium,CHF
+G-P00210-01,P00210,Emergency savings,71084.1,2029-12-31,high,CHF
+G-P00211-01,P00211,Emergency savings,10000,2029-12-31,high,CHF
+G-P00212-01,P00212,Long-term financial resilience,171064.11,2029-12-31,high,CHF
+G-P00213-01,P00213,Long-term financial resilience,179649.09,2029-12-31,high,CHF
+G-P00213-02,P00213,Education flexibility,109925.04,2032-12-31,medium,CHF
+G-P00214-01,P00214,Long-term financial resilience,159938.54,2029-12-31,high,CHF
+G-P00215-01,P00215,Emergency savings,78414.02,2029-12-31,high,CHF
+G-P00216-01,P00216,Long-term financial resilience,58389.97,2029-12-31,high,CHF
+G-P00217-01,P00217,Long-term financial resilience,148574.94,2029-12-31,high,CHF
+G-P00217-02,P00217,Housing deposit,70267.52,2032-12-31,medium,CHF
+G-P00218-01,P00218,Long-term financial resilience,221466.51,2029-12-31,high,CHF
+G-P00219-01,P00219,Long-term financial resilience,68200.83,2029-12-31,high,CHF
+G-P00220-01,P00220,Emergency savings,79771.86,2029-12-31,high,CHF
+G-P00221-01,P00221,Long-term financial resilience,208569.86,2029-12-31,high,CHF
+G-P00221-02,P00221,Housing deposit,91111.41,2032-12-31,medium,CHF
+G-P00222-01,P00222,Long-term financial resilience,140758.1,2029-12-31,high,CHF
+G-P00223-01,P00223,Long-term financial resilience,48359.5,2029-12-31,high,CHF
+G-P00224-01,P00224,Long-term financial resilience,231489.76,2029-12-31,high,CHF
+G-P00225-01,P00225,Emergency savings,84743.41,2029-12-31,high,CHF
+G-P00225-02,P00225,Retirement reserve,57656.9,2032-12-31,medium,CHF
+G-P00226-01,P00226,Emergency savings,53741.22,2029-12-31,high,CHF
+G-P00227-01,P00227,Long-term financial resilience,132679.73,2029-12-31,high,CHF
+G-P00228-01,P00228,Long-term financial resilience,37672.45,2029-12-31,high,CHF
+G-P00229-01,P00229,Long-term financial resilience,235051.86,2029-12-31,high,CHF
+G-P00229-02,P00229,Retirement reserve,102387.22,2032-12-31,medium,CHF
+G-P00230-01,P00230,Emergency savings,22925.34,2029-12-31,high,CHF
+G-P00231-01,P00231,Long-term financial resilience,107387.46,2029-12-31,high,CHF
+G-P00232-01,P00232,Long-term financial resilience,21637.66,2029-12-31,high,CHF
+G-P00233-01,P00233,Long-term financial resilience,117264.5,2029-12-31,high,CHF
+G-P00233-02,P00233,Career transition,12274.66,2032-12-31,medium,CHF
+G-P00234-01,P00234,Emergency savings,29448.56,2029-12-31,high,CHF
+G-P00235-01,P00235,Emergency savings,10000,2029-12-31,high,CHF
+G-P00236-01,P00236,Long-term financial resilience,153496.91,2029-12-31,high,CHF
+G-P00237-01,P00237,Long-term financial resilience,113471.44,2029-12-31,high,CHF
+G-P00237-02,P00237,Education flexibility,61538.84,2032-12-31,medium,CHF
+G-P00238-01,P00238,Emergency savings,44631.63,2029-12-31,high,CHF
+G-P00239-01,P00239,Long-term financial resilience,92023.55,2029-12-31,high,CHF
+G-P00240-01,P00240,Long-term financial resilience,37840.85,2029-12-31,high,CHF
+G-P00241-01,P00241,Long-term financial resilience,34709.36,2029-12-31,high,CHF
+G-P00241-02,P00241,Career transition,82900.99,2032-12-31,medium,CHF
+G-P00242-01,P00242,Long-term financial resilience,35062.8,2029-12-31,high,CHF
+G-P00243-01,P00243,Long-term financial resilience,10938.85,2029-12-31,high,CHF
+G-P00244-01,P00244,Long-term financial resilience,83061.5,2029-12-31,high,CHF
+G-P00245-01,P00245,Long-term financial resilience,192535.92,2029-12-31,high,CHF
+G-P00245-02,P00245,Housing deposit,80311.55,2032-12-31,medium,CHF
+G-P00246-01,P00246,Emergency savings,34765.81,2029-12-31,high,CHF
+G-P00247-01,P00247,Emergency savings,32465.49,2029-12-31,high,CHF
+G-P00248-01,P00248,Long-term financial resilience,102424.99,2029-12-31,high,CHF
+G-P00249-01,P00249,Long-term financial resilience,135192.7,2029-12-31,high,CHF
+G-P00249-02,P00249,Housing deposit,26882.78,2032-12-31,medium,CHF
+G-P00250-01,P00250,Long-term financial resilience,225804.11,2029-12-31,high,CHF
+G-P00251-01,P00251,Long-term financial resilience,214420.86,2029-12-31,high,CHF
+G-P00252-01,P00252,Long-term financial resilience,123658.1,2029-12-31,high,CHF
+G-P00253-01,P00253,Emergency savings,10000,2029-12-31,high,CHF
+G-P00253-02,P00253,Housing deposit,22143.36,2032-12-31,medium,CHF
+G-P00254-01,P00254,Emergency savings,48747.68,2029-12-31,high,CHF
+G-P00255-01,P00255,Long-term financial resilience,17155.92,2029-12-31,high,CHF
+G-P00256-01,P00256,Emergency savings,148248.3,2029-12-31,high,CHF
+G-P00257-01,P00257,Long-term financial resilience,155582.5,2029-12-31,high,CHF
+G-P00257-02,P00257,Career transition,92659.65,2032-12-31,medium,CHF
+G-P00258-01,P00258,Long-term financial resilience,15446.05,2029-12-31,high,CHF
+G-P00259-01,P00259,Emergency savings,83879.68,2029-12-31,high,CHF
+G-P00260-01,P00260,Long-term financial resilience,195916.03,2029-12-31,high,CHF
+G-P00261-01,P00261,Emergency savings,23722.72,2029-12-31,high,CHF
+G-P00261-02,P00261,Housing deposit,89460.36,2032-12-31,medium,CHF
+G-P00262-01,P00262,Long-term financial resilience,65373.04,2029-12-31,high,CHF
+G-P00263-01,P00263,Emergency savings,18988.75,2029-12-31,high,CHF
+G-P00264-01,P00264,Long-term financial resilience,146677.94,2029-12-31,high,CHF
+G-P00265-01,P00265,Emergency savings,197394.03,2029-12-31,high,CHF
+G-P00265-02,P00265,Retirement reserve,59918.06,2032-12-31,medium,CHF
+G-P00266-01,P00266,Long-term financial resilience,75803.63,2029-12-31,high,CHF
+G-P00267-01,P00267,Long-term financial resilience,121099.86,2029-12-31,high,CHF
+G-P00268-01,P00268,Long-term financial resilience,118108.37,2029-12-31,high,CHF
+G-P00269-01,P00269,Long-term financial resilience,150060.03,2029-12-31,high,CHF
+G-P00269-02,P00269,Retirement reserve,72023.24,2032-12-31,medium,CHF
+G-P00270-01,P00270,Long-term financial resilience,146338.32,2029-12-31,high,CHF
+G-P00271-01,P00271,Long-term financial resilience,39561.14,2029-12-31,high,CHF
+G-P00272-01,P00272,Long-term financial resilience,67303.5,2029-12-31,high,CHF
+G-P00273-01,P00273,Long-term financial resilience,62473.46,2029-12-31,high,CHF
+G-P00273-02,P00273,Retirement reserve,68935.09,2032-12-31,medium,CHF
+G-P00274-01,P00274,Long-term financial resilience,188424.9,2029-12-31,high,CHF
+G-P00275-01,P00275,Emergency savings,57655.62,2029-12-31,high,CHF
+G-P00276-01,P00276,Long-term financial resilience,66592.64,2029-12-31,high,CHF
+G-P00277-01,P00277,Long-term financial resilience,24608.72,2029-12-31,high,CHF
+G-P00277-02,P00277,Housing deposit,49237.95,2032-12-31,medium,CHF
+G-P00278-01,P00278,Long-term financial resilience,39446.59,2029-12-31,high,CHF
+G-P00279-01,P00279,Long-term financial resilience,116209.46,2029-12-31,high,CHF
+G-P00280-01,P00280,Long-term financial resilience,182557.04,2029-12-31,high,CHF
+G-P00281-01,P00281,Long-term financial resilience,57552.46,2029-12-31,high,CHF
+G-P00281-02,P00281,Housing deposit,101002.04,2032-12-31,medium,CHF
+G-P00282-01,P00282,Long-term financial resilience,11532.66,2029-12-31,high,CHF
+G-P00283-01,P00283,Long-term financial resilience,85372.64,2029-12-31,high,CHF
+G-P00284-01,P00284,Long-term financial resilience,229217.52,2029-12-31,high,CHF
+G-P00285-01,P00285,Emergency savings,46886.58,2029-12-31,high,CHF
+G-P00285-02,P00285,Housing deposit,87759.4,2032-12-31,medium,CHF
+G-P00286-01,P00286,Emergency savings,57403.81,2029-12-31,high,CHF
+G-P00287-01,P00287,Long-term financial resilience,18734.9,2029-12-31,high,CHF
+G-P00288-01,P00288,Emergency savings,10000,2029-12-31,high,CHF
+G-P00289-01,P00289,Emergency savings,146171.3,2029-12-31,high,CHF
+G-P00289-02,P00289,Education flexibility,98432.16,2032-12-31,medium,CHF
+G-P00290-01,P00290,Emergency savings,31663.01,2029-12-31,high,CHF
+G-P00291-01,P00291,Long-term financial resilience,36733.33,2029-12-31,high,CHF
+G-P00292-01,P00292,Long-term financial resilience,130582.67,2029-12-31,high,CHF
+G-P00293-01,P00293,Long-term financial resilience,234735.65,2029-12-31,high,CHF
+G-P00293-02,P00293,Career transition,102388.96,2032-12-31,medium,CHF
+G-P00294-01,P00294,Long-term financial resilience,12624.69,2029-12-31,high,CHF
+G-P00295-01,P00295,Long-term financial resilience,131996.74,2029-12-31,high,CHF
+G-P00296-01,P00296,Long-term financial resilience,100709.06,2029-12-31,high,CHF
+G-P00297-01,P00297,Emergency savings,68848.77,2029-12-31,high,CHF
+G-P00297-02,P00297,Housing deposit,29977.39,2032-12-31,medium,CHF
+G-P00298-01,P00298,Emergency savings,62710.58,2029-12-31,high,CHF
+G-P00299-01,P00299,Emergency savings,62330.74,2029-12-31,high,CHF
+G-P00300-01,P00300,Long-term financial resilience,238189.68,2029-12-31,high,CHF
+G-P00301-01,P00301,Emergency savings,70154.91,2029-12-31,high,CHF
+G-P00301-02,P00301,Retirement reserve,42418.88,2032-12-31,medium,CHF
+G-P00302-01,P00302,Emergency savings,25928.91,2029-12-31,high,CHF
+G-P00303-01,P00303,Long-term financial resilience,14050.34,2029-12-31,high,CHF
+G-P00304-01,P00304,Long-term financial resilience,130230.4,2029-12-31,high,CHF
+G-P00305-01,P00305,Long-term financial resilience,72894.29,2029-12-31,high,CHF
+G-P00305-02,P00305,Education flexibility,95904.54,2032-12-31,medium,CHF
+G-P00306-01,P00306,Long-term financial resilience,80982.51,2029-12-31,high,CHF
+G-P00307-01,P00307,Long-term financial resilience,47010.51,2029-12-31,high,CHF
+G-P00308-01,P00308,Long-term financial resilience,234570.29,2029-12-31,high,CHF
+G-P00309-01,P00309,Long-term financial resilience,125528.08,2029-12-31,high,CHF
+G-P00309-02,P00309,Education flexibility,89220.47,2032-12-31,medium,CHF
+G-P00310-01,P00310,Emergency savings,76109.49,2029-12-31,high,CHF
+G-P00311-01,P00311,Long-term financial resilience,118732.7,2029-12-31,high,CHF
+G-P00312-01,P00312,Emergency savings,63180.18,2029-12-31,high,CHF
+G-P00313-01,P00313,Emergency savings,72565.31,2029-12-31,high,CHF
+G-P00313-02,P00313,Retirement reserve,26584.26,2032-12-31,medium,CHF
+G-P00314-01,P00314,Long-term financial resilience,190362.16,2029-12-31,high,CHF
+G-P00315-01,P00315,Long-term financial resilience,157420.21,2029-12-31,high,CHF
+G-P00316-01,P00316,Emergency savings,14667.39,2029-12-31,high,CHF
+G-P00317-01,P00317,Long-term financial resilience,210927.82,2029-12-31,high,CHF
+G-P00317-02,P00317,Housing deposit,21375.23,2032-12-31,medium,CHF
+G-P00318-01,P00318,Long-term financial resilience,142327.17,2029-12-31,high,CHF
+G-P00319-01,P00319,Long-term financial resilience,95927.95,2029-12-31,high,CHF
+G-P00320-01,P00320,Emergency savings,35229.81,2029-12-31,high,CHF
+G-P00321-01,P00321,Long-term financial resilience,117489.17,2029-12-31,high,CHF
+G-P00321-02,P00321,Housing deposit,70089.9,2032-12-31,medium,CHF
+G-P00322-01,P00322,Long-term financial resilience,210829.12,2029-12-31,high,CHF
+G-P00323-01,P00323,Long-term financial resilience,24061.38,2029-12-31,high,CHF
+G-P00324-01,P00324,Long-term financial resilience,226577.04,2029-12-31,high,CHF
+G-P00325-01,P00325,Long-term financial resilience,141720.3,2029-12-31,high,CHF
+G-P00325-02,P00325,Retirement reserve,104715.63,2032-12-31,medium,CHF
+G-P00326-01,P00326,Long-term financial resilience,38150.96,2029-12-31,high,CHF
+G-P00327-01,P00327,Emergency savings,44378.35,2029-12-31,high,CHF
+G-P00328-01,P00328,Long-term financial resilience,16653.76,2029-12-31,high,CHF
+G-P00329-01,P00329,Long-term financial resilience,153453.63,2029-12-31,high,CHF
+G-P00329-02,P00329,Education flexibility,13075.54,2032-12-31,medium,CHF
+G-P00330-01,P00330,Long-term financial resilience,89850.3,2029-12-31,high,CHF
+G-P00331-01,P00331,Long-term financial resilience,238809.6,2029-12-31,high,CHF
+G-P00332-01,P00332,Long-term financial resilience,225689.17,2029-12-31,high,CHF
+G-P00333-01,P00333,Long-term financial resilience,140712.5,2029-12-31,high,CHF
+G-P00333-02,P00333,Education flexibility,21617.65,2032-12-31,medium,CHF
+G-P00334-01,P00334,Emergency savings,26887.57,2029-12-31,high,CHF
+G-P00335-01,P00335,Long-term financial resilience,221452.58,2029-12-31,high,CHF
+G-P00336-01,P00336,Emergency savings,39142.05,2029-12-31,high,CHF
+G-P00337-01,P00337,Long-term financial resilience,76400.48,2029-12-31,high,CHF
+G-P00337-02,P00337,Education flexibility,63602.54,2032-12-31,medium,CHF
+G-P00338-01,P00338,Long-term financial resilience,25191.04,2029-12-31,high,CHF
+G-P00339-01,P00339,Long-term financial resilience,197353.79,2029-12-31,high,CHF
+G-P00340-01,P00340,Emergency savings,10000,2029-12-31,high,CHF
+G-P00341-01,P00341,Long-term financial resilience,150211.98,2029-12-31,high,CHF
+G-P00341-02,P00341,Career transition,91252.64,2032-12-31,medium,CHF
+G-P00342-01,P00342,Long-term financial resilience,183667.89,2029-12-31,high,CHF
+G-P00343-01,P00343,Emergency savings,156129.25,2029-12-31,high,CHF
+G-P00344-01,P00344,Long-term financial resilience,47945.7,2029-12-31,high,CHF
+G-P00345-01,P00345,Long-term financial resilience,239999.65,2029-12-31,high,CHF
+G-P00345-02,P00345,Retirement reserve,29175.62,2032-12-31,medium,CHF
+G-P00346-01,P00346,Long-term financial resilience,59873.49,2029-12-31,high,CHF
+G-P00347-01,P00347,Long-term financial resilience,232479.71,2029-12-31,high,CHF
+G-P00348-01,P00348,Long-term financial resilience,115454.7,2029-12-31,high,CHF
+G-P00349-01,P00349,Emergency savings,77714.8,2029-12-31,high,CHF
+G-P00349-02,P00349,Career transition,46950.09,2032-12-31,medium,CHF
+G-P00350-01,P00350,Emergency savings,85999.36,2029-12-31,high,CHF
+G-P00351-01,P00351,Long-term financial resilience,23023.47,2029-12-31,high,CHF
+G-P00352-01,P00352,Long-term financial resilience,209526.27,2029-12-31,high,CHF
+G-P00353-01,P00353,Long-term financial resilience,93004.93,2029-12-31,high,CHF
+G-P00353-02,P00353,Housing deposit,54526.96,2032-12-31,medium,CHF
+G-P00354-01,P00354,Long-term financial resilience,133684.78,2029-12-31,high,CHF
+G-P00355-01,P00355,Long-term financial resilience,70818.58,2029-12-31,high,CHF
+G-P00356-01,P00356,Long-term financial resilience,144820.58,2029-12-31,high,CHF
+G-P00357-01,P00357,Emergency savings,25119.73,2029-12-31,high,CHF
+G-P00357-02,P00357,Housing deposit,10228.74,2032-12-31,medium,CHF
+G-P00358-01,P00358,Long-term financial resilience,139265.54,2029-12-31,high,CHF
+G-P00359-01,P00359,Emergency savings,52476.02,2029-12-31,high,CHF
+G-P00360-01,P00360,Long-term financial resilience,172087.84,2029-12-31,high,CHF
+G-P00361-01,P00361,Long-term financial resilience,75271.63,2029-12-31,high,CHF
+G-P00361-02,P00361,Housing deposit,22413.37,2032-12-31,medium,CHF
+G-P00362-01,P00362,Long-term financial resilience,105448.94,2029-12-31,high,CHF
+G-P00363-01,P00363,Long-term financial resilience,152620.64,2029-12-31,high,CHF
+G-P00364-01,P00364,Emergency savings,173984.82,2029-12-31,high,CHF
+G-P00365-01,P00365,Long-term financial resilience,67953.71,2029-12-31,high,CHF
+G-P00365-02,P00365,Education flexibility,40485.98,2032-12-31,medium,CHF
+G-P00366-01,P00366,Emergency savings,27091.52,2029-12-31,high,CHF
+G-P00367-01,P00367,Emergency savings,137280.72,2029-12-31,high,CHF
+G-P00368-01,P00368,Emergency savings,64032.03,2029-12-31,high,CHF
+G-P00369-01,P00369,Emergency savings,40522.06,2029-12-31,high,CHF
+G-P00369-02,P00369,Retirement reserve,99082.49,2032-12-31,medium,CHF
+G-P00370-01,P00370,Emergency savings,55048.1,2029-12-31,high,CHF
+G-P00371-01,P00371,Emergency savings,38676.96,2029-12-31,high,CHF
+G-P00372-01,P00372,Long-term financial resilience,44318.34,2029-12-31,high,CHF
+G-P00373-01,P00373,Emergency savings,46562.53,2029-12-31,high,CHF
+G-P00373-02,P00373,Career transition,23590.93,2032-12-31,medium,CHF
+G-P00374-01,P00374,Long-term financial resilience,178293.5,2029-12-31,high,CHF
+G-P00375-01,P00375,Emergency savings,10000,2029-12-31,high,CHF
+G-P00376-01,P00376,Long-term financial resilience,236708.3,2029-12-31,high,CHF
+G-P00377-01,P00377,Emergency savings,77696.64,2029-12-31,high,CHF
+G-P00377-02,P00377,Retirement reserve,70871.37,2032-12-31,medium,CHF
+G-P00378-01,P00378,Long-term financial resilience,58113.82,2029-12-31,high,CHF
+G-P00379-01,P00379,Long-term financial resilience,71286.18,2029-12-31,high,CHF
+G-P00380-01,P00380,Long-term financial resilience,109261.86,2029-12-31,high,CHF
+G-P00381-01,P00381,Long-term financial resilience,134035.26,2029-12-31,high,CHF
+G-P00381-02,P00381,Housing deposit,87083.66,2032-12-31,medium,CHF
+G-P00382-01,P00382,Emergency savings,42365.41,2029-12-31,high,CHF
+G-P00383-01,P00383,Long-term financial resilience,236374.77,2029-12-31,high,CHF
+G-P00384-01,P00384,Long-term financial resilience,52506.48,2029-12-31,high,CHF
+G-P00385-01,P00385,Long-term financial resilience,42814.96,2029-12-31,high,CHF
+G-P00385-02,P00385,Education flexibility,22950.99,2032-12-31,medium,CHF
+G-P00386-01,P00386,Emergency savings,65848.94,2029-12-31,high,CHF
+G-P00387-01,P00387,Long-term financial resilience,233878.86,2029-12-31,high,CHF
+G-P00388-01,P00388,Emergency savings,135040.56,2029-12-31,high,CHF
+G-P00389-01,P00389,Long-term financial resilience,239454.22,2029-12-31,high,CHF
+G-P00389-02,P00389,Career transition,40414.1,2032-12-31,medium,CHF
+G-P00390-01,P00390,Long-term financial resilience,233380.83,2029-12-31,high,CHF
+G-P00391-01,P00391,Emergency savings,163914.98,2029-12-31,high,CHF
+G-P00392-01,P00392,Emergency savings,85861.97,2029-12-31,high,CHF
+G-P00393-01,P00393,Emergency savings,30469.12,2029-12-31,high,CHF
+G-P00393-02,P00393,Retirement reserve,94172.72,2032-12-31,medium,CHF
+G-P00394-01,P00394,Long-term financial resilience,79992.48,2029-12-31,high,CHF
+G-P00395-01,P00395,Emergency savings,32182.82,2029-12-31,high,CHF
+G-P00396-01,P00396,Long-term financial resilience,235623.71,2029-12-31,high,CHF
+G-P00397-01,P00397,Long-term financial resilience,134812.14,2029-12-31,high,CHF
+G-P00397-02,P00397,Retirement reserve,24902.34,2032-12-31,medium,CHF
+G-P00398-01,P00398,Long-term financial resilience,25614.69,2029-12-31,high,CHF
+G-P00399-01,P00399,Long-term financial resilience,209223.97,2029-12-31,high,CHF
+G-P00400-01,P00400,Emergency savings,84731.36,2029-12-31,high,CHF
+G-P00401-01,P00401,Emergency savings,77182.58,2029-12-31,high,CHF
+G-P00401-02,P00401,Retirement reserve,86863.31,2032-12-31,medium,CHF
+G-P00402-01,P00402,Emergency savings,57145.26,2029-12-31,high,CHF
+G-P00403-01,P00403,Emergency savings,37213.38,2029-12-31,high,CHF
+G-P00404-01,P00404,Long-term financial resilience,219677.71,2029-12-31,high,CHF
+G-P00405-01,P00405,Long-term financial resilience,139838.05,2029-12-31,high,CHF
+G-P00405-02,P00405,Career transition,32415.29,2032-12-31,medium,CHF
+G-P00406-01,P00406,Long-term financial resilience,239750.51,2029-12-31,high,CHF
+G-P00407-01,P00407,Long-term financial resilience,147787.2,2029-12-31,high,CHF
+G-P00408-01,P00408,Long-term financial resilience,233263.73,2029-12-31,high,CHF
+G-P00409-01,P00409,Long-term financial resilience,209387.14,2029-12-31,high,CHF
+G-P00409-02,P00409,Education flexibility,108994.88,2032-12-31,medium,CHF
+G-P00410-01,P00410,Emergency savings,23933.87,2029-12-31,high,CHF
+G-P00411-01,P00411,Long-term financial resilience,79746.98,2029-12-31,high,CHF
+G-P00412-01,P00412,Long-term financial resilience,92131.3,2029-12-31,high,CHF
+G-P00413-01,P00413,Long-term financial resilience,12046.16,2029-12-31,high,CHF
+G-P00413-02,P00413,Housing deposit,25579.11,2032-12-31,medium,CHF
+G-P00414-01,P00414,Emergency savings,10634.62,2029-12-31,high,CHF
+G-P00415-01,P00415,Emergency savings,83439.98,2029-12-31,high,CHF
+G-P00416-01,P00416,Emergency savings,150891.7,2029-12-31,high,CHF
+G-P00417-01,P00417,Emergency savings,234655.68,2029-12-31,high,CHF
+G-P00417-02,P00417,Retirement reserve,74062.47,2032-12-31,medium,CHF
+G-P00418-01,P00418,Emergency savings,10000,2029-12-31,high,CHF
+G-P00419-01,P00419,Long-term financial resilience,53257.78,2029-12-31,high,CHF
+G-P00420-01,P00420,Long-term financial resilience,96933.82,2029-12-31,high,CHF
+G-P00421-01,P00421,Emergency savings,11402.27,2029-12-31,high,CHF
+G-P00421-02,P00421,Retirement reserve,63991.29,2032-12-31,medium,CHF
+G-P00422-01,P00422,Long-term financial resilience,96199.68,2029-12-31,high,CHF
+G-P00423-01,P00423,Long-term financial resilience,198037.25,2029-12-31,high,CHF
+G-P00424-01,P00424,Long-term financial resilience,55207.38,2029-12-31,high,CHF
+G-P00425-01,P00425,Long-term financial resilience,143404.85,2029-12-31,high,CHF
+G-P00425-02,P00425,Education flexibility,85376.91,2032-12-31,medium,CHF
+G-P00426-01,P00426,Long-term financial resilience,116199.9,2029-12-31,high,CHF
+G-P00427-01,P00427,Long-term financial resilience,183391.15,2029-12-31,high,CHF
+G-P00428-01,P00428,Emergency savings,35012.43,2029-12-31,high,CHF
+G-P00429-01,P00429,Emergency savings,31685.44,2029-12-31,high,CHF
+G-P00429-02,P00429,Career transition,20657.99,2032-12-31,medium,CHF
+G-P00430-01,P00430,Emergency savings,10000,2029-12-31,high,CHF
+G-P00431-01,P00431,Emergency savings,86015.02,2029-12-31,high,CHF
+G-P00432-01,P00432,Long-term financial resilience,209358.19,2029-12-31,high,CHF
+G-P00433-01,P00433,Long-term financial resilience,159779.04,2029-12-31,high,CHF
+G-P00433-02,P00433,Education flexibility,40925.63,2032-12-31,medium,CHF
+G-P00434-01,P00434,Emergency savings,54218.64,2029-12-31,high,CHF
+G-P00435-01,P00435,Long-term financial resilience,80704.96,2029-12-31,high,CHF
+G-P00436-01,P00436,Long-term financial resilience,14486.61,2029-12-31,high,CHF
+G-P00437-01,P00437,Long-term financial resilience,47767.81,2029-12-31,high,CHF
+G-P00437-02,P00437,Education flexibility,40122.54,2032-12-31,medium,CHF
+G-P00438-01,P00438,Long-term financial resilience,37278.16,2029-12-31,high,CHF
+G-P00439-01,P00439,Emergency savings,87249.52,2029-12-31,high,CHF
+G-P00440-01,P00440,Long-term financial resilience,140706.93,2029-12-31,high,CHF
+G-P00441-01,P00441,Long-term financial resilience,219013.17,2029-12-31,high,CHF
+G-P00441-02,P00441,Retirement reserve,95012.2,2032-12-31,medium,CHF
+G-P00442-01,P00442,Long-term financial resilience,91279.41,2029-12-31,high,CHF
+G-P00443-01,P00443,Long-term financial resilience,173084.53,2029-12-31,high,CHF
+G-P00444-01,P00444,Emergency savings,80143.38,2029-12-31,high,CHF
+G-P00445-01,P00445,Long-term financial resilience,139956.99,2029-12-31,high,CHF
+G-P00445-02,P00445,Career transition,26526.91,2032-12-31,medium,CHF
+G-P00446-01,P00446,Long-term financial resilience,150998.61,2029-12-31,high,CHF
+G-P00447-01,P00447,Long-term financial resilience,181694.37,2029-12-31,high,CHF
+G-P00448-01,P00448,Long-term financial resilience,51024.69,2029-12-31,high,CHF
+G-P00449-01,P00449,Long-term financial resilience,52727.82,2029-12-31,high,CHF
+G-P00449-02,P00449,Housing deposit,58966.55,2032-12-31,medium,CHF
+G-P00450-01,P00450,Long-term financial resilience,152680.3,2029-12-31,high,CHF
+G-P00451-01,P00451,Long-term financial resilience,205657.39,2029-12-31,high,CHF
+G-P00452-01,P00452,Emergency savings,75801.47,2029-12-31,high,CHF
+G-P00453-01,P00453,Emergency savings,133867.98,2029-12-31,high,CHF
+G-P00453-02,P00453,Career transition,96659.7,2032-12-31,medium,CHF
+G-P00454-01,P00454,Emergency savings,58619.65,2029-12-31,high,CHF
+G-P00455-01,P00455,Long-term financial resilience,14741.39,2029-12-31,high,CHF
+G-P00456-01,P00456,Emergency savings,64317.84,2029-12-31,high,CHF
+G-P00457-01,P00457,Long-term financial resilience,204470.48,2029-12-31,high,CHF
+G-P00457-02,P00457,Retirement reserve,68408.25,2032-12-31,medium,CHF
+G-P00458-01,P00458,Emergency savings,40207.38,2029-12-31,high,CHF
+G-P00459-01,P00459,Emergency savings,95007.79,2029-12-31,high,CHF
+G-P00460-01,P00460,Long-term financial resilience,74350.56,2029-12-31,high,CHF
+G-P00461-01,P00461,Long-term financial resilience,10000,2029-12-31,high,CHF
+G-P00461-02,P00461,Housing deposit,93699.03,2032-12-31,medium,CHF
+G-P00462-01,P00462,Long-term financial resilience,124292.06,2029-12-31,high,CHF
+G-P00463-01,P00463,Emergency savings,21189.14,2029-12-31,high,CHF
+G-P00464-01,P00464,Long-term financial resilience,76707.55,2029-12-31,high,CHF
+G-P00465-01,P00465,Emergency savings,39921.3,2029-12-31,high,CHF
+G-P00465-02,P00465,Career transition,18499.92,2032-12-31,medium,CHF
+G-P00466-01,P00466,Emergency savings,71645.15,2029-12-31,high,CHF
+G-P00467-01,P00467,Long-term financial resilience,10189.15,2029-12-31,high,CHF
+G-P00468-01,P00468,Long-term financial resilience,164335.14,2029-12-31,high,CHF
+G-P00469-01,P00469,Long-term financial resilience,137293.14,2029-12-31,high,CHF
+G-P00469-02,P00469,Housing deposit,30887.84,2032-12-31,medium,CHF
+G-P00470-01,P00470,Long-term financial resilience,181323.76,2029-12-31,high,CHF
+G-P00471-01,P00471,Emergency savings,86764.94,2029-12-31,high,CHF
+G-P00472-01,P00472,Long-term financial resilience,40710.78,2029-12-31,high,CHF
+G-P00473-01,P00473,Long-term financial resilience,104377.84,2029-12-31,high,CHF
+G-P00473-02,P00473,Career transition,59724.88,2032-12-31,medium,CHF
+G-P00474-01,P00474,Long-term financial resilience,114298.05,2029-12-31,high,CHF
+G-P00475-01,P00475,Emergency savings,50681.04,2029-12-31,high,CHF
+G-P00476-01,P00476,Long-term financial resilience,79694.18,2029-12-31,high,CHF
+G-P00477-01,P00477,Long-term financial resilience,180252.37,2029-12-31,high,CHF
+G-P00477-02,P00477,Education flexibility,53726.36,2032-12-31,medium,CHF
+G-P00478-01,P00478,Long-term financial resilience,69924.53,2029-12-31,high,CHF
+G-P00479-01,P00479,Long-term financial resilience,38640.13,2029-12-31,high,CHF
+G-P00480-01,P00480,Long-term financial resilience,221129.66,2029-12-31,high,CHF
+G-P00481-01,P00481,Long-term financial resilience,114576.51,2029-12-31,high,CHF
+G-P00481-02,P00481,Education flexibility,19661.68,2032-12-31,medium,CHF
+G-P00482-01,P00482,Long-term financial resilience,50080.67,2029-12-31,high,CHF
+G-P00483-01,P00483,Emergency savings,63927.7,2029-12-31,high,CHF
+G-P00484-01,P00484,Emergency savings,76247.49,2029-12-31,high,CHF
+G-P00485-01,P00485,Long-term financial resilience,129376.45,2029-12-31,high,CHF
+G-P00485-02,P00485,Housing deposit,26224.05,2032-12-31,medium,CHF
+G-P00486-01,P00486,Long-term financial resilience,82856.16,2029-12-31,high,CHF
+G-P00487-01,P00487,Long-term financial resilience,15869.57,2029-12-31,high,CHF
+G-P00488-01,P00488,Emergency savings,10000,2029-12-31,high,CHF
+G-P00489-01,P00489,Emergency savings,10000,2029-12-31,high,CHF
+G-P00489-02,P00489,Housing deposit,25667.38,2032-12-31,medium,CHF
+G-P00490-01,P00490,Long-term financial resilience,195108.72,2029-12-31,high,CHF
+G-P00491-01,P00491,Emergency savings,27217.55,2029-12-31,high,CHF
+G-P00492-01,P00492,Emergency savings,48150.45,2029-12-31,high,CHF
+G-P00493-01,P00493,Long-term financial resilience,53829.47,2029-12-31,high,CHF
+G-P00493-02,P00493,Retirement reserve,33340.47,2032-12-31,medium,CHF
+G-P00494-01,P00494,Long-term financial resilience,53825.57,2029-12-31,high,CHF
+G-P00495-01,P00495,Emergency savings,47822.02,2029-12-31,high,CHF
+G-P00496-01,P00496,Long-term financial resilience,122604.08,2029-12-31,high,CHF
+G-P00497-01,P00497,Long-term financial resilience,201176.16,2029-12-31,high,CHF
+G-P00497-02,P00497,Housing deposit,34655.02,2032-12-31,medium,CHF
+G-P00498-01,P00498,Emergency savings,64078.75,2029-12-31,high,CHF
+G-P00499-01,P00499,Long-term financial resilience,45377.55,2029-12-31,high,CHF
+G-P00500-01,P00500,Long-term financial resilience,56803.04,2029-12-31,high,CHF
+G-P00501-01,P00501,Emergency savings,60702.03,2029-12-31,high,CHF
+G-P00501-02,P00501,Education flexibility,72016.12,2032-12-31,medium,CHF
+G-P00502-01,P00502,Emergency savings,41645.55,2029-12-31,high,CHF
+G-P00503-01,P00503,Emergency savings,81363.01,2029-12-31,high,CHF
+G-P00504-01,P00504,Long-term financial resilience,114277.66,2029-12-31,high,CHF
+G-P00505-01,P00505,Emergency savings,54708.43,2029-12-31,high,CHF
+G-P00505-02,P00505,Retirement reserve,44636.02,2032-12-31,medium,CHF
+G-P00506-01,P00506,Long-term financial resilience,63522.99,2029-12-31,high,CHF
+G-P00507-01,P00507,Emergency savings,87443.3,2029-12-31,high,CHF
+G-P00508-01,P00508,Long-term financial resilience,194900.4,2029-12-31,high,CHF
+G-P00509-01,P00509,Long-term financial resilience,180354.24,2029-12-31,high,CHF
+G-P00509-02,P00509,Education flexibility,55019.77,2032-12-31,medium,CHF
+G-P00510-01,P00510,Long-term financial resilience,199508.21,2029-12-31,high,CHF
+G-P00511-01,P00511,Long-term financial resilience,96610.96,2029-12-31,high,CHF
+G-P00512-01,P00512,Emergency savings,154833.95,2029-12-31,high,CHF
+G-P00513-01,P00513,Long-term financial resilience,198481.54,2029-12-31,high,CHF
+G-P00513-02,P00513,Career transition,61319.38,2032-12-31,medium,CHF
+G-P00514-01,P00514,Long-term financial resilience,85666.05,2029-12-31,high,CHF
+G-P00515-01,P00515,Long-term financial resilience,113342.46,2029-12-31,high,CHF
+G-P00516-01,P00516,Emergency savings,83692.0,2029-12-31,high,CHF
+G-P00517-01,P00517,Long-term financial resilience,91515.1,2029-12-31,high,CHF
+G-P00517-02,P00517,Career transition,52132.02,2032-12-31,medium,CHF
+G-P00518-01,P00518,Long-term financial resilience,141573.89,2029-12-31,high,CHF
+G-P00519-01,P00519,Long-term financial resilience,80308.72,2029-12-31,high,CHF
+G-P00520-01,P00520,Emergency savings,52798.51,2029-12-31,high,CHF
+G-P00521-01,P00521,Emergency savings,78939.63,2029-12-31,high,CHF
+G-P00521-02,P00521,Housing deposit,86026.68,2032-12-31,medium,CHF
+G-P00522-01,P00522,Emergency savings,61805.12,2029-12-31,high,CHF
+G-P00523-01,P00523,Long-term financial resilience,173451.06,2029-12-31,high,CHF
+G-P00524-01,P00524,Long-term financial resilience,185521.38,2029-12-31,high,CHF
+G-P00525-01,P00525,Long-term financial resilience,100168.03,2029-12-31,high,CHF
+G-P00525-02,P00525,Education flexibility,54164.84,2032-12-31,medium,CHF
+G-P00526-01,P00526,Long-term financial resilience,21651.86,2029-12-31,high,CHF
+G-P00527-01,P00527,Long-term financial resilience,153625.25,2029-12-31,high,CHF
+G-P00528-01,P00528,Long-term financial resilience,155720.42,2029-12-31,high,CHF
+G-P00529-01,P00529,Emergency savings,135760.88,2029-12-31,high,CHF
+G-P00529-02,P00529,Education flexibility,64107.62,2032-12-31,medium,CHF
+G-P00530-01,P00530,Long-term financial resilience,222160.14,2029-12-31,high,CHF
+G-P00531-01,P00531,Long-term financial resilience,160282.53,2029-12-31,high,CHF
+G-P00532-01,P00532,Long-term financial resilience,64599.38,2029-12-31,high,CHF
+G-P00533-01,P00533,Long-term financial resilience,182308.86,2029-12-31,high,CHF
+G-P00533-02,P00533,Housing deposit,105743.35,2032-12-31,medium,CHF
+G-P00534-01,P00534,Emergency savings,10000,2029-12-31,high,CHF
+G-P00535-01,P00535,Emergency savings,11992.27,2029-12-31,high,CHF
+G-P00536-01,P00536,Long-term financial resilience,128597.66,2029-12-31,high,CHF
+G-P00537-01,P00537,Long-term financial resilience,172055.46,2029-12-31,high,CHF
+G-P00537-02,P00537,Housing deposit,80418.47,2032-12-31,medium,CHF
+G-P00538-01,P00538,Long-term financial resilience,223709.6,2029-12-31,high,CHF
+G-P00539-01,P00539,Long-term financial resilience,45436.19,2029-12-31,high,CHF
+G-P00540-01,P00540,Emergency savings,27897.39,2029-12-31,high,CHF
+G-P00541-01,P00541,Long-term financial resilience,122873.2,2029-12-31,high,CHF
+G-P00541-02,P00541,Housing deposit,92140.62,2032-12-31,medium,CHF
+G-P00542-01,P00542,Long-term financial resilience,129328.24,2029-12-31,high,CHF
+G-P00543-01,P00543,Emergency savings,62481.76,2029-12-31,high,CHF
+G-P00544-01,P00544,Long-term financial resilience,185737.87,2029-12-31,high,CHF
+G-P00545-01,P00545,Long-term financial resilience,218320.51,2029-12-31,high,CHF
+G-P00545-02,P00545,Education flexibility,83674.52,2032-12-31,medium,CHF
+G-P00546-01,P00546,Emergency savings,52271.84,2029-12-31,high,CHF
+G-P00547-01,P00547,Long-term financial resilience,122225.52,2029-12-31,high,CHF
+G-P00548-01,P00548,Long-term financial resilience,124680.54,2029-12-31,high,CHF
+G-P00549-01,P00549,Long-term financial resilience,173156.46,2029-12-31,high,CHF
+G-P00549-02,P00549,Retirement reserve,52308.12,2032-12-31,medium,CHF
+G-P00550-01,P00550,Long-term financial resilience,15744.61,2029-12-31,high,CHF
+G-P00551-01,P00551,Long-term financial resilience,142008.1,2029-12-31,high,CHF
+G-P00552-01,P00552,Emergency savings,79732.43,2029-12-31,high,CHF
+G-P00553-01,P00553,Long-term financial resilience,156437.82,2029-12-31,high,CHF
+G-P00553-02,P00553,Housing deposit,52310.62,2032-12-31,medium,CHF
+G-P00554-01,P00554,Long-term financial resilience,236741.28,2029-12-31,high,CHF
+G-P00555-01,P00555,Long-term financial resilience,74808.11,2029-12-31,high,CHF
+G-P00556-01,P00556,Long-term financial resilience,63884.56,2029-12-31,high,CHF
+G-P00557-01,P00557,Emergency savings,69245.66,2029-12-31,high,CHF
+G-P00557-02,P00557,Career transition,43928.72,2032-12-31,medium,CHF
+G-P00558-01,P00558,Emergency savings,20818.58,2029-12-31,high,CHF
+G-P00559-01,P00559,Long-term financial resilience,140293.66,2029-12-31,high,CHF
+G-P00560-01,P00560,Emergency savings,122369.36,2029-12-31,high,CHF
+G-P00561-01,P00561,Long-term financial resilience,141977.42,2029-12-31,high,CHF
+G-P00561-02,P00561,Housing deposit,107049.39,2032-12-31,medium,CHF
+G-P00562-01,P00562,Emergency savings,69794.5,2029-12-31,high,CHF
+G-P00563-01,P00563,Long-term financial resilience,57407.82,2029-12-31,high,CHF
+G-P00564-01,P00564,Long-term financial resilience,70748.32,2029-12-31,high,CHF
+G-P00565-01,P00565,Long-term financial resilience,13231.28,2029-12-31,high,CHF
+G-P00565-02,P00565,Housing deposit,22667.8,2032-12-31,medium,CHF
+G-P00566-01,P00566,Long-term financial resilience,128082.69,2029-12-31,high,CHF
+G-P00567-01,P00567,Long-term financial resilience,199735.2,2029-12-31,high,CHF
+G-P00568-01,P00568,Long-term financial resilience,130262.02,2029-12-31,high,CHF
+G-P00569-01,P00569,Long-term financial resilience,130293.18,2029-12-31,high,CHF
+G-P00569-02,P00569,Education flexibility,107228.25,2032-12-31,medium,CHF
+G-P00570-01,P00570,Emergency savings,41719.84,2029-12-31,high,CHF
+G-P00571-01,P00571,Emergency savings,23636.99,2029-12-31,high,CHF
+G-P00572-01,P00572,Emergency savings,10000,2029-12-31,high,CHF
+G-P00573-01,P00573,Long-term financial resilience,163989.12,2029-12-31,high,CHF
+G-P00573-02,P00573,Education flexibility,77978.4,2032-12-31,medium,CHF
+G-P00574-01,P00574,Long-term financial resilience,130913.76,2029-12-31,high,CHF
+G-P00575-01,P00575,Long-term financial resilience,111678.83,2029-12-31,high,CHF
+G-P00576-01,P00576,Emergency savings,67852.74,2029-12-31,high,CHF
+G-P00577-01,P00577,Emergency savings,48555.3,2029-12-31,high,CHF
+G-P00577-02,P00577,Career transition,12799.94,2032-12-31,medium,CHF
+G-P00578-01,P00578,Long-term financial resilience,144831.49,2029-12-31,high,CHF
+G-P00579-01,P00579,Long-term financial resilience,68793.66,2029-12-31,high,CHF
+G-P00580-01,P00580,Long-term financial resilience,90262.08,2029-12-31,high,CHF
+G-P00581-01,P00581,Long-term financial resilience,16521.52,2029-12-31,high,CHF
+G-P00581-02,P00581,Career transition,66048.77,2032-12-31,medium,CHF
+G-P00582-01,P00582,Emergency savings,20594.64,2029-12-31,high,CHF
+G-P00583-01,P00583,Long-term financial resilience,195811.73,2029-12-31,high,CHF
+G-P00584-01,P00584,Long-term financial resilience,33013.97,2029-12-31,high,CHF
+G-P00585-01,P00585,Long-term financial resilience,198980.3,2029-12-31,high,CHF
+G-P00585-02,P00585,Housing deposit,60389.3,2032-12-31,medium,CHF
+G-P00586-01,P00586,Emergency savings,81864.3,2029-12-31,high,CHF
+G-P00587-01,P00587,Long-term financial resilience,122909.94,2029-12-31,high,CHF
+G-P00588-01,P00588,Emergency savings,18164.86,2029-12-31,high,CHF
+G-P00589-01,P00589,Long-term financial resilience,38245.06,2029-12-31,high,CHF
+G-P00589-02,P00589,Housing deposit,51896.56,2032-12-31,medium,CHF
+G-P00590-01,P00590,Long-term financial resilience,76899.44,2029-12-31,high,CHF
+G-P00591-01,P00591,Emergency savings,51433.07,2029-12-31,high,CHF
+G-P00592-01,P00592,Long-term financial resilience,90268.91,2029-12-31,high,CHF
+G-P00593-01,P00593,Long-term financial resilience,199751.04,2029-12-31,high,CHF
+G-P00593-02,P00593,Career transition,39623.14,2032-12-31,medium,CHF
+G-P00594-01,P00594,Emergency savings,31979.74,2029-12-31,high,CHF
+G-P00595-01,P00595,Emergency savings,225063.09,2029-12-31,high,CHF
+G-P00596-01,P00596,Emergency savings,68232.72,2029-12-31,high,CHF
+G-P00597-01,P00597,Emergency savings,10000,2029-12-31,high,CHF
+G-P00597-02,P00597,Housing deposit,60656.21,2032-12-31,medium,CHF
+G-P00598-01,P00598,Emergency savings,49029.54,2029-12-31,high,CHF
+G-P00599-01,P00599,Emergency savings,86847.46,2029-12-31,high,CHF
+G-P00600-01,P00600,Emergency savings,56495.89,2029-12-31,high,CHF
+G-P00601-01,P00601,Long-term financial resilience,191625.17,2029-12-31,high,CHF
+G-P00601-02,P00601,Education flexibility,30653.21,2032-12-31,medium,CHF
+G-P00602-01,P00602,Long-term financial resilience,62082.54,2029-12-31,high,CHF
+G-P00603-01,P00603,Emergency savings,71516.98,2029-12-31,high,CHF
+G-P00604-01,P00604,Long-term financial resilience,190474.62,2029-12-31,high,CHF
+G-P00605-01,P00605,Emergency savings,41938.37,2029-12-31,high,CHF
+G-P00605-02,P00605,Retirement reserve,25102.82,2032-12-31,medium,CHF
+G-P00606-01,P00606,Long-term financial resilience,197956.83,2029-12-31,high,CHF
+G-P00607-01,P00607,Long-term financial resilience,195280.78,2029-12-31,high,CHF
+G-P00608-01,P00608,Emergency savings,73805.65,2029-12-31,high,CHF
+G-P00609-01,P00609,Long-term financial resilience,154381.58,2029-12-31,high,CHF
+G-P00609-02,P00609,Housing deposit,49956.16,2032-12-31,medium,CHF
+G-P00610-01,P00610,Emergency savings,65821.95,2029-12-31,high,CHF
+G-P00611-01,P00611,Long-term financial resilience,235082.69,2029-12-31,high,CHF
+G-P00612-01,P00612,Long-term financial resilience,85080.94,2029-12-31,high,CHF
+G-P00613-01,P00613,Emergency savings,37908.59,2029-12-31,high,CHF
+G-P00613-02,P00613,Housing deposit,11354.74,2032-12-31,medium,CHF
+G-P00614-01,P00614,Emergency savings,25125.82,2029-12-31,high,CHF
+G-P00615-01,P00615,Long-term financial resilience,34815.01,2029-12-31,high,CHF
+G-P00616-01,P00616,Emergency savings,65910.86,2029-12-31,high,CHF
+G-P00617-01,P00617,Emergency savings,41713.47,2029-12-31,high,CHF
+G-P00617-02,P00617,Education flexibility,100649.44,2032-12-31,medium,CHF
+G-P00618-01,P00618,Emergency savings,12541.41,2029-12-31,high,CHF
+G-P00619-01,P00619,Long-term financial resilience,109817.81,2029-12-31,high,CHF
+G-P00620-01,P00620,Long-term financial resilience,52618.45,2029-12-31,high,CHF
+G-P00621-01,P00621,Long-term financial resilience,231606.37,2029-12-31,high,CHF
+G-P00621-02,P00621,Career transition,14247.43,2032-12-31,medium,CHF
+G-P00622-01,P00622,Long-term financial resilience,171731.23,2029-12-31,high,CHF
+G-P00623-01,P00623,Emergency savings,43316.96,2029-12-31,high,CHF
+G-P00624-01,P00624,Long-term financial resilience,99161.42,2029-12-31,high,CHF
+G-P00625-01,P00625,Emergency savings,65874.98,2029-12-31,high,CHF
+G-P00625-02,P00625,Housing deposit,92129.14,2032-12-31,medium,CHF
+G-P00626-01,P00626,Long-term financial resilience,227164.35,2029-12-31,high,CHF
+G-P00627-01,P00627,Long-term financial resilience,98060.05,2029-12-31,high,CHF
+G-P00628-01,P00628,Long-term financial resilience,42687.47,2029-12-31,high,CHF
+G-P00629-01,P00629,Emergency savings,13992.3,2029-12-31,high,CHF
+G-P00629-02,P00629,Career transition,42561.26,2032-12-31,medium,CHF
+G-P00630-01,P00630,Emergency savings,77737.33,2029-12-31,high,CHF
+G-P00631-01,P00631,Emergency savings,65246.26,2029-12-31,high,CHF
+G-P00632-01,P00632,Emergency savings,10000,2029-12-31,high,CHF
+G-P00633-01,P00633,Long-term financial resilience,143939.36,2029-12-31,high,CHF
+G-P00633-02,P00633,Education flexibility,15507.12,2032-12-31,medium,CHF
+G-P00634-01,P00634,Long-term financial resilience,142685.01,2029-12-31,high,CHF
+G-P00635-01,P00635,Long-term financial resilience,134912.08,2029-12-31,high,CHF
+G-P00636-01,P00636,Long-term financial resilience,42605.86,2029-12-31,high,CHF
+G-P00637-01,P00637,Emergency savings,72588.13,2029-12-31,high,CHF
+G-P00637-02,P00637,Education flexibility,41731.51,2032-12-31,medium,CHF
+G-P00638-01,P00638,Emergency savings,21032.3,2029-12-31,high,CHF
+G-P00639-01,P00639,Long-term financial resilience,235992.46,2029-12-31,high,CHF
+G-P00640-01,P00640,Long-term financial resilience,117081.07,2029-12-31,high,CHF
+G-P00641-01,P00641,Long-term financial resilience,57841.49,2029-12-31,high,CHF
+G-P00641-02,P00641,Education flexibility,81607.53,2032-12-31,medium,CHF
+G-P00642-01,P00642,Long-term financial resilience,187557.01,2029-12-31,high,CHF
+G-P00643-01,P00643,Long-term financial resilience,116104.59,2029-12-31,high,CHF
+G-P00644-01,P00644,Long-term financial resilience,225366.05,2029-12-31,high,CHF
+G-P00645-01,P00645,Emergency savings,22876.06,2029-12-31,high,CHF
+G-P00645-02,P00645,Housing deposit,65737.61,2032-12-31,medium,CHF
+G-P00646-01,P00646,Long-term financial resilience,159503.57,2029-12-31,high,CHF
+G-P00647-01,P00647,Long-term financial resilience,212883.2,2029-12-31,high,CHF
+G-P00648-01,P00648,Emergency savings,10000,2029-12-31,high,CHF
+G-P00649-01,P00649,Long-term financial resilience,135322.93,2029-12-31,high,CHF
+G-P00649-02,P00649,Housing deposit,69450.93,2032-12-31,medium,CHF
+G-P00650-01,P00650,Long-term financial resilience,171795.04,2029-12-31,high,CHF
+G-P00651-01,P00651,Long-term financial resilience,114450.74,2029-12-31,high,CHF
+G-P00652-01,P00652,Long-term financial resilience,62807.38,2029-12-31,high,CHF
+G-P00653-01,P00653,Long-term financial resilience,183729.01,2029-12-31,high,CHF
+G-P00653-02,P00653,Education flexibility,26250.98,2032-12-31,medium,CHF
+G-P00654-01,P00654,Emergency savings,63349.25,2029-12-31,high,CHF
+G-P00655-01,P00655,Long-term financial resilience,146778.48,2029-12-31,high,CHF
+G-P00656-01,P00656,Long-term financial resilience,34983.34,2029-12-31,high,CHF
+G-P00657-01,P00657,Emergency savings,128508.56,2029-12-31,high,CHF
+G-P00657-02,P00657,Education flexibility,56295.2,2032-12-31,medium,CHF
+G-P00658-01,P00658,Long-term financial resilience,84342.83,2029-12-31,high,CHF
+G-P00659-01,P00659,Long-term financial resilience,115512.51,2029-12-31,high,CHF
+G-P00660-01,P00660,Long-term financial resilience,183595.94,2029-12-31,high,CHF
+G-P00661-01,P00661,Emergency savings,197329.33,2029-12-31,high,CHF
+G-P00661-02,P00661,Retirement reserve,107325.78,2032-12-31,medium,CHF
+G-P00662-01,P00662,Emergency savings,48573.94,2029-12-31,high,CHF
+G-P00663-01,P00663,Long-term financial resilience,166306.46,2029-12-31,high,CHF
+G-P00664-01,P00664,Emergency savings,55894.56,2029-12-31,high,CHF
+G-P00665-01,P00665,Long-term financial resilience,154963.38,2029-12-31,high,CHF
+G-P00665-02,P00665,Education flexibility,36327.45,2032-12-31,medium,CHF
+G-P00666-01,P00666,Long-term financial resilience,28575.84,2029-12-31,high,CHF
+G-P00667-01,P00667,Long-term financial resilience,227288.16,2029-12-31,high,CHF
+G-P00668-01,P00668,Long-term financial resilience,119158.83,2029-12-31,high,CHF
+G-P00669-01,P00669,Long-term financial resilience,58677.12,2029-12-31,high,CHF
+G-P00669-02,P00669,Career transition,87832.61,2032-12-31,medium,CHF
+G-P00670-01,P00670,Long-term financial resilience,59871.44,2029-12-31,high,CHF
+G-P00671-01,P00671,Long-term financial resilience,87581.33,2029-12-31,high,CHF
+G-P00672-01,P00672,Emergency savings,44473.28,2029-12-31,high,CHF
+G-P00673-01,P00673,Long-term financial resilience,177327.73,2029-12-31,high,CHF
+G-P00673-02,P00673,Retirement reserve,51180.49,2032-12-31,medium,CHF
+G-P00674-01,P00674,Long-term financial resilience,126676.35,2029-12-31,high,CHF
+G-P00675-01,P00675,Long-term financial resilience,72966.03,2029-12-31,high,CHF
+G-P00676-01,P00676,Long-term financial resilience,50794.53,2029-12-31,high,CHF
+G-P00677-01,P00677,Emergency savings,222698.96,2029-12-31,high,CHF
+G-P00677-02,P00677,Career transition,18105.85,2032-12-31,medium,CHF
+G-P00678-01,P00678,Emergency savings,125290.93,2029-12-31,high,CHF
+G-P00679-01,P00679,Long-term financial resilience,120252.54,2029-12-31,high,CHF
+G-P00680-01,P00680,Long-term financial resilience,223636.7,2029-12-31,high,CHF
+G-P00681-01,P00681,Long-term financial resilience,121426.38,2029-12-31,high,CHF
+G-P00681-02,P00681,Career transition,48799.96,2032-12-31,medium,CHF
+G-P00682-01,P00682,Emergency savings,148787.94,2029-12-31,high,CHF
+G-P00683-01,P00683,Long-term financial resilience,61497.98,2029-12-31,high,CHF
+G-P00684-01,P00684,Emergency savings,28071.38,2029-12-31,high,CHF
+G-P00685-01,P00685,Long-term financial resilience,128695.25,2029-12-31,high,CHF
+G-P00685-02,P00685,Career transition,97845.7,2032-12-31,medium,CHF
+G-P00686-01,P00686,Emergency savings,10000,2029-12-31,high,CHF
+G-P00687-01,P00687,Emergency savings,76513.71,2029-12-31,high,CHF
+G-P00688-01,P00688,Emergency savings,46189.78,2029-12-31,high,CHF
+G-P00689-01,P00689,Long-term financial resilience,51658.94,2029-12-31,high,CHF
+G-P00689-02,P00689,Education flexibility,85202.9,2032-12-31,medium,CHF
+G-P00690-01,P00690,Emergency savings,64273.65,2029-12-31,high,CHF
+G-P00691-01,P00691,Long-term financial resilience,197797.95,2029-12-31,high,CHF
+G-P00692-01,P00692,Emergency savings,66820.93,2029-12-31,high,CHF
+G-P00693-01,P00693,Emergency savings,53060.13,2029-12-31,high,CHF
+G-P00693-02,P00693,Retirement reserve,29356.65,2032-12-31,medium,CHF
+G-P00694-01,P00694,Emergency savings,87916.74,2029-12-31,high,CHF
+G-P00695-01,P00695,Emergency savings,77812.05,2029-12-31,high,CHF
+G-P00696-01,P00696,Emergency savings,10806.34,2029-12-31,high,CHF
+G-P00697-01,P00697,Long-term financial resilience,116083.17,2029-12-31,high,CHF
+G-P00697-02,P00697,Education flexibility,68529.82,2032-12-31,medium,CHF
+G-P00698-01,P00698,Emergency savings,38030.99,2029-12-31,high,CHF
+G-P00699-01,P00699,Long-term financial resilience,79995.34,2029-12-31,high,CHF
+G-P00700-01,P00700,Emergency savings,49401.15,2029-12-31,high,CHF
+G-P00701-01,P00701,Emergency savings,51010.75,2029-12-31,high,CHF
+G-P00701-02,P00701,Housing deposit,32756.73,2032-12-31,medium,CHF
+G-P00702-01,P00702,Emergency savings,187745.44,2029-12-31,high,CHF
+G-P00703-01,P00703,Long-term financial resilience,191256.18,2029-12-31,high,CHF
+G-P00704-01,P00704,Long-term financial resilience,205932.22,2029-12-31,high,CHF
+G-P00705-01,P00705,Emergency savings,13498.91,2029-12-31,high,CHF
+G-P00705-02,P00705,Education flexibility,70303.38,2032-12-31,medium,CHF
+G-P00706-01,P00706,Long-term financial resilience,22613.9,2029-12-31,high,CHF
+G-P00707-01,P00707,Long-term financial resilience,122582.64,2029-12-31,high,CHF
+G-P00708-01,P00708,Emergency savings,63945.26,2029-12-31,high,CHF
+G-P00709-01,P00709,Long-term financial resilience,148088.66,2029-12-31,high,CHF
+G-P00709-02,P00709,Housing deposit,73953.71,2032-12-31,medium,CHF
+G-P00710-01,P00710,Emergency savings,19232.5,2029-12-31,high,CHF
+G-P00711-01,P00711,Long-term financial resilience,90413.25,2029-12-31,high,CHF
+G-P00712-01,P00712,Long-term financial resilience,161377.55,2029-12-31,high,CHF
+G-P00713-01,P00713,Long-term financial resilience,25982.77,2029-12-31,high,CHF
+G-P00713-02,P00713,Retirement reserve,68412.9,2032-12-31,medium,CHF
+G-P00714-01,P00714,Long-term financial resilience,49700.66,2029-12-31,high,CHF
+G-P00715-01,P00715,Emergency savings,55327.01,2029-12-31,high,CHF
+G-P00716-01,P00716,Long-term financial resilience,56600.54,2029-12-31,high,CHF
+G-P00717-01,P00717,Long-term financial resilience,103724.72,2029-12-31,high,CHF
+G-P00717-02,P00717,Education flexibility,36403.11,2032-12-31,medium,CHF
+G-P00718-01,P00718,Long-term financial resilience,124411.28,2029-12-31,high,CHF
+G-P00719-01,P00719,Emergency savings,26187.04,2029-12-31,high,CHF
+G-P00720-01,P00720,Long-term financial resilience,90727.36,2029-12-31,high,CHF
+G-P00721-01,P00721,Emergency savings,24348.16,2029-12-31,high,CHF
+G-P00721-02,P00721,Housing deposit,26091.72,2032-12-31,medium,CHF
+G-P00722-01,P00722,Long-term financial resilience,124126.18,2029-12-31,high,CHF
+G-P00723-01,P00723,Long-term financial resilience,207745.68,2029-12-31,high,CHF
+G-P00724-01,P00724,Long-term financial resilience,233284.03,2029-12-31,high,CHF
+G-P00725-01,P00725,Long-term financial resilience,173121.04,2029-12-31,high,CHF
+G-P00725-02,P00725,Education flexibility,49411.04,2032-12-31,medium,CHF
+G-P00726-01,P00726,Emergency savings,84752.54,2029-12-31,high,CHF
+G-P00727-01,P00727,Long-term financial resilience,224339.25,2029-12-31,high,CHF
+G-P00728-01,P00728,Long-term financial resilience,63361.14,2029-12-31,high,CHF
+G-P00729-01,P00729,Emergency savings,13830.99,2029-12-31,high,CHF
+G-P00729-02,P00729,Education flexibility,13248.13,2032-12-31,medium,CHF
+G-P00730-01,P00730,Long-term financial resilience,121078.99,2029-12-31,high,CHF
+G-P00731-01,P00731,Emergency savings,113852.98,2029-12-31,high,CHF
+G-P00732-01,P00732,Long-term financial resilience,187145.94,2029-12-31,high,CHF
+G-P00733-01,P00733,Long-term financial resilience,177441.47,2029-12-31,high,CHF
+G-P00733-02,P00733,Career transition,74986.42,2032-12-31,medium,CHF
+G-P00734-01,P00734,Long-term financial resilience,77398.21,2029-12-31,high,CHF
+G-P00735-01,P00735,Long-term financial resilience,147834.58,2029-12-31,high,CHF
+G-P00736-01,P00736,Long-term financial resilience,235747.98,2029-12-31,high,CHF
+G-P00737-01,P00737,Long-term financial resilience,31483.39,2029-12-31,high,CHF
+G-P00737-02,P00737,Housing deposit,54518.94,2032-12-31,medium,CHF
+G-P00738-01,P00738,Long-term financial resilience,115345.02,2029-12-31,high,CHF
+G-P00739-01,P00739,Emergency savings,29231.33,2029-12-31,high,CHF
+G-P00740-01,P00740,Emergency savings,45044.35,2029-12-31,high,CHF
+G-P00741-01,P00741,Long-term financial resilience,156257.87,2029-12-31,high,CHF
+G-P00741-02,P00741,Education flexibility,69406.33,2032-12-31,medium,CHF
+G-P00742-01,P00742,Long-term financial resilience,157574.48,2029-12-31,high,CHF
+G-P00743-01,P00743,Long-term financial resilience,133301.63,2029-12-31,high,CHF
+G-P00744-01,P00744,Emergency savings,163119.41,2029-12-31,high,CHF
+G-P00745-01,P00745,Emergency savings,22883.7,2029-12-31,high,CHF
+G-P00745-02,P00745,Education flexibility,44963.3,2032-12-31,medium,CHF
+G-P00746-01,P00746,Emergency savings,29959.98,2029-12-31,high,CHF
+G-P00747-01,P00747,Emergency savings,20927.6,2029-12-31,high,CHF
+G-P00748-01,P00748,Long-term financial resilience,33153.34,2029-12-31,high,CHF
+G-P00749-01,P00749,Emergency savings,58914.13,2029-12-31,high,CHF
+G-P00749-02,P00749,Education flexibility,71195.83,2032-12-31,medium,CHF
+G-P00750-01,P00750,Long-term financial resilience,220653.42,2029-12-31,high,CHF
+G-P00751-01,P00751,Long-term financial resilience,14847.42,2029-12-31,high,CHF
+G-P00752-01,P00752,Long-term financial resilience,233255.5,2029-12-31,high,CHF
+G-P00753-01,P00753,Emergency savings,10000,2029-12-31,high,CHF
+G-P00753-02,P00753,Career transition,54871.9,2032-12-31,medium,CHF
+G-P00754-01,P00754,Long-term financial resilience,105731.6,2029-12-31,high,CHF
+G-P00755-01,P00755,Long-term financial resilience,34133.2,2029-12-31,high,CHF
+G-P00756-01,P00756,Long-term financial resilience,33108.54,2029-12-31,high,CHF
+G-P00757-01,P00757,Long-term financial resilience,143430.9,2029-12-31,high,CHF
+G-P00757-02,P00757,Education flexibility,101082.4,2032-12-31,medium,CHF
+G-P00758-01,P00758,Emergency savings,58014.85,2029-12-31,high,CHF
+G-P00759-01,P00759,Long-term financial resilience,219639.26,2029-12-31,high,CHF
+G-P00760-01,P00760,Long-term financial resilience,123179.2,2029-12-31,high,CHF
+G-P00761-01,P00761,Emergency savings,231062.19,2029-12-31,high,CHF
+G-P00761-02,P00761,Career transition,11490.77,2032-12-31,medium,CHF
+G-P00762-01,P00762,Long-term financial resilience,78559.7,2029-12-31,high,CHF
+G-P00763-01,P00763,Emergency savings,36568.53,2029-12-31,high,CHF
+G-P00764-01,P00764,Emergency savings,52054.9,2029-12-31,high,CHF
+G-P00765-01,P00765,Emergency savings,56116.43,2029-12-31,high,CHF
+G-P00765-02,P00765,Career transition,85237.86,2032-12-31,medium,CHF
+G-P00766-01,P00766,Long-term financial resilience,192455.04,2029-12-31,high,CHF
+G-P00767-01,P00767,Emergency savings,21892.24,2029-12-31,high,CHF
+G-P00768-01,P00768,Long-term financial resilience,221656.78,2029-12-31,high,CHF
+G-P00769-01,P00769,Long-term financial resilience,143947.07,2029-12-31,high,CHF
+G-P00769-02,P00769,Retirement reserve,55896.26,2032-12-31,medium,CHF
+G-P00770-01,P00770,Emergency savings,45181.74,2029-12-31,high,CHF
+G-P00771-01,P00771,Emergency savings,46480.46,2029-12-31,high,CHF
+G-P00772-01,P00772,Emergency savings,79289.1,2029-12-31,high,CHF
+G-P00773-01,P00773,Emergency savings,60475.98,2029-12-31,high,CHF
+G-P00773-02,P00773,Career transition,16715.37,2032-12-31,medium,CHF
+G-P00774-01,P00774,Long-term financial resilience,184469.15,2029-12-31,high,CHF
+G-P00775-01,P00775,Emergency savings,23354.56,2029-12-31,high,CHF
+G-P00776-01,P00776,Long-term financial resilience,45376.32,2029-12-31,high,CHF
+G-P00777-01,P00777,Long-term financial resilience,143652.21,2029-12-31,high,CHF
+G-P00777-02,P00777,Housing deposit,33117.75,2032-12-31,medium,CHF
+G-P00778-01,P00778,Long-term financial resilience,13015.74,2029-12-31,high,CHF
+G-P00779-01,P00779,Long-term financial resilience,156488.46,2029-12-31,high,CHF
+G-P00780-01,P00780,Long-term financial resilience,120841.6,2029-12-31,high,CHF
+G-P00781-01,P00781,Emergency savings,51272.85,2029-12-31,high,CHF
+G-P00781-02,P00781,Housing deposit,78372.97,2032-12-31,medium,CHF
+G-P00782-01,P00782,Long-term financial resilience,230635.25,2029-12-31,high,CHF
+G-P00783-01,P00783,Long-term financial resilience,208176.34,2029-12-31,high,CHF
+G-P00784-01,P00784,Emergency savings,60676.86,2029-12-31,high,CHF
+G-P00785-01,P00785,Emergency savings,34360.82,2029-12-31,high,CHF
+G-P00785-02,P00785,Career transition,41070.08,2032-12-31,medium,CHF
+G-P00786-01,P00786,Long-term financial resilience,237411.74,2029-12-31,high,CHF
+G-P00787-01,P00787,Emergency savings,71765.5,2029-12-31,high,CHF
+G-P00788-01,P00788,Long-term financial resilience,171180.08,2029-12-31,high,CHF
+G-P00789-01,P00789,Emergency savings,76835.47,2029-12-31,high,CHF
+G-P00789-02,P00789,Housing deposit,64352.55,2032-12-31,medium,CHF
+G-P00790-01,P00790,Long-term financial resilience,148491.2,2029-12-31,high,CHF
+G-P00791-01,P00791,Long-term financial resilience,198308.67,2029-12-31,high,CHF
+G-P00792-01,P00792,Long-term financial resilience,230641.74,2029-12-31,high,CHF
+G-P00793-01,P00793,Long-term financial resilience,217468.56,2029-12-31,high,CHF
+G-P00793-02,P00793,Education flexibility,74507.38,2032-12-31,medium,CHF
+G-P00794-01,P00794,Long-term financial resilience,163838.21,2029-12-31,high,CHF
+G-P00795-01,P00795,Emergency savings,183920.91,2029-12-31,high,CHF
+G-P00796-01,P00796,Long-term financial resilience,96312.16,2029-12-31,high,CHF
+G-P00797-01,P00797,Emergency savings,50179.36,2029-12-31,high,CHF
+G-P00797-02,P00797,Retirement reserve,13820.19,2032-12-31,medium,CHF
+G-P00798-01,P00798,Emergency savings,59873.55,2029-12-31,high,CHF
+G-P00799-01,P00799,Emergency savings,19049.94,2029-12-31,high,CHF
+G-P00800-01,P00800,Long-term financial resilience,182397.1,2029-12-31,high,CHF
+G-P00801-01,P00801,Long-term financial resilience,72266.42,2029-12-31,high,CHF
+G-P00801-02,P00801,Retirement reserve,81539.61,2032-12-31,medium,CHF
+G-P00802-01,P00802,Long-term financial resilience,172679.62,2029-12-31,high,CHF
+G-P00803-01,P00803,Long-term financial resilience,221757.1,2029-12-31,high,CHF
+G-P00804-01,P00804,Long-term financial resilience,37553.22,2029-12-31,high,CHF
+G-P00805-01,P00805,Emergency savings,187882.06,2029-12-31,high,CHF
+G-P00805-02,P00805,Retirement reserve,105274.01,2032-12-31,medium,CHF
+G-P00806-01,P00806,Long-term financial resilience,24338.03,2029-12-31,high,CHF
+G-P00807-01,P00807,Long-term financial resilience,110208.4,2029-12-31,high,CHF
+G-P00808-01,P00808,Long-term financial resilience,64593.89,2029-12-31,high,CHF
+G-P00809-01,P00809,Emergency savings,32586.94,2029-12-31,high,CHF
+G-P00809-02,P00809,Career transition,104645.52,2032-12-31,medium,CHF
+G-P00810-01,P00810,Long-term financial resilience,53732.78,2029-12-31,high,CHF
+G-P00811-01,P00811,Long-term financial resilience,85261.31,2029-12-31,high,CHF
+G-P00812-01,P00812,Long-term financial resilience,174346.29,2029-12-31,high,CHF
+G-P00813-01,P00813,Emergency savings,69725.26,2029-12-31,high,CHF
+G-P00813-02,P00813,Education flexibility,26570.69,2032-12-31,medium,CHF
+G-P00814-01,P00814,Long-term financial resilience,43106.7,2029-12-31,high,CHF
+G-P00815-01,P00815,Emergency savings,76397.87,2029-12-31,high,CHF
+G-P00816-01,P00816,Long-term financial resilience,96855.47,2029-12-31,high,CHF
+G-P00817-01,P00817,Emergency savings,33579.44,2029-12-31,high,CHF
+G-P00817-02,P00817,Education flexibility,29468.35,2032-12-31,medium,CHF
+G-P00818-01,P00818,Long-term financial resilience,153047.18,2029-12-31,high,CHF
+G-P00819-01,P00819,Long-term financial resilience,93772.67,2029-12-31,high,CHF
+G-P00820-01,P00820,Long-term financial resilience,88617.79,2029-12-31,high,CHF
+G-P00821-01,P00821,Long-term financial resilience,53458.11,2029-12-31,high,CHF
+G-P00821-02,P00821,Education flexibility,10279.44,2032-12-31,medium,CHF
+G-P00822-01,P00822,Long-term financial resilience,67616.67,2029-12-31,high,CHF
+G-P00823-01,P00823,Emergency savings,218404.5,2029-12-31,high,CHF
+G-P00824-01,P00824,Emergency savings,38971.36,2029-12-31,high,CHF
+G-P00825-01,P00825,Emergency savings,83047.09,2029-12-31,high,CHF
+G-P00825-02,P00825,Retirement reserve,55037.68,2032-12-31,medium,CHF
+G-P00826-01,P00826,Long-term financial resilience,225372.18,2029-12-31,high,CHF
+G-P00827-01,P00827,Emergency savings,10000,2029-12-31,high,CHF
+G-P00828-01,P00828,Long-term financial resilience,156691.74,2029-12-31,high,CHF
+G-P00829-01,P00829,Emergency savings,48199.7,2029-12-31,high,CHF
+G-P00829-02,P00829,Retirement reserve,109486.11,2032-12-31,medium,CHF
+G-P00830-01,P00830,Long-term financial resilience,47399.22,2029-12-31,high,CHF
+G-P00831-01,P00831,Emergency savings,210795.9,2029-12-31,high,CHF
+G-P00832-01,P00832,Emergency savings,77831.1,2029-12-31,high,CHF
+G-P00833-01,P00833,Long-term financial resilience,85500.21,2029-12-31,high,CHF
+G-P00833-02,P00833,Retirement reserve,72031.28,2032-12-31,medium,CHF
+G-P00834-01,P00834,Long-term financial resilience,183460.61,2029-12-31,high,CHF
+G-P00835-01,P00835,Emergency savings,87755.62,2029-12-31,high,CHF
+G-P00836-01,P00836,Long-term financial resilience,156450.75,2029-12-31,high,CHF
+G-P00837-01,P00837,Long-term financial resilience,182373.66,2029-12-31,high,CHF
+G-P00837-02,P00837,Retirement reserve,61759.89,2032-12-31,medium,CHF
+G-P00838-01,P00838,Emergency savings,45869.86,2029-12-31,high,CHF
+G-P00839-01,P00839,Long-term financial resilience,50239.74,2029-12-31,high,CHF
+G-P00840-01,P00840,Emergency savings,67760.27,2029-12-31,high,CHF
+G-P00841-01,P00841,Emergency savings,31001.95,2029-12-31,high,CHF
+G-P00841-02,P00841,Education flexibility,108214.2,2032-12-31,medium,CHF
+G-P00842-01,P00842,Emergency savings,10000,2029-12-31,high,CHF
+G-P00843-01,P00843,Long-term financial resilience,180520.37,2029-12-31,high,CHF
+G-P00844-01,P00844,Long-term financial resilience,154475.81,2029-12-31,high,CHF
+G-P00845-01,P00845,Emergency savings,205270.62,2029-12-31,high,CHF
+G-P00845-02,P00845,Retirement reserve,79029.96,2032-12-31,medium,CHF
+G-P00846-01,P00846,Emergency savings,87851.57,2029-12-31,high,CHF
+G-P00847-01,P00847,Long-term financial resilience,81143.06,2029-12-31,high,CHF
+G-P00848-01,P00848,Emergency savings,27662.9,2029-12-31,high,CHF
+G-P00849-01,P00849,Long-term financial resilience,76287.6,2029-12-31,high,CHF
+G-P00849-02,P00849,Education flexibility,105098.98,2032-12-31,medium,CHF
+G-P00850-01,P00850,Long-term financial resilience,132373.81,2029-12-31,high,CHF
+G-P00851-01,P00851,Long-term financial resilience,128549.68,2029-12-31,high,CHF
+G-P00852-01,P00852,Emergency savings,15558.53,2029-12-31,high,CHF
+G-P00853-01,P00853,Long-term financial resilience,189272.14,2029-12-31,high,CHF
+G-P00853-02,P00853,Career transition,91012.44,2032-12-31,medium,CHF
+G-P00854-01,P00854,Long-term financial resilience,174838.35,2029-12-31,high,CHF
+G-P00855-01,P00855,Emergency savings,61820.61,2029-12-31,high,CHF
+G-P00856-01,P00856,Emergency savings,22075.25,2029-12-31,high,CHF
+G-P00857-01,P00857,Long-term financial resilience,161744.24,2029-12-31,high,CHF
+G-P00857-02,P00857,Housing deposit,73473.27,2032-12-31,medium,CHF
+G-P00858-01,P00858,Long-term financial resilience,197827.12,2029-12-31,high,CHF
+G-P00859-01,P00859,Long-term financial resilience,142200.62,2029-12-31,high,CHF
+G-P00860-01,P00860,Long-term financial resilience,202618.3,2029-12-31,high,CHF
+G-P00861-01,P00861,Long-term financial resilience,115870.62,2029-12-31,high,CHF
+G-P00861-02,P00861,Housing deposit,24709.9,2032-12-31,medium,CHF
+G-P00862-01,P00862,Emergency savings,35063.55,2029-12-31,high,CHF
+G-P00863-01,P00863,Emergency savings,50641.04,2029-12-31,high,CHF
+G-P00864-01,P00864,Long-term financial resilience,97679.97,2029-12-31,high,CHF
+G-P00865-01,P00865,Emergency savings,43012.7,2029-12-31,high,CHF
+G-P00865-02,P00865,Education flexibility,33315.94,2032-12-31,medium,CHF
+G-P00866-01,P00866,Long-term financial resilience,36687.52,2029-12-31,high,CHF
+G-P00867-01,P00867,Long-term financial resilience,75222.1,2029-12-31,high,CHF
+G-P00868-01,P00868,Long-term financial resilience,114346.29,2029-12-31,high,CHF
+G-P00869-01,P00869,Long-term financial resilience,64156.8,2029-12-31,high,CHF
+G-P00869-02,P00869,Education flexibility,15587.16,2032-12-31,medium,CHF
+G-P00870-01,P00870,Emergency savings,57146.75,2029-12-31,high,CHF
+G-P00871-01,P00871,Long-term financial resilience,170854.48,2029-12-31,high,CHF
+G-P00872-01,P00872,Long-term financial resilience,117147.3,2029-12-31,high,CHF
+G-P00873-01,P00873,Long-term financial resilience,57950.51,2029-12-31,high,CHF
+G-P00873-02,P00873,Retirement reserve,37809.6,2032-12-31,medium,CHF
+G-P00874-01,P00874,Long-term financial resilience,144416.72,2029-12-31,high,CHF
+G-P00875-01,P00875,Long-term financial resilience,75464.35,2029-12-31,high,CHF
+G-P00876-01,P00876,Long-term financial resilience,80829.41,2029-12-31,high,CHF
+G-P00877-01,P00877,Long-term financial resilience,74017.25,2029-12-31,high,CHF
+G-P00877-02,P00877,Housing deposit,86802.1,2032-12-31,medium,CHF
+G-P00878-01,P00878,Emergency savings,81189.5,2029-12-31,high,CHF
+G-P00879-01,P00879,Emergency savings,85505.52,2029-12-31,high,CHF
+G-P00880-01,P00880,Emergency savings,65159.65,2029-12-31,high,CHF
+G-P00881-01,P00881,Emergency savings,69702.98,2029-12-31,high,CHF
+G-P00881-02,P00881,Housing deposit,23154.72,2032-12-31,medium,CHF
+G-P00882-01,P00882,Long-term financial resilience,108004.77,2029-12-31,high,CHF
+G-P00883-01,P00883,Emergency savings,68195.02,2029-12-31,high,CHF
+G-P00884-01,P00884,Emergency savings,29794.77,2029-12-31,high,CHF
+G-P00885-01,P00885,Long-term financial resilience,144007.04,2029-12-31,high,CHF
+G-P00885-02,P00885,Career transition,25655.91,2032-12-31,medium,CHF
+G-P00886-01,P00886,Long-term financial resilience,189308.56,2029-12-31,high,CHF
+G-P00887-01,P00887,Long-term financial resilience,74358.69,2029-12-31,high,CHF
+G-P00888-01,P00888,Emergency savings,71757.57,2029-12-31,high,CHF
+G-P00889-01,P00889,Emergency savings,13556.16,2029-12-31,high,CHF
+G-P00889-02,P00889,Education flexibility,103723.81,2032-12-31,medium,CHF
+G-P00890-01,P00890,Long-term financial resilience,185582.02,2029-12-31,high,CHF
+G-P00891-01,P00891,Long-term financial resilience,148031.3,2029-12-31,high,CHF
+G-P00892-01,P00892,Long-term financial resilience,32698.38,2029-12-31,high,CHF
+G-P00893-01,P00893,Long-term financial resilience,228922.99,2029-12-31,high,CHF
+G-P00893-02,P00893,Retirement reserve,106006.45,2032-12-31,medium,CHF
+G-P00894-01,P00894,Emergency savings,205580.7,2029-12-31,high,CHF
+G-P00895-01,P00895,Long-term financial resilience,89900.98,2029-12-31,high,CHF
+G-P00896-01,P00896,Long-term financial resilience,52708.32,2029-12-31,high,CHF
+G-P00897-01,P00897,Emergency savings,80278.98,2029-12-31,high,CHF
+G-P00897-02,P00897,Retirement reserve,95599.58,2032-12-31,medium,CHF
+G-P00898-01,P00898,Long-term financial resilience,37277.09,2029-12-31,high,CHF
+G-P00899-01,P00899,Emergency savings,66433.42,2029-12-31,high,CHF
+G-P00900-01,P00900,Long-term financial resilience,164908.83,2029-12-31,high,CHF
+G-P00901-01,P00901,Emergency savings,70910.96,2029-12-31,high,CHF
+G-P00901-02,P00901,Career transition,41983.09,2032-12-31,medium,CHF
+G-P00902-01,P00902,Long-term financial resilience,51153.98,2029-12-31,high,CHF
+G-P00903-01,P00903,Emergency savings,72710.46,2029-12-31,high,CHF
+G-P00904-01,P00904,Emergency savings,123463.23,2029-12-31,high,CHF
+G-P00905-01,P00905,Emergency savings,10215.94,2029-12-31,high,CHF
+G-P00905-02,P00905,Housing deposit,82651.91,2032-12-31,medium,CHF
+G-P00906-01,P00906,Long-term financial resilience,85732.58,2029-12-31,high,CHF
+G-P00907-01,P00907,Long-term financial resilience,167683.54,2029-12-31,high,CHF
+G-P00908-01,P00908,Emergency savings,235596.38,2029-12-31,high,CHF
+G-P00909-01,P00909,Long-term financial resilience,204137.87,2029-12-31,high,CHF
+G-P00909-02,P00909,Retirement reserve,42499.65,2032-12-31,medium,CHF
+G-P00910-01,P00910,Long-term financial resilience,187448.08,2029-12-31,high,CHF
+G-P00911-01,P00911,Emergency savings,30024.42,2029-12-31,high,CHF
+G-P00912-01,P00912,Emergency savings,10873.94,2029-12-31,high,CHF
+G-P00913-01,P00913,Long-term financial resilience,24043.34,2029-12-31,high,CHF
+G-P00913-02,P00913,Retirement reserve,109957.57,2032-12-31,medium,CHF
+G-P00914-01,P00914,Long-term financial resilience,178553.18,2029-12-31,high,CHF
+G-P00915-01,P00915,Emergency savings,14814.42,2029-12-31,high,CHF
+G-P00916-01,P00916,Emergency savings,10000,2029-12-31,high,CHF
+G-P00917-01,P00917,Emergency savings,14145.18,2029-12-31,high,CHF
+G-P00917-02,P00917,Education flexibility,15066.08,2032-12-31,medium,CHF
+G-P00918-01,P00918,Emergency savings,209406.05,2029-12-31,high,CHF
+G-P00919-01,P00919,Emergency savings,60639.15,2029-12-31,high,CHF
+G-P00920-01,P00920,Emergency savings,29459.36,2029-12-31,high,CHF
+G-P00921-01,P00921,Emergency savings,125595.68,2029-12-31,high,CHF
+G-P00921-02,P00921,Education flexibility,73030.46,2032-12-31,medium,CHF
+G-P00922-01,P00922,Long-term financial resilience,201318.64,2029-12-31,high,CHF
+G-P00923-01,P00923,Long-term financial resilience,142931.12,2029-12-31,high,CHF
+G-P00924-01,P00924,Emergency savings,87159.95,2029-12-31,high,CHF
+G-P00925-01,P00925,Long-term financial resilience,10718.3,2029-12-31,high,CHF
+G-P00925-02,P00925,Retirement reserve,78374.4,2032-12-31,medium,CHF
+G-P00926-01,P00926,Long-term financial resilience,104121.63,2029-12-31,high,CHF
+G-P00927-01,P00927,Emergency savings,171892.82,2029-12-31,high,CHF
+G-P00928-01,P00928,Emergency savings,62348.75,2029-12-31,high,CHF
+G-P00929-01,P00929,Emergency savings,67999.31,2029-12-31,high,CHF
+G-P00929-02,P00929,Housing deposit,45663.69,2032-12-31,medium,CHF
+G-P00930-01,P00930,Long-term financial resilience,209374.67,2029-12-31,high,CHF
+G-P00931-01,P00931,Long-term financial resilience,22690.02,2029-12-31,high,CHF
+G-P00932-01,P00932,Long-term financial resilience,64714.22,2029-12-31,high,CHF
+G-P00933-01,P00933,Emergency savings,43868.08,2029-12-31,high,CHF
+G-P00933-02,P00933,Education flexibility,94771.13,2032-12-31,medium,CHF
+G-P00934-01,P00934,Emergency savings,46603.3,2029-12-31,high,CHF
+G-P00935-01,P00935,Emergency savings,68814.11,2029-12-31,high,CHF
+G-P00936-01,P00936,Emergency savings,85035.36,2029-12-31,high,CHF
+G-P00937-01,P00937,Long-term financial resilience,117032.42,2029-12-31,high,CHF
+G-P00937-02,P00937,Retirement reserve,29216.72,2032-12-31,medium,CHF
+G-P00938-01,P00938,Long-term financial resilience,171304.88,2029-12-31,high,CHF
+G-P00939-01,P00939,Long-term financial resilience,77866.67,2029-12-31,high,CHF
+G-P00940-01,P00940,Emergency savings,26013.79,2029-12-31,high,CHF
+G-P00941-01,P00941,Long-term financial resilience,211225.66,2029-12-31,high,CHF
+G-P00941-02,P00941,Career transition,88159.72,2032-12-31,medium,CHF
+G-P00942-01,P00942,Long-term financial resilience,233176.61,2029-12-31,high,CHF
+G-P00943-01,P00943,Long-term financial resilience,197069.68,2029-12-31,high,CHF
+G-P00944-01,P00944,Long-term financial resilience,156543.86,2029-12-31,high,CHF
+G-P00945-01,P00945,Emergency savings,14473.36,2029-12-31,high,CHF
+G-P00945-02,P00945,Retirement reserve,65470.23,2032-12-31,medium,CHF
+G-P00946-01,P00946,Long-term financial resilience,14727.6,2029-12-31,high,CHF
+G-P00947-01,P00947,Long-term financial resilience,60229.01,2029-12-31,high,CHF
+G-P00948-01,P00948,Long-term financial resilience,103794.82,2029-12-31,high,CHF
+G-P00949-01,P00949,Emergency savings,15209.04,2029-12-31,high,CHF
+G-P00949-02,P00949,Retirement reserve,42681.13,2032-12-31,medium,CHF
+G-P00950-01,P00950,Long-term financial resilience,135424.61,2029-12-31,high,CHF
+G-P00951-01,P00951,Long-term financial resilience,19522.88,2029-12-31,high,CHF
+G-P00952-01,P00952,Long-term financial resilience,221382.77,2029-12-31,high,CHF
+G-P00953-01,P00953,Long-term financial resilience,143552.91,2029-12-31,high,CHF
+G-P00953-02,P00953,Housing deposit,57759.36,2032-12-31,medium,CHF
+G-P00954-01,P00954,Emergency savings,65178.34,2029-12-31,high,CHF
+G-P00955-01,P00955,Long-term financial resilience,211683.44,2029-12-31,high,CHF
+G-P00956-01,P00956,Long-term financial resilience,15872.22,2029-12-31,high,CHF
+G-P00957-01,P00957,Long-term financial resilience,134179.44,2029-12-31,high,CHF
+G-P00957-02,P00957,Education flexibility,61904.15,2032-12-31,medium,CHF
+G-P00958-01,P00958,Long-term financial resilience,85815.86,2029-12-31,high,CHF
+G-P00959-01,P00959,Emergency savings,67263.12,2029-12-31,high,CHF
+G-P00960-01,P00960,Emergency savings,48238.08,2029-12-31,high,CHF
+G-P00961-01,P00961,Emergency savings,30700.74,2029-12-31,high,CHF
+G-P00961-02,P00961,Retirement reserve,49142.21,2032-12-31,medium,CHF
+G-P00962-01,P00962,Long-term financial resilience,161254.32,2029-12-31,high,CHF
+G-P00963-01,P00963,Long-term financial resilience,98976.61,2029-12-31,high,CHF
+G-P00964-01,P00964,Emergency savings,10000,2029-12-31,high,CHF
+G-P00965-01,P00965,Emergency savings,90051.89,2029-12-31,high,CHF
+G-P00965-02,P00965,Housing deposit,98395.06,2032-12-31,medium,CHF
+G-P00966-01,P00966,Long-term financial resilience,192052.24,2029-12-31,high,CHF
+G-P00967-01,P00967,Emergency savings,12689.26,2029-12-31,high,CHF
+G-P00968-01,P00968,Long-term financial resilience,210568.46,2029-12-31,high,CHF
+G-P00969-01,P00969,Long-term financial resilience,74743.76,2029-12-31,high,CHF
+G-P00969-02,P00969,Housing deposit,69590.99,2032-12-31,medium,CHF
+G-P00970-01,P00970,Long-term financial resilience,50377.31,2029-12-31,high,CHF
+G-P00971-01,P00971,Long-term financial resilience,126048.38,2029-12-31,high,CHF
+G-P00972-01,P00972,Emergency savings,132857.26,2029-12-31,high,CHF
+G-P00973-01,P00973,Long-term financial resilience,51983.5,2029-12-31,high,CHF
+G-P00973-02,P00973,Housing deposit,33451.36,2032-12-31,medium,CHF
+G-P00974-01,P00974,Long-term financial resilience,232323.81,2029-12-31,high,CHF
+G-P00975-01,P00975,Emergency savings,179459.22,2029-12-31,high,CHF
+G-P00976-01,P00976,Long-term financial resilience,211586.51,2029-12-31,high,CHF
+G-P00977-01,P00977,Long-term financial resilience,152154.14,2029-12-31,high,CHF
+G-P00977-02,P00977,Housing deposit,50260.05,2032-12-31,medium,CHF
+G-P00978-01,P00978,Emergency savings,86466.19,2029-12-31,high,CHF
+G-P00979-01,P00979,Emergency savings,25128.19,2029-12-31,high,CHF
+G-P00980-01,P00980,Long-term financial resilience,190173.06,2029-12-31,high,CHF
+G-P00981-01,P00981,Long-term financial resilience,122636.83,2029-12-31,high,CHF
+G-P00981-02,P00981,Retirement reserve,73827.78,2032-12-31,medium,CHF
+G-P00982-01,P00982,Emergency savings,187653.01,2029-12-31,high,CHF
+G-P00983-01,P00983,Long-term financial resilience,62322.05,2029-12-31,high,CHF
+G-P00984-01,P00984,Long-term financial resilience,193047.89,2029-12-31,high,CHF
+G-P00985-01,P00985,Emergency savings,27774.58,2029-12-31,high,CHF
+G-P00985-02,P00985,Career transition,78476.67,2032-12-31,medium,CHF
+G-P00986-01,P00986,Long-term financial resilience,67430.67,2029-12-31,high,CHF
+G-P00987-01,P00987,Long-term financial resilience,195798.7,2029-12-31,high,CHF
+G-P00988-01,P00988,Emergency savings,10000,2029-12-31,high,CHF
+G-P00989-01,P00989,Emergency savings,12661.34,2029-12-31,high,CHF
+G-P00989-02,P00989,Retirement reserve,85729.68,2032-12-31,medium,CHF
+G-P00990-01,P00990,Emergency savings,14315.82,2029-12-31,high,CHF
+G-P00991-01,P00991,Emergency savings,41170.61,2029-12-31,high,CHF
+G-P00992-01,P00992,Long-term financial resilience,10704.59,2029-12-31,high,CHF
+G-P00993-01,P00993,Long-term financial resilience,208459.14,2029-12-31,high,CHF
+G-P00993-02,P00993,Career transition,80796.49,2032-12-31,medium,CHF
+G-P00994-01,P00994,Long-term financial resilience,105966.29,2029-12-31,high,CHF
+G-P00995-01,P00995,Long-term financial resilience,47496.85,2029-12-31,high,CHF
+G-P00996-01,P00996,Emergency savings,36933.23,2029-12-31,high,CHF
+G-P00997-01,P00997,Emergency savings,12782.77,2029-12-31,high,CHF
+G-P00997-02,P00997,Retirement reserve,25313.26,2032-12-31,medium,CHF
+G-P00998-01,P00998,Emergency savings,60909.34,2029-12-31,high,CHF
+G-P00999-01,P00999,Emergency savings,65740.99,2029-12-31,high,CHF
+G-P01000-01,P01000,Emergency savings,63072.7,2029-12-31,high,CHF
+G-P01001-01,P01001,Long-term financial resilience,167862.8,2029-12-31,high,CHF
+G-P01001-02,P01001,Housing deposit,53181.41,2032-12-31,medium,CHF
+G-P01002-01,P01002,Long-term financial resilience,148630.59,2029-12-31,high,CHF
+G-P01003-01,P01003,Long-term financial resilience,163105.01,2029-12-31,high,CHF
+G-P01004-01,P01004,Long-term financial resilience,101125.81,2029-12-31,high,CHF
+G-P01005-01,P01005,Long-term financial resilience,177318.35,2029-12-31,high,CHF
+G-P01005-02,P01005,Education flexibility,72996.51,2032-12-31,medium,CHF
+G-P01006-01,P01006,Long-term financial resilience,180902.1,2029-12-31,high,CHF
+G-P01007-01,P01007,Long-term financial resilience,82339.66,2029-12-31,high,CHF
+G-P01008-01,P01008,Long-term financial resilience,98543.55,2029-12-31,high,CHF
+G-P01009-01,P01009,Emergency savings,29765.94,2029-12-31,high,CHF
+G-P01009-02,P01009,Career transition,58628.04,2032-12-31,medium,CHF
+G-P01010-01,P01010,Emergency savings,38453.33,2029-12-31,high,CHF
+G-P01011-01,P01011,Long-term financial resilience,186811.44,2029-12-31,high,CHF
+G-P01012-01,P01012,Long-term financial resilience,135303.26,2029-12-31,high,CHF
+G-P01013-01,P01013,Emergency savings,123629.44,2029-12-31,high,CHF
+G-P01013-02,P01013,Career transition,90243.57,2032-12-31,medium,CHF
+G-P01014-01,P01014,Long-term financial resilience,113645.87,2029-12-31,high,CHF
+G-P01015-01,P01015,Long-term financial resilience,223486.19,2029-12-31,high,CHF
+G-P01016-01,P01016,Emergency savings,58888.0,2029-12-31,high,CHF
+G-P01017-01,P01017,Long-term financial resilience,47600.64,2029-12-31,high,CHF
+G-P01017-02,P01017,Career transition,80667.36,2032-12-31,medium,CHF
+G-P01018-01,P01018,Emergency savings,214777.68,2029-12-31,high,CHF
+G-P01019-01,P01019,Long-term financial resilience,161898.3,2029-12-31,high,CHF
+G-P01020-01,P01020,Long-term financial resilience,144880.43,2029-12-31,high,CHF
+G-P01021-01,P01021,Emergency savings,49957.06,2029-12-31,high,CHF
+G-P01021-02,P01021,Education flexibility,53129.39,2032-12-31,medium,CHF
+G-P01022-01,P01022,Emergency savings,20483.47,2029-12-31,high,CHF
+G-P01023-01,P01023,Long-term financial resilience,49958.64,2029-12-31,high,CHF
+G-P01024-01,P01024,Long-term financial resilience,130829.76,2029-12-31,high,CHF
+G-P01025-01,P01025,Emergency savings,44292.14,2029-12-31,high,CHF
+G-P01025-02,P01025,Education flexibility,48021.25,2032-12-31,medium,CHF
+G-P01026-01,P01026,Emergency savings,79831.63,2029-12-31,high,CHF
+G-P01027-01,P01027,Long-term financial resilience,52810.74,2029-12-31,high,CHF
+G-P01028-01,P01028,Long-term financial resilience,159737.2,2029-12-31,high,CHF
+G-P01029-01,P01029,Long-term financial resilience,239255.31,2029-12-31,high,CHF
+G-P01029-02,P01029,Career transition,96083.02,2032-12-31,medium,CHF
+G-P01030-01,P01030,Emergency savings,33433.97,2029-12-31,high,CHF
+G-P01031-01,P01031,Long-term financial resilience,80028.45,2029-12-31,high,CHF
+G-P01032-01,P01032,Long-term financial resilience,194698.98,2029-12-31,high,CHF
+G-P01033-01,P01033,Long-term financial resilience,194318.51,2029-12-31,high,CHF
+G-P01033-02,P01033,Housing deposit,52305.68,2032-12-31,medium,CHF
+G-P01034-01,P01034,Emergency savings,85942.93,2029-12-31,high,CHF
+G-P01035-01,P01035,Emergency savings,12594.24,2029-12-31,high,CHF
+G-P01036-01,P01036,Long-term financial resilience,134550.46,2029-12-31,high,CHF
+G-P01037-01,P01037,Emergency savings,196220.03,2029-12-31,high,CHF
+G-P01037-02,P01037,Housing deposit,70341.67,2032-12-31,medium,CHF
+G-P01038-01,P01038,Long-term financial resilience,32445.36,2029-12-31,high,CHF
+G-P01039-01,P01039,Emergency savings,51018.27,2029-12-31,high,CHF
+G-P01040-01,P01040,Long-term financial resilience,84935.1,2029-12-31,high,CHF
+G-P01041-01,P01041,Emergency savings,92058.19,2029-12-31,high,CHF
+G-P01041-02,P01041,Education flexibility,15309.67,2032-12-31,medium,CHF
+G-P01042-01,P01042,Long-term financial resilience,84647.68,2029-12-31,high,CHF
+G-P01043-01,P01043,Emergency savings,50316.98,2029-12-31,high,CHF
+G-P01044-01,P01044,Long-term financial resilience,146798.72,2029-12-31,high,CHF
+G-P01045-01,P01045,Long-term financial resilience,195407.34,2029-12-31,high,CHF
+G-P01045-02,P01045,Career transition,104851.28,2032-12-31,medium,CHF
+G-P01046-01,P01046,Long-term financial resilience,229725.55,2029-12-31,high,CHF
+G-P01047-01,P01047,Long-term financial resilience,153706.82,2029-12-31,high,CHF
+G-P01048-01,P01048,Long-term financial resilience,137471.86,2029-12-31,high,CHF
+G-P01049-01,P01049,Long-term financial resilience,43377.73,2029-12-31,high,CHF
+G-P01049-02,P01049,Housing deposit,74553.83,2032-12-31,medium,CHF
+G-P01050-01,P01050,Long-term financial resilience,170032.51,2029-12-31,high,CHF
+G-P01051-01,P01051,Long-term financial resilience,204508.18,2029-12-31,high,CHF
+G-P01052-01,P01052,Long-term financial resilience,49248.37,2029-12-31,high,CHF
+G-P01053-01,P01053,Long-term financial resilience,232800.34,2029-12-31,high,CHF
+G-P01053-02,P01053,Career transition,86187.9,2032-12-31,medium,CHF
+G-P01054-01,P01054,Long-term financial resilience,186327.81,2029-12-31,high,CHF
+G-P01055-01,P01055,Emergency savings,10000,2029-12-31,high,CHF
+G-P01056-01,P01056,Emergency savings,149734.61,2029-12-31,high,CHF
+G-P01057-01,P01057,Emergency savings,18624.19,2029-12-31,high,CHF
+G-P01057-02,P01057,Education flexibility,83699.37,2032-12-31,medium,CHF
+G-P01058-01,P01058,Long-term financial resilience,205443.23,2029-12-31,high,CHF
+G-P01059-01,P01059,Long-term financial resilience,44395.76,2029-12-31,high,CHF
+G-P01060-01,P01060,Long-term financial resilience,72888.45,2029-12-31,high,CHF
+G-P01061-01,P01061,Emergency savings,79502.83,2029-12-31,high,CHF
+G-P01061-02,P01061,Housing deposit,90700.04,2032-12-31,medium,CHF
+G-P01062-01,P01062,Long-term financial resilience,30102.1,2029-12-31,high,CHF
+G-P01063-01,P01063,Emergency savings,27432.58,2029-12-31,high,CHF
+G-P01064-01,P01064,Long-term financial resilience,190181.33,2029-12-31,high,CHF
+G-P01065-01,P01065,Long-term financial resilience,205216.86,2029-12-31,high,CHF
+G-P01065-02,P01065,Housing deposit,18734.87,2032-12-31,medium,CHF
+G-P01066-01,P01066,Emergency savings,83580.91,2029-12-31,high,CHF
+G-P01067-01,P01067,Long-term financial resilience,68501.12,2029-12-31,high,CHF
+G-P01068-01,P01068,Long-term financial resilience,66441.7,2029-12-31,high,CHF
+G-P01069-01,P01069,Long-term financial resilience,162965.98,2029-12-31,high,CHF
+G-P01069-02,P01069,Housing deposit,97449.77,2032-12-31,medium,CHF
+G-P01070-01,P01070,Long-term financial resilience,44779.2,2029-12-31,high,CHF
+G-P01071-01,P01071,Emergency savings,59275.18,2029-12-31,high,CHF
+G-P01072-01,P01072,Emergency savings,37831.79,2029-12-31,high,CHF
+G-P01073-01,P01073,Emergency savings,40493.25,2029-12-31,high,CHF
+G-P01073-02,P01073,Career transition,108648.58,2032-12-31,medium,CHF
+G-P01074-01,P01074,Long-term financial resilience,113558.03,2029-12-31,high,CHF
+G-P01075-01,P01075,Long-term financial resilience,238482.53,2029-12-31,high,CHF
+G-P01076-01,P01076,Emergency savings,31308.4,2029-12-31,high,CHF
+G-P01077-01,P01077,Long-term financial resilience,53631.58,2029-12-31,high,CHF
+G-P01077-02,P01077,Education flexibility,11650.29,2032-12-31,medium,CHF
+G-P01078-01,P01078,Long-term financial resilience,148126.61,2029-12-31,high,CHF
+G-P01079-01,P01079,Long-term financial resilience,121326.4,2029-12-31,high,CHF
+G-P01080-01,P01080,Emergency savings,41225.79,2029-12-31,high,CHF
+G-P01081-01,P01081,Long-term financial resilience,207651.12,2029-12-31,high,CHF
+G-P01081-02,P01081,Housing deposit,98316.38,2032-12-31,medium,CHF
+G-P01082-01,P01082,Long-term financial resilience,118492.94,2029-12-31,high,CHF
+G-P01083-01,P01083,Long-term financial resilience,142956.14,2029-12-31,high,CHF
+G-P01084-01,P01084,Emergency savings,26216.19,2029-12-31,high,CHF
+G-P01085-01,P01085,Long-term financial resilience,13764.48,2029-12-31,high,CHF
+G-P01085-02,P01085,Career transition,64684.38,2032-12-31,medium,CHF
+G-P01086-01,P01086,Emergency savings,57058.05,2029-12-31,high,CHF
+G-P01087-01,P01087,Long-term financial resilience,122263.41,2029-12-31,high,CHF
+G-P01088-01,P01088,Long-term financial resilience,193020.03,2029-12-31,high,CHF
+G-P01089-01,P01089,Emergency savings,28054.85,2029-12-31,high,CHF
+G-P01089-02,P01089,Retirement reserve,30795.65,2032-12-31,medium,CHF
+G-P01090-01,P01090,Long-term financial resilience,214743.94,2029-12-31,high,CHF
+G-P01091-01,P01091,Long-term financial resilience,187218.05,2029-12-31,high,CHF
+G-P01092-01,P01092,Long-term financial resilience,98871.81,2029-12-31,high,CHF
+G-P01093-01,P01093,Emergency savings,182498.88,2029-12-31,high,CHF
+G-P01093-02,P01093,Career transition,93461.12,2032-12-31,medium,CHF
+G-P01094-01,P01094,Emergency savings,30831.76,2029-12-31,high,CHF
+G-P01095-01,P01095,Emergency savings,67738.42,2029-12-31,high,CHF
+G-P01096-01,P01096,Emergency savings,10000,2029-12-31,high,CHF
+G-P01097-01,P01097,Long-term financial resilience,222849.38,2029-12-31,high,CHF
+G-P01097-02,P01097,Education flexibility,63823.21,2032-12-31,medium,CHF
+G-P01098-01,P01098,Emergency savings,42984.24,2029-12-31,high,CHF
+G-P01099-01,P01099,Long-term financial resilience,135197.86,2029-12-31,high,CHF
+G-P01100-01,P01100,Long-term financial resilience,175179.74,2029-12-31,high,CHF
+G-P01101-01,P01101,Long-term financial resilience,82761.36,2029-12-31,high,CHF
+G-P01101-02,P01101,Education flexibility,102694.65,2032-12-31,medium,CHF
+G-P01102-01,P01102,Long-term financial resilience,22110.32,2029-12-31,high,CHF
+G-P01103-01,P01103,Emergency savings,32077.39,2029-12-31,high,CHF
+G-P01104-01,P01104,Long-term financial resilience,88826.27,2029-12-31,high,CHF
+G-P01105-01,P01105,Emergency savings,45160.08,2029-12-31,high,CHF
+G-P01105-02,P01105,Retirement reserve,16673.21,2032-12-31,medium,CHF
+G-P01106-01,P01106,Long-term financial resilience,62656.62,2029-12-31,high,CHF
+G-P01107-01,P01107,Long-term financial resilience,14690.46,2029-12-31,high,CHF
+G-P01108-01,P01108,Emergency savings,206241.33,2029-12-31,high,CHF
+G-P01109-01,P01109,Long-term financial resilience,183482.05,2029-12-31,high,CHF
+G-P01109-02,P01109,Retirement reserve,62502.24,2032-12-31,medium,CHF
+G-P01110-01,P01110,Long-term financial resilience,130365.25,2029-12-31,high,CHF
+G-P01111-01,P01111,Emergency savings,23137.01,2029-12-31,high,CHF
+G-P01112-01,P01112,Long-term financial resilience,49608.82,2029-12-31,high,CHF
+G-P01113-01,P01113,Emergency savings,88592.35,2029-12-31,high,CHF
+G-P01113-02,P01113,Career transition,71807.95,2032-12-31,medium,CHF
+G-P01114-01,P01114,Emergency savings,10000,2029-12-31,high,CHF
+G-P01115-01,P01115,Long-term financial resilience,77721.89,2029-12-31,high,CHF
+G-P01116-01,P01116,Long-term financial resilience,218669.17,2029-12-31,high,CHF
+G-P01117-01,P01117,Long-term financial resilience,27324.19,2029-12-31,high,CHF
+G-P01117-02,P01117,Career transition,45929.78,2032-12-31,medium,CHF
+G-P01118-01,P01118,Long-term financial resilience,121953.62,2029-12-31,high,CHF
+G-P01119-01,P01119,Emergency savings,75000.06,2029-12-31,high,CHF
+G-P01120-01,P01120,Long-term financial resilience,226395.78,2029-12-31,high,CHF
+G-P01121-01,P01121,Long-term financial resilience,214493.63,2029-12-31,high,CHF
+G-P01121-02,P01121,Career transition,43643.83,2032-12-31,medium,CHF
+G-P01122-01,P01122,Long-term financial resilience,20669.17,2029-12-31,high,CHF
+G-P01123-01,P01123,Long-term financial resilience,114155.17,2029-12-31,high,CHF
+G-P01124-01,P01124,Emergency savings,27575.94,2029-12-31,high,CHF
+G-P01125-01,P01125,Long-term financial resilience,138875.04,2029-12-31,high,CHF
+G-P01125-02,P01125,Career transition,78840.39,2032-12-31,medium,CHF
+G-P01126-01,P01126,Long-term financial resilience,128199.44,2029-12-31,high,CHF
+G-P01127-01,P01127,Emergency savings,64206.16,2029-12-31,high,CHF
+G-P01128-01,P01128,Long-term financial resilience,23858.78,2029-12-31,high,CHF
+G-P01129-01,P01129,Emergency savings,84473.31,2029-12-31,high,CHF
+G-P01129-02,P01129,Housing deposit,22034.63,2032-12-31,medium,CHF
+G-P01130-01,P01130,Long-term financial resilience,164363.01,2029-12-31,high,CHF
+G-P01131-01,P01131,Long-term financial resilience,230056.64,2029-12-31,high,CHF
+G-P01132-01,P01132,Emergency savings,63450.53,2029-12-31,high,CHF
+G-P01133-01,P01133,Long-term financial resilience,122165.34,2029-12-31,high,CHF
+G-P01133-02,P01133,Education flexibility,37686.82,2032-12-31,medium,CHF
+G-P01134-01,P01134,Emergency savings,41514.35,2029-12-31,high,CHF
+G-P01135-01,P01135,Long-term financial resilience,218496.02,2029-12-31,high,CHF
+G-P01136-01,P01136,Long-term financial resilience,103639.17,2029-12-31,high,CHF
+G-P01137-01,P01137,Long-term financial resilience,130692.62,2029-12-31,high,CHF
+G-P01137-02,P01137,Housing deposit,103962.24,2032-12-31,medium,CHF
+G-P01138-01,P01138,Long-term financial resilience,213799.68,2029-12-31,high,CHF
+G-P01139-01,P01139,Long-term financial resilience,205513.26,2029-12-31,high,CHF
+G-P01140-01,P01140,Long-term financial resilience,12852.94,2029-12-31,high,CHF
+G-P01141-01,P01141,Long-term financial resilience,111310.34,2029-12-31,high,CHF
+G-P01141-02,P01141,Education flexibility,79044.54,2032-12-31,medium,CHF
+G-P01142-01,P01142,Long-term financial resilience,72415.44,2029-12-31,high,CHF
+G-P01143-01,P01143,Emergency savings,190446.05,2029-12-31,high,CHF
+G-P01144-01,P01144,Long-term financial resilience,204382.13,2029-12-31,high,CHF
+G-P01145-01,P01145,Emergency savings,77360.96,2029-12-31,high,CHF
+G-P01145-02,P01145,Education flexibility,101687.3,2032-12-31,medium,CHF
+G-P01146-01,P01146,Long-term financial resilience,53516.83,2029-12-31,high,CHF
+G-P01147-01,P01147,Emergency savings,231617.33,2029-12-31,high,CHF
+G-P01148-01,P01148,Long-term financial resilience,36036.62,2029-12-31,high,CHF
+G-P01149-01,P01149,Emergency savings,32419.3,2029-12-31,high,CHF
+G-P01149-02,P01149,Housing deposit,108744.33,2032-12-31,medium,CHF
+G-P01150-01,P01150,Long-term financial resilience,61071.2,2029-12-31,high,CHF
+G-P01151-01,P01151,Long-term financial resilience,201925.57,2029-12-31,high,CHF
+G-P01152-01,P01152,Emergency savings,53543.23,2029-12-31,high,CHF
+G-P01153-01,P01153,Emergency savings,47392.9,2029-12-31,high,CHF
+G-P01153-02,P01153,Retirement reserve,106776.83,2032-12-31,medium,CHF
+G-P01154-01,P01154,Long-term financial resilience,217607.42,2029-12-31,high,CHF
+G-P01155-01,P01155,Long-term financial resilience,206421.66,2029-12-31,high,CHF
+G-P01156-01,P01156,Long-term financial resilience,118386.94,2029-12-31,high,CHF
+G-P01157-01,P01157,Long-term financial resilience,127022.56,2029-12-31,high,CHF
+G-P01157-02,P01157,Retirement reserve,27027.85,2032-12-31,medium,CHF
+G-P01158-01,P01158,Long-term financial resilience,36284.88,2029-12-31,high,CHF
+G-P01159-01,P01159,Emergency savings,235578.83,2029-12-31,high,CHF
+G-P01160-01,P01160,Long-term financial resilience,83572.54,2029-12-31,high,CHF
+G-P01161-01,P01161,Long-term financial resilience,30290.61,2029-12-31,high,CHF
+G-P01161-02,P01161,Education flexibility,84448.44,2032-12-31,medium,CHF
+G-P01162-01,P01162,Emergency savings,27078.7,2029-12-31,high,CHF
+G-P01163-01,P01163,Long-term financial resilience,182986.32,2029-12-31,high,CHF
+G-P01164-01,P01164,Emergency savings,57722.59,2029-12-31,high,CHF
+G-P01165-01,P01165,Long-term financial resilience,60734.77,2029-12-31,high,CHF
+G-P01165-02,P01165,Housing deposit,36243.45,2032-12-31,medium,CHF
+G-P01166-01,P01166,Long-term financial resilience,129178.37,2029-12-31,high,CHF
+G-P01167-01,P01167,Long-term financial resilience,38639.89,2029-12-31,high,CHF
+G-P01168-01,P01168,Long-term financial resilience,150639.02,2029-12-31,high,CHF
+G-P01169-01,P01169,Emergency savings,39591.68,2029-12-31,high,CHF
+G-P01169-02,P01169,Housing deposit,52343.75,2032-12-31,medium,CHF
+G-P01170-01,P01170,Long-term financial resilience,116218.48,2029-12-31,high,CHF
+G-P01171-01,P01171,Long-term financial resilience,29297.25,2029-12-31,high,CHF
+G-P01172-01,P01172,Emergency savings,10000,2029-12-31,high,CHF
+G-P01173-01,P01173,Long-term financial resilience,69376.88,2029-12-31,high,CHF
+G-P01173-02,P01173,Career transition,70577.85,2032-12-31,medium,CHF
+G-P01174-01,P01174,Emergency savings,87361.54,2029-12-31,high,CHF
+G-P01175-01,P01175,Emergency savings,45905.12,2029-12-31,high,CHF
+G-P01176-01,P01176,Long-term financial resilience,110166.3,2029-12-31,high,CHF
+G-P01177-01,P01177,Emergency savings,74118.35,2029-12-31,high,CHF
+G-P01177-02,P01177,Career transition,98138.59,2032-12-31,medium,CHF
+G-P01178-01,P01178,Long-term financial resilience,220319.73,2029-12-31,high,CHF
+G-P01179-01,P01179,Emergency savings,85342.91,2029-12-31,high,CHF
+G-P01180-01,P01180,Long-term financial resilience,51399.71,2029-12-31,high,CHF
+G-P01181-01,P01181,Long-term financial resilience,200124.3,2029-12-31,high,CHF
+G-P01181-02,P01181,Retirement reserve,12231.59,2032-12-31,medium,CHF
+G-P01182-01,P01182,Long-term financial resilience,61217.04,2029-12-31,high,CHF
+G-P01183-01,P01183,Long-term financial resilience,31657.95,2029-12-31,high,CHF
+G-P01184-01,P01184,Long-term financial resilience,92619.12,2029-12-31,high,CHF
+G-P01185-01,P01185,Long-term financial resilience,213789.36,2029-12-31,high,CHF
+G-P01185-02,P01185,Housing deposit,109428.4,2032-12-31,medium,CHF
+G-P01186-01,P01186,Emergency savings,46427.94,2029-12-31,high,CHF
+G-P01187-01,P01187,Long-term financial resilience,192648.27,2029-12-31,high,CHF
+G-P01188-01,P01188,Long-term financial resilience,130276.42,2029-12-31,high,CHF
+G-P01189-01,P01189,Emergency savings,46404.08,2029-12-31,high,CHF
+G-P01189-02,P01189,Retirement reserve,51231.66,2032-12-31,medium,CHF
+G-P01190-01,P01190,Long-term financial resilience,203648.46,2029-12-31,high,CHF
+G-P01191-01,P01191,Long-term financial resilience,174734.9,2029-12-31,high,CHF
+G-P01192-01,P01192,Emergency savings,10660.82,2029-12-31,high,CHF
+G-P01193-01,P01193,Emergency savings,45403.84,2029-12-31,high,CHF
+G-P01193-02,P01193,Education flexibility,84845.76,2032-12-31,medium,CHF
+G-P01194-01,P01194,Emergency savings,55706.86,2029-12-31,high,CHF
+G-P01195-01,P01195,Long-term financial resilience,81427.84,2029-12-31,high,CHF
+G-P01196-01,P01196,Long-term financial resilience,62775.25,2029-12-31,high,CHF
+G-P01197-01,P01197,Emergency savings,146272.35,2029-12-31,high,CHF
+G-P01197-02,P01197,Career transition,26786.22,2032-12-31,medium,CHF
+G-P01198-01,P01198,Long-term financial resilience,235134.93,2029-12-31,high,CHF
+G-P01199-01,P01199,Emergency savings,29432.67,2029-12-31,high,CHF
+G-P01200-01,P01200,Long-term financial resilience,227074.19,2029-12-31,high,CHF
