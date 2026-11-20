@@ -1,0 +1,11 @@
+{
+  "name": "Alexia",
+  "fictional": true,
+  "age_at_start": 20,
+  "city": "Lausanne",
+  "country": "CH",
+  "currency": "CHF",
+  "opening_cash_chf": 8000,
+  "horizon_months": 120,
+  "note": "Synthetic example. Figures do not represent official Swiss household statistics."
+}

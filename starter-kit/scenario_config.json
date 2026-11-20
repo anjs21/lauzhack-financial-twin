@@ -1,0 +1,61 @@
+{
+  "note": "All amounts are illustrative CHF assumptions, not predictions or official salary/rent data.",
+  "scenarios": [
+    {
+      "name": "Start working",
+      "phases": [
+        {
+          "start_month": 0,
+          "end_month": 120,
+          "monthly_income_chf": 4200,
+          "monthly_expenses_chf": 3000
+        }
+      ],
+      "one_off_costs": []
+    },
+    {
+      "name": "Master's degree",
+      "phases": [
+        {
+          "start_month": 0,
+          "end_month": 24,
+          "monthly_income_chf": 1200,
+          "monthly_expenses_chf": 2100
+        },
+        {
+          "start_month": 24,
+          "end_month": 120,
+          "monthly_income_chf": 4800,
+          "monthly_expenses_chf": 3100
+        }
+      ],
+      "one_off_costs": [
+        {
+          "month": 0,
+          "amount_chf": 2500
+        },
+        {
+          "month": 12,
+          "amount_chf": 2500
+        }
+      ]
+    },
+    {
+      "name": "Move abroad",
+      "phases": [
+        {
+          "start_month": 0,
+          "end_month": 120,
+          "monthly_income_chf": 3700,
+          "monthly_expenses_chf": 2900
+        }
+      ],
+      "one_off_costs": [
+        {
+          "month": 0,
+          "amount_chf": 6500
+        }
+      ]
+    }
+  ]
+}
