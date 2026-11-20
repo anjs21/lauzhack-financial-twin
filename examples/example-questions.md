@@ -1,7 +1,7 @@
 
 # 100 Financial Twin Questions
 
-**UBS × LauzHack 2026 | Example Question Library**
+** LauzHack 2026 | Example Question Library**
 
 These questions are intended to inspire scenario exploration.
 
