@@ -91,7 +91,7 @@ def test_cash_identity_every_month(world):
         a = np.stack([rng.integers(0, 5, s.n), rng.integers(-1, 2, s.n), rng.integers(-1, 2, s.n),
                       rng.integers(-1, 2, s.n)], 1)
         s1, info = world.step(s, a, streams)
-        assert np.allclose(s1.cash, s.cash - info["transfer"] + info["net"], atol=1e-6)
+        assert np.allclose(s1.cash, s.cash - info["transfer"] + info["net"] + info["topup"], atol=1e-6)
         s = s1
 
 
@@ -101,14 +101,15 @@ def test_transfers_do_not_change_net_worth():
     people = profiles().iloc[:100]
     streams = Streams(3, len(people))
     s = w.initial_state(people, 1, streams)
-    for t in range(12):
+    for t in range(24):
         a = np.zeros((s.n, 4), int)
-        a[:, 3] = 1 if t % 2 == 0 else -1                 # invest, then sell
+        a[:, 3] = 1 if t < 12 else -1                 # invest in year one, sell in year two
         s1, info = w.step(s, a, streams)
         nw0, nw1 = s.cash + s.inv - s.debt, s1.cash + s1.inv - s1.debt
         expected = info["net"] + info["loan_payment"] - info["loan_interest"]
         assert np.allclose(nw1 - nw0, expected, atol=1e-6)
-        assert (np.abs(info["transfer"]) > 0).any()
+        moved = (np.abs(info["transfer"]) > 0).any()
+        assert moved if t in (0, 12) else not moved   # transfers only at the January review
         s = s1
 
 

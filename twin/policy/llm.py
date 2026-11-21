@@ -305,9 +305,19 @@ def apply_demos(P, M, train_ids, n_paths, weight=10.0, path=DEMOS, power=(1.0, 2
         raise SystemExit("The saved LLM labels describe trajectories from an older decision clock. Regenerate labels before cloning with --llm.")
     if meta["n_paths"] != n_paths or meta["train_ids_hash"] != hashlib.sha256(",".join(train_ids).encode()).hexdigest()[:16]:
         raise SystemExit("llm_demos.json was made for other teacher lives; rerun `python -m twin llm-demos`.")
-    P = P.copy()
+    P0, P = P, P.copy()
     W = np.ones(P.shape[:2], np.float32)
+    used = 0
     for demo in d["demos"]:
-        P[demo["life"], demo["month"]] = sharpen(demo["probs"], power) * M[demo["life"], demo["month"]]
-        W[demo["life"], demo["month"]] = weight
-    return P, W, len(d["demos"])
+        i, k = demo["life"], demo["month"]
+        # The answer belongs to one simulated situation; if the teacher lives changed (new rules,
+        # new decision months), the rule targets there differ and the answer no longer fits.
+        if not np.allclose(P0[i, k], demo["rule_probs"], atol=1e-3):
+            continue
+        P[i, k] = sharpen(demo["probs"], power) * M[i, k]
+        W[i, k] = weight
+        used += 1
+    if used < len(d["demos"]):
+        print(f"skipped {len(d['demos']) - used} of {len(d['demos'])} LLM answers whose situations changed; "
+              "rerun `python -m twin llm-demos` to ask about the current decision points")
+    return P, W, used

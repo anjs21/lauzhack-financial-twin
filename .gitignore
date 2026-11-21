@@ -8,6 +8,7 @@ venv/
 *.egg-info/
 /build/
 /dist/
+*/__pycache__/
 
 # Local configuration and credentials
 .env

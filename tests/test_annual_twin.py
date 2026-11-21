@@ -25,9 +25,9 @@ def test_dated_major_plan_waits_for_january(policy, world):
     p.intentions = [Intention("status", 0, when="2025-01"), Intention("status", 2, when="2025-03")]
     out = simulate(world, people, p, 40, 32, horizon=24, policy_cls=policy)
     quiet = np.arange(24) % 12 != 0
-    assert (out.action[:, quiet, :2] == 0).all()
+    assert (out.action[:, quiet] == 0).all()                  # no voluntary choice outside January
     assert (out.action[:, 12, 0] == 2).all()
-    assert (out.action[:, quiet, 2:] != 0).any()
+    assert (out.action[:, [0, 12], 2:] != 0).any()            # lifestyle / investing happen in January
 
 
 def test_live_offer_and_observation(tmp_path, world):
@@ -45,15 +45,17 @@ def test_live_offer_and_observation(tmp_path, world):
     committed = simulate(world, people, p, 40, 2, horizon=2, timeline=saved.timeline)
     assert np.array_equal(preview.cash, committed.cash)
     assert (committed.income[:, 1] >= 12500).all()
-    with pytest.raises(ValueError):
-        record(db, saved, 1, "observation", {"cash": 1})
-    record(db, saved, 0, "observation", {"cash": 100, "investments": 50000, "rent": 1200, "income": 4200})
+    for month in (0, 1, 10):                                  # only the December year-end check-in
+        with pytest.raises(ValueError):
+            record(db, saved, month, "observation", {"cash": 1})
+    record(db, saved, 11, "observation", {"cash": 100, "investments": 50000, "rent": 1200, "income": 4200,
+                                          "avg_net_flow": 2500})
     observed = read_journal(db, "P00003")
-    assert observed.current_month == 1
-    updated = simulate(world, people, p, 40, 2, horizon=2, timeline=observed.timeline)
-    assert np.all(updated.cash[:, 1] == 100) and np.all(updated.inv[:, 1] == 50000)
-    assert np.allclose(updated.income[:, 1], 4200)
-    assert np.all(updated.mode[:, 1] == C.PART_TIME)
+    assert observed.current_month == 12 and observed.next_checkin == 23
+    updated = simulate(world, people, p, 40, 2, horizon=13, timeline=observed.timeline)
+    assert np.all(updated.cash[:, 12] == 100) and np.all(updated.inv[:, 12] == 50000)
+    assert np.allclose(updated.income[:, 12], 4200)
+    assert np.all(updated.mode[:, 12] == C.PART_TIME)
 
 
 def test_credit_breach_blocks_only_goals_at_or_after_breach(world):

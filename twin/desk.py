@@ -1,13 +1,21 @@
-"""Start with: python -m streamlit run twin/desk.py"""
+"""Start with: python -m streamlit run twin/desk.py
+
+A yearly desk: check in once a year with December figures, decide at the January review,
+and see the spread of possible lives as a fan chart with the reasons behind it.
+"""
+import json
 import os
 from pathlib import Path
 
+import altair as alt
+import numpy as np
 import pandas as pd
 import streamlit as st
 
 from twin import config as C
+from twin import report
 from twin.data import profiles
-from twin.explore import compare, simulate
+from twin.explore import compare, fan, simulate, summarize
 from twin.live import branch, outcomes, read_journal, record, salary_search
 from twin.policy.traits import from_profile
 from twin.world.env import World
@@ -28,9 +36,22 @@ free_time = st.sidebar.slider("Value of free time", 0., 1., float(from_profile(p
 persona = from_profile(person)
 persona.traits["free_time"] = free_time
 seed = C.SEED
+MONTHS = pd.to_datetime([C.month_label(t) for t in range(C.HORIZON + 1)])
 
 
-@st.cache_data(max_entries=24, show_spinner="Comparing possible futures…")
+def jsonable(x):
+    if isinstance(x, dict):
+        return {str(k): jsonable(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [jsonable(v) for v in x]
+    if isinstance(x, (np.generic,)):
+        return x.item()
+    if isinstance(x, float) and np.isnan(x):
+        return None
+    return x
+
+
+@st.cache_data(max_entries=24, show_spinner="Simulating possible lives…")
 def project(profile_id, revision, preference, n, salary, _journal, _world):
     rows = profiles().loc[[profile_id]]
     p = from_profile(rows.iloc[0])
@@ -39,20 +60,63 @@ def project(profile_id, revision, preference, n, salary, _journal, _world):
     out = outcomes(base)
     as_of = _journal.current_month
     out.update(cash=float(base.cash[0, as_of]), invested=float(base.inv[0, as_of]),
-               debt=float(base.debt[0, as_of]), income=float(base.income[0, as_of]))
+               debt=float(base.debt[0, as_of]), income=float(base.income[0, as_of]),
+               fan_nw=fan(base.nw), fan_cash=fan(base.cash))
+    summary = summarize(base)
+    out["summary"] = jsonable({"person": {k: (None if pd.isna(v) else v) for k, v in rows.iloc[0].items()},
+                               "persona": {"traits": p.traits, "temperature": p.temperature, "spread": p.spread,
+                                           "intentions": [], "policy": "rule persona"},
+                               "n_paths": n, "seed": seed, **summary})
     if salary is None:
         return out, None
-    alt = simulate(_world, rows, p, n, seed, timeline=branch(_journal, C.PART_TIME, salary))
-    delta = compare(base, alt)
-    delta["part_time_months"] = float(((alt.mode[:, 1:] == C.PART_TIME).sum(1)
+    alt_paths = simulate(_world, rows, p, n, seed, timeline=branch(_journal, C.PART_TIME, salary))
+    delta = compare(base, alt_paths)
+    delta["part_time_months"] = float(((alt_paths.mode[:, 1:] == C.PART_TIME).sum(1)
                                        - (base.mode[:, 1:] == C.PART_TIME).sum(1)).mean())
+    delta["median_nw"] = np.median(alt_paths.nw, 0)
+    delta["median_cash"] = np.median(alt_paths.cash, 0)
     return out, delta
+
+
+def fan_chart(f, measure, offer_median=None, checkins=(), goal=None):
+    """Fan chart: 5-95% and 25-75% of paths, median, check-ins, offer preview, goal marker."""
+    df = pd.DataFrame({"date": MONTHS, "p5": f[0], "p25": f[1], "p50": f[2], "p75": f[3], "p95": f[4]})
+    x = alt.X("date:T", title=None, axis=alt.Axis(format="%Y", tickCount="year"))
+    y = alt.Y("p5:Q", title=f"{measure}, CHF", axis=alt.Axis(format="~s"))
+    base = alt.Chart(df).encode(x=x)
+    hover = alt.selection_point(nearest=True, on="pointerover", fields=["date"], empty=False)
+    layers = [
+        base.mark_area(color="#86b6ef", opacity=0.35).encode(y=y, y2="p95:Q"),
+        base.mark_area(color="#2a78d6", opacity=0.45).encode(y="p25:Q", y2="p75:Q"),
+        base.mark_line(color="#1c5cab", strokeWidth=2.5).encode(y="p50:Q"),
+        base.mark_rule(color="#888").encode(
+            opacity=alt.condition(hover, alt.value(0.7), alt.value(0)),
+            tooltip=[alt.Tooltip("date:T", title="Month", format="%b %Y")]
+            + [alt.Tooltip(f"{q}:Q", title=t, format=",.0f") for q, t in
+               (("p95", "95th pct"), ("p75", "75th"), ("p50", "median"), ("p25", "25th"), ("p5", "5th"))]
+        ).add_params(hover),
+    ]
+    if offer_median is not None:
+        od = pd.DataFrame({"date": MONTHS, "offer": offer_median})
+        layers.append(alt.Chart(od).mark_line(color="#eb6834", strokeWidth=2, strokeDash=[6, 4])
+                      .encode(x=x, y="offer:Q", tooltip=[alt.Tooltip("offer:Q", title="Median with offer", format=",.0f")]))
+    if len(checkins):
+        cd = pd.DataFrame({"date": MONTHS[[t + 1 for t, _ in checkins]], "value": [v for _, v in checkins]})
+        layers.append(alt.Chart(cd).mark_point(color="black", filled=True, size=60)
+                      .encode(x=x, y="value:Q", tooltip=[alt.Tooltip("date:T", title="Check-in", format="%b %Y"),
+                                                         alt.Tooltip("value:Q", title="Recorded", format=",.0f")]))
+    if goal is not None:
+        gd = pd.DataFrame({"date": [MONTHS[C.T_HIGH_GOAL + 1]], "target": [goal]})
+        layers.append(alt.Chart(gd).mark_point(shape="diamond", size=140, color="black", filled=False, strokeWidth=2)
+                      .encode(x=x, y="target:Q", tooltip=[alt.Tooltip("target:Q", title="Goal target", format=",.0f")]))
+    return alt.layer(*layers).properties(height=360)
 
 
 # Include the full observed history in the cache key, including journals at different paths.
 key = (journal.revision, repr(journal.timeline))
 baseline, _ = project(pid, key, free_time, paths_count, None, journal, world)
-st.subheader(f"{person['name']} · {C.month_label(current) if current < C.HORIZON else 'End of 2034'}")
+as_of = f"start of {C.month_label(current)}" if current < C.HORIZON else "end of 2034"
+st.subheader(f"{person['name']} · {as_of}")
 available = baseline["cash"] if person.high_goal == "Emergency savings" else baseline["cash"] + baseline["invested"] - baseline["debt"]
 gap = max(0, person.high_target - available)
 st.write(f"Cash CHF {baseline['cash']:,.0f} · Investments CHF {baseline['invested']:,.0f} · "
@@ -63,22 +127,44 @@ a, b, c = st.columns(3)
 a.metric("Goal success", f"{baseline['goal']:.1%}")
 b.metric("Credit limit exceeded by 2034", f"{baseline['breach']:.1%}")
 c.metric("Median wealth in 2034", f"CHF {baseline['wealth']:,.0f}")
-st.caption("Conditional estimates from the rule persona. Voluntary work and housing decisions take place in January.")
+st.caption("Conditional estimates from the rule persona. Every voluntary decision (work, housing, lifestyle, "
+           "investing) is made once a year at the January review; if cash falls below zero in between, "
+           "investments are sold automatically back to one month of outgoings.")
+
 committed = journal.timeline.offers.get(review)
 can_offer = review < C.HORIZON and person.age + review / 12 < world.pr["jobs"]["forced_retirement_age"] and not committed
+salary, delta = None, None
 if committed:
     st.success(f"Committed for {C.month_label(review)}: monthly net pay CHF {committed[1]:,.0f}.")
 if can_offer:
-    st.subheader(f"Part-time offer for {C.month_label(review)}")
+    st.subheader(f"Part-time offer for the January {C.month_label(review)[:4]} review")
     salary = st.number_input("Offered monthly take-home pay (CHF)", min_value=1., value=5000., step=100.)
-    _, alt = project(pid, key, free_time, paths_count, salary, journal, world)
-    lo, hi = alt["goal_change_mc95_pp"]
-    wealth_change = alt["median_final_net_worth"][1] - baseline["wealth"]
-    st.write(f"With the offer, goal success is {alt['high_goal_odds'][1]:.1%} "
-             f"({alt['goal_change_pp']:+.1f} percentage points; approximate 95% paired sampling interval "
+    _, delta = project(pid, key, free_time, paths_count, salary, journal, world)
+
+# ----------------------------------------------------------------------------- the chart
+st.subheader("How the money could move")
+measure = st.radio("Show", ["Net worth", "Cash"], horizontal=True, label_visibility="collapsed")
+f = baseline["fan_nw"] if measure == "Net worth" else baseline["fan_cash"]
+obs = journal.timeline.observations
+checkins = [(t, f[2][t + 1]) for t in sorted(obs)]       # all paths sit on the check-in figures there
+goal_on_this_chart = (person.high_goal == "Emergency savings") == (measure == "Cash")
+offer_line = None if delta is None else (delta["median_nw"] if measure == "Net worth" else delta["median_cash"])
+st.altair_chart(fan_chart(f, measure, offer_line, checkins, person.high_target if goal_on_this_chart else None),
+                width="stretch")
+legend = "Light band: 5–95% of paths · dark band: 25–75% · line: median"
+legend += " · black dots: your year-end check-ins" if checkins else ""
+legend += " · diamond: high goal, Dec 2029" if goal_on_this_chart else ""
+legend += " · dashed orange: median if you take the offer" if offer_line is not None else ""
+st.caption(legend)
+
+if can_offer and delta is not None:
+    lo, hi = delta["goal_change_mc95_pp"]
+    wealth_change = delta["median_final_net_worth"][1] - baseline["wealth"]
+    st.write(f"With the offer, goal success is {delta['high_goal_odds'][1]:.1%} "
+             f"({delta['goal_change_pp']:+.1f} percentage points; approximate 95% paired sampling interval "
              f"{lo:+.1f} to {hi:+.1f}). Median wealth changes by CHF {wealth_change:+,.0f}.")
-    st.write(f"The offer changes expected time in part-time work by {alt['part_time_months']:+.1f} months. "
-             f"Credit-limit breaches change from {baseline['breach']:.1%} to {alt['credit_breach_odds'][1]:.1%}.")
+    st.write(f"The offer changes expected time in part-time work by {delta['part_time_months']:+.1f} months. "
+             f"Credit-limit breaches change from {baseline['breach']:.1%} to {delta['credit_breach_odds'][1]:.1%}.")
     st.caption("The interval covers simulation sampling error under the chosen assumptions.")
     if st.button("Commit this offer"):
         try:
@@ -104,24 +190,53 @@ if can_offer:
                              "shortfall":"Negative cash (fraction)", "wealth":"Median final wealth (CHF)", "salary":"Salary (CHF/month)"}), hide_index=True)
             except ValueError as exc:
                 st.error(str(exc))
+
+# -------------------------------------------------------------------------- explanation
+sm = baseline["summary"]
+st.subheader("Why it comes out this way")
+left, right = st.columns(2)
+with left:
+    st.markdown("**The most common ways the ten years go**")
+    st.dataframe(pd.DataFrame([{"Story": s["story"], "Share": f"{s['share']:.0%}",
+                                "From": s["typical_change_year"] or "—",
+                                "Median wealth 2034": f"CHF {s['median_final_net_worth']:,.0f}",
+                                "Goal met": f"{s['high_goal_odds']:.0%}"} for s in sm["stories"]]), hide_index=True)
+with right:
+    st.markdown("**What separates the better paths from the worse**")
+    st.dataframe(pd.DataFrame([{"On the path": t["feature"], "Share": f"{t['share']:.0%}",
+                                "Median wealth with": f"CHF {t['median_nw_with']:,.0f}",
+                                "without": f"CHF {t['median_nw_without']:,.0f}",
+                                "Goal with / without": f"{t['high_goal_with']:.0%} / {t['high_goal_without']:.0%}"}
+                               for t in sm["turning_points"]]), hide_index=True)
+    st.caption("Associations across sampled lives, not causes.")
+val_path = C.ARTIFACTS / "validation.json"
+html = report.render(sm, json.loads(val_path.read_text()) if val_path.exists() else None)
+st.download_button("Download the full report (HTML)", html, file_name=f"{pid}-twin-report.html", mime="text/html")
+
+# ------------------------------------------------------------------------ year-end check-in
 if current < C.HORIZON:
+    checkin = journal.next_checkin
+    year = C.month_label(checkin)[:4]
     with st.form("observed", clear_on_submit=True):
-        st.subheader(f"Record actuals for {C.month_label(current)}")
-        cash = st.number_input("Closing cash (CHF)", value=None)
-        rent = st.number_input("Updated monthly rent for next month (optional CHF)", value=None, min_value=1.)
-        assets = st.number_input("Closing investments (optional CHF)", value=None, min_value=0.)
-        income = st.number_input("Updated take-home income for next month (optional CHF)", value=None, min_value=0.)
-        status = st.selectbox("Employment status at close", ["Carry forward", *C.STATUS_TO_MODE])
-        flow = st.number_input("Comparable monthly net flow (optional CHF)", value=None,
-                               help="Income less normal living costs, excluding investment transfers, loan payments and exceptional scenario costs. Enables a recurring-surplus adjustment.")
-        save = st.form_submit_button("Save month and update projections")
+        st.subheader(f"Year-end check-in for {year}")
+        st.caption(f"Once a year: enter your figures at the end of December {year}. The months in between are "
+                   "simulated; your figures then replace the simulated ones.")
+        cash = st.number_input("Cash at 31 December (CHF)", value=None)
+        assets = st.number_input("Investments at 31 December (optional CHF)", value=None, min_value=0.)
+        income = st.number_input("Monthly take-home income for next year (optional CHF)", value=None, min_value=0.)
+        rent = st.number_input("Monthly rent for next year (optional CHF)", value=None, min_value=1.)
+        status = st.selectbox("Employment status at year end", ["Carry forward", *C.STATUS_TO_MODE])
+        flow = st.number_input("Average monthly net flow this year (optional CHF)", value=None,
+                               help="Income less normal living costs, excluding investment transfers, loan payments and "
+                                    "one-off scenario costs. Lets the twin learn your typical surplus.")
+        save = st.form_submit_button("Save year and update projections")
     if save:
         try:
             if cash is None:
-                raise ValueError("Enter closing cash.")
-            fields = dict(cash=cash, rent=rent, investments=assets, net_flow=flow, income=income,
+                raise ValueError("Enter cash at 31 December.")
+            fields = dict(cash=cash, investments=assets, rent=rent, income=income, avg_net_flow=flow,
                           status=None if status == "Carry forward" else status)
-            record(db, journal, current, "observation", {k:v for k,v in fields.items() if v is not None})
+            record(db, journal, checkin, "observation", {k: v for k, v in fields.items() if v is not None})
             st.rerun()
         except ValueError as exc:
             st.error(str(exc))

@@ -22,13 +22,17 @@ def observed_month(world, s, observation, offer, count, bias):
         s.mode[:], s.self_employed[:], s.pensioner[:] = offer[0], False, False
         s.tau[:], s.search[:], s.study_left[:] = 0, 0, 0
         world.set_salary(s, offer[1])
-    if "net_flow" in observation:
-        X = features(s.mode, s.self_employed, s.pensioner, s.income / s.P,
-                     s.rent / s.P, s.city, np.full(s.n, s.t % 12 + 1))
-        # Same historical state for every path. Use the ensemble expectation.
-        mean, _ = world.flow.mean_var(X[:1])
-        expected = (mean[0] + s.offset.mean()) * SCALE * s.P[0] - bias
-        new_bias = update_bias(bias, observation["net_flow"] - expected, count + 1)
+    flow_key = "avg_net_flow" if "avg_net_flow" in observation else "net_flow"
+    if flow_key in observation:
+        # Same historical state for every path. Use the ensemble expectation: of this month for a
+        # monthly flow, or the average over the twelve calendar months for a year-end check-in.
+        months = np.arange(1, 13) if flow_key == "avg_net_flow" else np.array([s.t % 12 + 1])
+        X = features(np.full(len(months), s.mode[0]), np.full(len(months), s.self_employed[0]),
+                     np.full(len(months), s.pensioner[0]), np.full(len(months), s.income[0] / s.P[0]),
+                     np.full(len(months), s.rent[0] / s.P[0]), np.full(len(months), s.city[0]), months)
+        mean, _ = world.flow.mean_var(X)
+        expected = (mean.mean() + s.offset.mean()) * SCALE * s.P[0] - bias
+        new_bias = update_bias(bias, observation[flow_key] - expected, count + 1)
         s.offset += (new_bias - bias) / (SCALE * s.P)
         bias, count = new_bias, count + 1
     loan_due = s.debt * (1 + s.loan_rate / 12)

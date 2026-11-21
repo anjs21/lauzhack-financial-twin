@@ -89,6 +89,7 @@ class Config:
     events: bool = True        # job loss, offers, promotions, family, economy switches, windfalls
     loans: bool = True
     credit_interest: bool = True
+    auto_topup: bool = True    # standing order: cash below zero -> sell investments back to a month of outgoings
 
 
 class World:
@@ -179,9 +180,11 @@ class World:
         spending = np.stack([s.lifestyle > 0, np.ones(N, bool), s.lifestyle < 2], 1)
         buffer = s.buffer_months * self.outgoings(s)
         assets = np.stack([(s.inv > 0) & (s.cash < buffer), np.ones(N, bool), s.cash > buffer], 1)
-        if not C.annual_review(s.t):
+        if not C.annual_review(s.t):          # every voluntary choice waits for the January review
             status[:, 1:] = False
             housing[:, [0, 2]] = False
+            spending[:, [0, 2]] = False
+            assets[:, [0, 2]] = False
         return status, housing, spending, assets
 
     def _set_income(self, s: State):
@@ -347,6 +350,11 @@ class World:
         mu, sd = self.ret[s.econ, 0] / 12, self.ret[s.econ, 1] / np.sqrt(12)
         r = mu + sd * streams.normal("market", t, 1)[0]
         s.inv = s.inv * (1 + r)
+        topup = np.zeros(N)
+        if self.cfg.auto_topup:            # not a decision: a standing order that runs any month
+            need = np.where(s.cash < 0, self.outgoings(s) - s.cash, 0.0)
+            topup = np.minimum(np.maximum(s.inv, 0.0), need)
+            s.cash, s.inv = s.cash + topup, s.inv - topup
 
         # 5. clocks ------------------------------------------------------------------------------
         g = pr["drift"]["pay_growth_per_year"]
@@ -364,7 +372,7 @@ class World:
         s.t = t + 1
         self._set_income(s)
         limit = np.maximum(pr["credit"]["limit_months_of_pay"] * s.income, pr["credit"]["limit_floor"])
-        info.update(flow=flow, net=net, transfer=x, loan_payment=loan_payment, loan_interest=loan_interest,
+        info.update(flow=flow, net=net, transfer=x, topup=topup, loan_payment=loan_payment, loan_interest=loan_interest,
                     returns=r, action=np.stack([status, housing, spending, asset], 1),
                     below_zero=s.cash < 0, credit_breach=s.cash < -limit)
         return s, info

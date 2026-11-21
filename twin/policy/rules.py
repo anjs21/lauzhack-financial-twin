@@ -3,8 +3,8 @@
 For every head the policy builds logits from trait-weighted rules plus inertia, masks
 invalid options, divides by the person's temperature and samples. Nothing is maximised.
 
-January is the annual review for voluntary work and housing decisions. Spending,
-asset transfers and external events continue monthly.
+January is the annual review for every voluntary decision: work, housing, lifestyle and
+investing. External events (job loss, bills, markets, family) still happen monthly.
 """
 from __future__ import annotations
 
@@ -17,6 +17,10 @@ from .traits import TRAIT, Intention, buffer_months
 HEADS = ["status", "housing", "spending", "assets"]
 N_OPTS = {"status": 5, "housing": 3, "spending": 3, "assets": 3}
 NEG = -1e9
+# Lifestyle odds were set per month; decided once a year they get log(12) so the yearly rate
+# stays the same. Investing or selling to the buffer becomes a likely annual rebalance.
+YEARLY = float(np.log(12))
+ANNUAL_REBALANCE = 1.5
 
 
 def softmax_masked(logits, mask, temperature):
@@ -113,16 +117,16 @@ class RulePolicy:
 
         sp = np.zeros((N, 3))
         sp[:, 1] = 3.5 + 2.0 * T("inertia")
-        sp[:, 0] = -2.0 + 4.0 * cp + 2.5 * gp + 1.0 * T("frugality")
-        sp[:, 2] = (-2.5 + 1.5 * (1 - T("frugality")) + 1.5 * T("impatience") + 1.5 * c["comfort"]
+        sp[:, 0] = YEARLY - 2.0 + 4.0 * cp + 2.5 * gp + 1.0 * T("frugality")
+        sp[:, 2] = (YEARLY - 2.5 + 1.5 * (1 - T("frugality")) + 1.5 * T("impatience") + 1.5 * c["comfort"]
                     - 4.0 * cp - 1.5 * gp)
 
         buffer = np.maximum(s.buffer_months * self.w.outgoings(s), 1.0)
         below = np.clip(1 - s.cash / buffer, 0, 1)               # 0 at the buffer, 1 at zero cash
         asst = np.zeros((N, 3))
         asst[:, 1] = 1.0 + 1.0 * T("inertia")
-        asst[:, 2] = -0.5 + 3.0 * T("risk_tolerance") + 1.0 * (s.cash > 2 * buffer)
-        asst[:, 0] = -1.5 + 6.0 * below + 1.0 * (1 - T("risk_tolerance"))
+        asst[:, 2] = ANNUAL_REBALANCE - 0.5 + 3.0 * T("risk_tolerance") + 1.0 * (s.cash > 2 * buffer)
+        asst[:, 0] = ANNUAL_REBALANCE - 1.5 + 6.0 * below + 1.0 * (1 - T("risk_tolerance"))
         return {"status": st, "housing": ho, "spending": sp, "assets": asst}
 
     # ----------------------------------------------------------------------------- acting
@@ -151,16 +155,14 @@ class RulePolicy:
         return action, probs
 
     def _apply_intentions(self, s, c, valid, decide, choice, probs, u):
-        """Stated plans: major plans fall due at the first January on or after the requested date."""
+        """Stated plans fall due at the first January on or after the requested date."""
         for k, it in enumerate(self.intentions):
             idx = it.option if it.head == "status" else it.option + 1
             ok = valid[it.head][:, idx].copy()
             if it.when is not None:
                 due = C.month_index(it.when)
-                if it.head in ("status", "housing"):
-                    due = C.next_review(due)
-                ok &= s.t == due
-            elif it.head in ("status", "housing"):
+                ok &= s.t == C.next_review(due)       # every plan falls due at a January review
+            else:
                 ok &= decide
             if it.min_age is not None:
                 ok &= s.age >= it.min_age

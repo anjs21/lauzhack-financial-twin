@@ -20,7 +20,12 @@ class Journal:
 
     @property
     def current_month(self):
-        return len(self.timeline.observations)
+        """First month not yet covered by a check-in."""
+        return max(self.timeline.observations) + 1 if self.timeline.observations else 0
+
+    @property
+    def next_checkin(self):
+        return C.next_checkin(self.current_month)
 
 
 def read_journal(db, profile):
@@ -46,9 +51,9 @@ def record(db, journal, month, kind, payload):
         if mode not in (C.PART_TIME, C.FULL_TIME) or not math.isfinite(salary) or salary <= 0:
             raise ValueError("Choose a work mode and a positive monthly net salary.")
     elif kind == "observation":
-        if month != journal.current_month or not 0 <= month < C.HORIZON:
-            raise ValueError("Record consecutive closing months within the ten-year horizon.")
-        allowed = {"cash", "investments", "rent", "income", "net_flow", "status"}
+        if month != journal.next_checkin or not 0 <= month < C.HORIZON:
+            raise ValueError("Check in once a year with December closing figures, in order.")
+        allowed = {"cash", "investments", "rent", "income", "net_flow", "avg_net_flow", "status"}
         if "cash" not in payload or set(payload) - allowed:
             raise ValueError("Supply closing cash and supported observation fields.")
         if "status" in payload and payload["status"] not in C.STATUS_TO_MODE:
