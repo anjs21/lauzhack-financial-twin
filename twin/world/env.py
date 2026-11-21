@@ -48,6 +48,7 @@ class State:
     tau: np.ndarray           # months in the current mode
     rank: np.ndarray          # pay rank in (0, 1): carries earning power across modes
     income: np.ndarray        # net_income, nominal CHF a month (student income and pensions included)
+    wage_adjustment: np.ndarray   # contractual difference from mode/rank pay, at opening pay index
     pensioner: np.ndarray
     self_employed: np.ndarray
     search: np.ndarray        # 0 not looking, 1 looking for part-time, 2 for full-time work
@@ -122,6 +123,7 @@ class World:
         mode, pens = rep("mode").astype(int), rep("pensioner").astype(bool)
         kind = income_kind(mode, pens)
         income0 = rep("income0").astype(float)
+        rank = self.income_model.rank(kind, income0)
         tier, city = rep("tier").astype(int), rep("city_idx").astype(int)
         u = streams.uniform("model", 0, 3)
         z = streams.normal("model", 0, 1)
@@ -136,13 +138,14 @@ class World:
             pay = np.where(i > 0, debt * i / (1 - (1 + i) ** -term), debt / term)
         if not self.cfg.loans:
             debt, pay = np.zeros(N), np.zeros(N)
-        months = self.pr["masters"]["months"]
+        # Source profiles identify students but give no existing master's enrollment.
+        # The opening review falls in the last month of their current course.
         return State(
             person=np.repeat(np.arange(len(people)), n_paths), age=rep("age").astype(float), mode=mode,
-            tau=np.zeros(N, int), rank=self.income_model.rank(kind, income0), income=income0, pensioner=pens,
+            tau=np.zeros(N, int), wage_adjustment=income0 - self.income_model.quantile(kind, rank), rank=rank, income=income0, pensioner=pens,
             self_employed=rep("self_employed").astype(bool), search=np.zeros(N, int),
-            study_left=np.where(mode == C.STUDENT, 1 + (u[2] * months).astype(int).clip(0, months - 1), 0),
-            delayed=np.zeros(N, bool), degree=mode == C.STUDENT, tuition=tuition, tier=tier,
+            study_left=np.where(mode == C.STUDENT, 1, 0),
+            delayed=np.zeros(N, bool), degree=np.zeros(N, bool), tuition=tuition, tier=tier,
             rent_z=self.rent_model.z_of(rep("rent0"), tier, city), rent=rep("rent0").astype(float), city=city,
             household=rep("household").astype(int), child_cost=np.zeros(N, bool), lifestyle=np.ones(N, int),
             buffer_months=np.broadcast_to(np.asarray(buffer_months, float), (N,)).copy(),
@@ -167,7 +170,7 @@ class World:
         work = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
         young_enough = s.age < self.pr["jobs"]["forced_retirement_age"]
         status = np.ones((N, 5), bool)
-        status[:, 1] = (s.mode != C.STUDENT) & ~s.degree & (s.age <= self.pr["masters"]["max_start_age"])
+        status[:, 1] = ~s.degree & (s.age <= self.pr["masters"]["max_start_age"])
         status[:, 2] = (s.mode != C.PART_TIME) & (s.search != 1) & young_enough
         status[:, 3] = (s.mode != C.FULL_TIME) & (s.search != 2) & young_enough
         status[:, 4] = work
@@ -176,22 +179,35 @@ class World:
         spending = np.stack([s.lifestyle > 0, np.ones(N, bool), s.lifestyle < 2], 1)
         buffer = s.buffer_months * self.outgoings(s)
         assets = np.stack([(s.inv > 0) & (s.cash < buffer), np.ones(N, bool), s.cash > buffer], 1)
+        if not C.annual_review(s.t):
+            status[:, 1:] = False
+            housing[:, [0, 2]] = False
         return status, housing, spending, assets
 
     def _set_income(self, s: State):
-        s.income = self.income_model.quantile(income_kind(s.mode, s.pensioner), s.rank) * s.G
+        base = self.income_model.quantile(income_kind(s.mode, s.pensioner), s.rank)
+        s.income = np.maximum(0, base + s.wage_adjustment) * s.G
+
+    def set_salary(self, s, salary):
+        """Preserve a quoted salary even outside the empirical pay range."""
+        kind = income_kind(s.mode, s.pensioner)
+        real = np.broadcast_to(salary, s.income.shape) / s.G
+        s.rank = self.income_model.rank(kind, real)
+        s.wage_adjustment = real - self.income_model.quantile(kind, s.rank)
+        self._set_income(s)
 
     def _move(self, s: State, rows, new_tier):
         s.tier[rows] = new_tier[rows]
         s.rent[rows] = self.rent_model.rent(s.tier[rows], s.city[rows], s.rent_z[rows]) * s.P[rows]
 
     # ------------------------------------------------------------------------------ step
-    def step(self, s: State, action: np.ndarray, streams: Streams):
+    def step(self, s: State, action: np.ndarray, streams: Streams, offer=None):
         """Advance one month. action: (N, 4) = status 0..4, housing/spending/assets as -1/0/+1."""
         s = s.copy()
         t, N, pr = s.t, s.n, self.pr
         info = {k: np.zeros(N, bool) for k in ["job_loss", "offer", "graduated", "partner", "child",
                                               "separation", "forced_move", "windfall", "moved", "status_change"]}
+        previous_mode = s.mode.copy()
         cash0 = s.cash.copy()
         st_mask, h_mask, sp_mask, a_mask = self.masks(s)
         a = np.asarray(action, int)
@@ -216,6 +232,20 @@ class World:
         leave = status == 4
         s.mode[leave], s.tau[leave], s.search[leave] = C.NOT_WORKING, 0, 0
         s.pensioner[leave] = s.age[leave] >= pr["retirement"]["pension_age"]
+        if offer is not None:
+            if not C.annual_review(t) or np.any(s.age >= pr["jobs"]["forced_retirement_age"]):
+                raise ValueError("An offer requires a January review before forced retirement.")
+            mode, salary = offer
+            if mode not in (C.PART_TIME, C.FULL_TIME) or not np.isfinite(salary) or salary < 0:
+                raise ValueError("Specify a paid work mode and a non-negative finite monthly salary.")
+            status[:] = 2 if mode == C.PART_TIME else 3
+            s.mode[:], s.search[:], s.tau[:], s.study_left[:] = mode, 0, 0, 0
+            s.pensioner[:], s.self_employed[:] = False, False
+            self.set_salary(s, salary)
+        else:
+            s.wage_adjustment[s.mode != previous_mode] = 0
+        self._set_income(s)
+        action_mode, action_pension = s.mode.copy(), s.pensioner.copy()
         info["status_change"] = status > 0
 
         new_tier = s.tier + housing
@@ -259,7 +289,7 @@ class World:
             info["offer"] = got
 
             working = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
-            promo = working & ~got & (ev[3] < self.p_promo[s.econ])
+            promo = working & ~got & (offer is None) & (ev[3] < self.p_promo[s.econ])
             s.rank[promo] = shift_rank(s.rank[promo], pr["jobs"]["promotion_rank_step"])
 
             hh = pr["household"]
@@ -281,12 +311,9 @@ class World:
         studying = s.mode == C.STUDENT
         s.study_left[studying] -= 1
         done = studying & (s.study_left <= 0)
-        late = done & ~s.delayed & (ev[9] < pr["masters"]["delay_probability"])
+        late = done & s.degree & ~s.delayed & (ev[9] < pr["masters"]["delay_probability"])
         s.study_left[late], s.delayed[late] = pr["masters"]["delay_months"], True
         grad = done & ~late
-        s.mode[grad], s.tau[grad], s.search[grad] = C.NOT_WORKING, 0, 2
-        s.rank[grad] = np.clip(s.rank[grad] + pr["masters"]["degree_rank_shift"], 1e-4, 1 - 1e-4)
-        info["graduated"] = grad
         to_pension = (s.mode == C.NOT_WORKING) & ~s.pensioner & (s.age >= pr["retirement"]["pension_age"])
         s.pensioner[to_pension], s.search[to_pension] = True, 0
         forced = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME]) & (s.age >= pr["jobs"]["forced_retirement_age"])
@@ -296,6 +323,7 @@ class World:
         self._move(s, crowded, np.ones(N, int))
         moving += crowded * pr["housing"]["moving_cost"] * s.P
         info["forced_move"] = crowded
+        s.wage_adjustment[(s.mode != action_mode) | (s.pensioner != action_pension)] = 0
         self._set_income(s)
 
         # 3. the month's net flow from the network ---------------------------------------------
@@ -326,6 +354,12 @@ class World:
         s.G = s.G * (1 + g) ** (1 / 12)
         s.rent = s.rent * (1 + self.cost_growth[s.econ]) ** (1 / 12)
         s.age = s.age + 1 / 12
+        s.mode[grad], s.tau[grad] = C.NOT_WORKING, 0
+        s.search[grad & (s.search == 0)] = 2
+        earned = grad & s.degree
+        s.rank[earned] = np.clip(s.rank[earned] + pr["masters"]["degree_rank_shift"], 1e-4, 1 - 1e-4)
+        info["graduated"] = grad
+        s.wage_adjustment[grad] = 0
         s.tau = s.tau + 1
         s.t = t + 1
         self._set_income(s)

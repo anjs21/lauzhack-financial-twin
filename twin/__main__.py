@@ -3,13 +3,19 @@
   train                       fit the world model, save it, run the acceptance tests
   validate                    re-run the acceptance tests on the saved world model
   explore PROFILE_ID          sample one person's possible lives and write an HTML report
-      --policy rules|neural   the rule persona (default) or its neural clone
+      --policy rules|neural|foresight   who decides (default: the rule persona)
+      --foresight 0.5         knob for --policy foresight: 0 = as they tend to decide, 1 = most foresight
       --paths 2000 --seed 1
       --answers answers.json  questionnaire answers, 1-5 per trait (see twin/examples)
-      --plan '{"head": "status", "option": 1, "prob": 0.6, "when": "2026-09"}'   (repeatable)
+      --plan '{"head": "status", "option": 1, "prob": 0.6, "when": "2026-01"}'   (repeatable)
       --custom person.json    a person who is not in the data (see twin/examples)
-      --out report.html --json result.json --no-what-ifs --no-spread
-  clone                       stretch: train the neural persona on the rule persona and compare
+      --out report.html --json result.json --no-what-ifs --no-spread --no-foresight
+  llm-demos                   ask an LLM (OpenAI; needs OPENAI_API_KEY) to role-play personas at decision points
+      --calls 300 --model gpt-4o-mini --workers 8 --dry-run
+  replay                      score monthly updates on the held-out 2026 ledger
+  clone [--llm] [--llm-sharpen 1,2,2,1]  train the neural persona on the rule persona (plus the LLM answers) and compare
+  foresight                   train the foresight knob on top of the neural persona and compare
+      --points 2000           decision points to look ahead from (each: 11 options x 6 rollouts x 60 months)
 """
 from __future__ import annotations
 
@@ -27,6 +33,8 @@ def main(argv=None):
     tr = sub.add_parser("train")
     tr.add_argument("--no-validate", action="store_true")
     sub.add_parser("validate")
+    replay = sub.add_parser("replay", help="score monthly updates against the 2026 ledger")
+    replay.add_argument("--out", type=Path, default=C.ARTIFACTS / "monthly_replay.json")
     ex = sub.add_parser("explore")
     ex.add_argument("profile_id", nargs="?")
     ex.add_argument("--custom", type=Path)
@@ -39,15 +47,29 @@ def main(argv=None):
     ex.add_argument("--json", type=Path)
     ex.add_argument("--no-what-ifs", action="store_true")
     ex.add_argument("--no-spread", action="store_true")
-    ex.add_argument("--policy", choices=["rules", "neural"], default="rules",
-                    help="rule persona, or the neural persona cloned from it (run `clone` first)")
+    ex.add_argument("--no-foresight", action="store_true")
+    ex.add_argument("--policy", choices=["rules", "neural", "foresight"], default="rules")
+    ex.add_argument("--foresight", type=float, default=0.5)
+    ld = sub.add_parser("llm-demos")
+    ld.add_argument("--calls", type=int, default=300)
+    ld.add_argument("--model")
+    ld.add_argument("--workers", type=int, default=8)
+    ld.add_argument("--dry-run", action="store_true")
     cl = sub.add_parser("clone")
     cl.add_argument("--profiles", type=int, default=400)
+    cl.add_argument("--llm", action="store_true", help="use twin/artifacts/llm_demos.json from `llm-demos`")
+    cl.add_argument("--llm-weight", type=float, default=10.0)
+    cl.add_argument("--llm-sharpen", default="1,2,2,1", help="power on LLM probabilities per head: status,housing,spending,assets (1 = as answered)")
+    fs = sub.add_parser("foresight")
+    fs.add_argument("--points", type=int, default=2000)
     a = ap.parse_args(argv)
 
     if a.cmd == "train":
         from .train import main as train_main
         train_main(run_validation=not a.no_validate)
+    elif a.cmd == "replay":
+        from .replay import run
+        print(json.dumps(run(a.out), indent=2))
     elif a.cmd == "validate":
         from . import validate
         from .train import to_json
@@ -74,24 +96,38 @@ def main(argv=None):
         what_ifs = None if a.no_what_ifs else default_what_ifs(person, persona)
         if a.policy == "neural":
             from .policy.net import NeuralPolicy as policy_cls
+        elif a.policy == "foresight":
+            from .policy.foresight import at_level
+            policy_cls = at_level(a.foresight)
         else:
             from .policy.rules import RulePolicy as policy_cls
+        from .policy.foresight import PATH as FORESIGHT_NET
+        levels = None if (a.no_foresight or not FORESIGHT_NET.exists()) else (0.0, 0.5, 1.0)
         res, _ = explore(a.profile_id, custom, persona, a.paths, a.seed, what_ifs=what_ifs,
-                         with_spread=not a.no_spread, policy_cls=policy_cls)
+                         with_spread=not a.no_spread, policy_cls=policy_cls, foresight_levels=levels)
         res = to_json(res)
-        print(f"{res['person']['name']}: high goal {res['high_goal_odds']:.0%}, ever below zero {res['shortfall_odds']:.0%}, "
-              f"median net worth 2034 CHF {res['final_net_worth']['p50']:,.0f}")
+        print(f"{res['person']['name']} ({res['persona']['policy']}): high goal {res['high_goal_odds']:.0%}, "
+              f"ever below zero {res['shortfall_odds']:.0%}, median net worth 2034 CHF {res['final_net_worth']['p50']:,.0f}")
         for s in res["stories"][:3]:
             print(f"  {s['share']:.0%}  {s['story']}")
+        for lv, v in (res.get("foresight") or {}).items():
+            print(f"  foresight {lv}: high goal {v['high_goal_odds']:.0%}, ever below zero {v['shortfall_odds']:.0%}, "
+                  f"median net worth CHF {v['median_final_net_worth']:,.0f}")
         out = a.out or C.ARTIFACTS / "reports" / f"{a.profile_id or (custom or {}).get('id', 'custom')}.html"
         out.parent.mkdir(parents=True, exist_ok=True)
         report.write(res, out)
         print(f"report: {out}")
         if a.json:
             a.json.write_text(json.dumps(res, indent=1))
+    elif a.cmd == "llm-demos":
+        from .policy.llm import collect
+        collect(calls=a.calls, model=a.model, workers=a.workers, dry_run=a.dry_run)
     elif a.cmd == "clone":
         from .policy.net import main as clone_main
-        clone_main(n_profiles=a.profiles)
+        clone_main(n_profiles=a.profiles, use_llm=a.llm, llm_weight=a.llm_weight, llm_sharpen=tuple(float(x) for x in a.llm_sharpen.split(",")))
+    elif a.cmd == "foresight":
+        from .policy.foresight import main as foresight_main
+        foresight_main(n_points=a.points)
 
 
 if __name__ == "__main__":

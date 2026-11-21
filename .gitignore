@@ -1,0 +1,22 @@
+# Python tooling and build output
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+/build/
+/dist/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+.DS_Store
+
+# Local session data and cached LLM responses
+.twin-sessions.sqlite3
+.twin-sessions.sqlite3-*
+/twin/artifacts/llm_cache.jsonl

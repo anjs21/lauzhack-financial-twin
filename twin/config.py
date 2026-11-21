@@ -49,3 +49,11 @@ def month_label(t: int) -> str:
 def month_index(label: str) -> int:
     y, m = (int(x) for x in label.split("-"))
     return (y - START_YEAR) * 12 + (m - START_MONTH)
+
+
+def annual_review(t):
+    return (START_MONTH - 1 + t) % 12 == 0
+
+
+def next_review(t):
+    return t + (-(START_MONTH - 1 + t)) % 12

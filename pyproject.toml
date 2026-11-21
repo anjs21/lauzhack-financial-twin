@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "financial-twin"
+version = "0.1.0"
+description = "LauzHack 2026 Financial Twin: learned world model and persona policies"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scipy", "torch", "pyyaml", "openai"]
+
+[tool.setuptools.packages.find]
+include = ["twin*"]
+
+[tool.setuptools.package-data]
+twin = ["world/priors.yaml", "examples/*.json"]
+
+[project.optional-dependencies]
+live = ["streamlit>=1.35"]

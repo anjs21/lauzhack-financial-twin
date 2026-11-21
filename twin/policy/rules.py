@@ -3,10 +3,8 @@
 For every head the policy builds logits from trait-weighted rules plus inertia, masks
 invalid options, divides by the person's temperature and samples. Nothing is maximised.
 
-Decision clock: status and housing are reconsidered at the person's yearly review month,
-right after an event (job loss, offer, end of the master's, partner, child, separation,
-forced move, a month that ate more than a month of outgoings) or when a dated intention
-falls due. Spending and assets are reconsidered every month.
+January is the annual review for voluntary work and housing decisions. Spending,
+asset transfers and external events continue monthly.
 """
 from __future__ import annotations
 
@@ -48,11 +46,9 @@ class RulePolicy:
 
     def reset(self, s: State, streams: Streams):
         N = s.n
-        self.review_month = 1 + (streams.uniform("policy", 100_000, 1)[0] * 12).astype(int).clip(0, 11)
         self.last_move = np.full(N, -99)
         self.last_status = np.full(N, -99)
         self.last_job_loss = np.full(N, -99)
-        self.trigger = np.ones(N, bool)             # everyone takes stock in the first month
         self.fired = np.zeros((len(self.intentions), N), bool)
         self.switches = np.zeros(N, int)
 
@@ -131,8 +127,7 @@ class RulePolicy:
 
     # ----------------------------------------------------------------------------- acting
     def decision_points(self, s: State):
-        moy = (C.START_MONTH - 1 + s.t) % 12 + 1
-        return (self.review_month == moy) | self.trigger
+        return np.full(s.n, C.annual_review(s.t))
 
     def act(self, s: State, streams: Streams):
         """Sample (N, 4) actions; also return the probabilities they were drawn from."""
@@ -156,13 +151,15 @@ class RulePolicy:
         return action, probs
 
     def _apply_intentions(self, s, c, valid, decide, choice, probs, u):
-        """Stated plans: a dated plan makes its month a decision point; others wait for one."""
-        label = C.month_label(s.t)
+        """Stated plans: major plans fall due at the first January on or after the requested date."""
         for k, it in enumerate(self.intentions):
             idx = it.option if it.head == "status" else it.option + 1
             ok = valid[it.head][:, idx].copy()
             if it.when is not None:
-                ok &= label == it.when
+                due = C.month_index(it.when)
+                if it.head in ("status", "housing"):
+                    due = C.next_review(due)
+                ok &= s.t == due
             elif it.head in ("status", "housing"):
                 ok &= decide
             if it.min_age is not None:
@@ -192,6 +189,3 @@ class RulePolicy:
         self.last_status = np.where(changed, t, self.last_status)
         self.switches += changed
         self.last_job_loss = np.where(info["job_loss"], t, self.last_job_loss)
-        big_bill = info["net"] < -np.maximum(self.w.outgoings(s), 1.0)
-        self.trigger = (info["job_loss"] | info["offer"] | info["graduated"] | info["partner"] | info["child"]
-                        | info["separation"] | info["forced_move"] | big_bill)

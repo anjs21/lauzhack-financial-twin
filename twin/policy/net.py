@@ -58,9 +58,9 @@ def policy_inputs(w: World, s: State, c: dict, decide, traits, temperature) -> n
 
 
 class PersonaNet(nn.Module):
-    def __init__(self, hidden=32):
+    def __init__(self, hidden=32, n_in=N_IN):
         super().__init__()
-        self.inp = nn.Sequential(nn.Linear(N_IN, 64), nn.ReLU())
+        self.inp = nn.Sequential(nn.Linear(n_in, 64), nn.ReLU())
         self.gru = nn.GRU(64, hidden, batch_first=True)
         self.heads = nn.ModuleList([nn.Linear(hidden + 64, k) for k in SIZES])
 
@@ -88,17 +88,25 @@ class NeuralPolicy(RulePolicy):
         super().reset(s, streams)
         self.h = None
 
-    def act(self, s: State, streams: Streams):
-        c = self.context(s)
+    def inputs(self, s, c, decide):
+        return policy_inputs(self.w, s, c, decide, self.tr, self.temp)
+
+    def clock_masks(self, s):
+        """Valid options, and the options open this month under the decision clock."""
         valid = dict(zip(HEADS, self.w.masks(s)))
         masks = dict(valid)
         decide = self.decision_points(s)
-        self.last_decide = decide
         for h in ("status", "housing"):
             keep = np.zeros_like(masks[h])
             keep[:, 0 if h == "status" else 1] = True
             masks[h] = np.where(decide[:, None], masks[h], keep)
-        x = torch.as_tensor(policy_inputs(self.w, s, c, decide, self.tr, self.temp))[:, None, :]
+        return valid, masks, decide
+
+    def act(self, s: State, streams: Streams):
+        c = self.context(s)
+        valid, masks, decide = self.clock_masks(s)
+        self.last_decide = decide
+        x = torch.as_tensor(self.inputs(s, c, decide))[:, None, :]
         with torch.no_grad():
             logits, self.h = self.net(x, self.h)
         u = streams.uniform("policy", s.t, 4 + len(self.intentions))
@@ -128,11 +136,25 @@ class Recorder(RulePolicy):
         self.log.append((policy_inputs(self.w, s, c, self.last_decide, self.tr, self.temp),
                          np.concatenate([valid[h] for h in HEADS], 1),
                          np.concatenate([probs[h] for h in HEADS], 1).astype(np.float32)))
+        if self.keep_states:          # readable snapshot for LLM prompts
+            snap = {k: getattr(s, k).copy() for k in SNAP_FIELDS}
+            snap.update(t=s.t, decide=self.last_decide.copy(), outgoings=self.w.outgoings(s),
+                        recent_loss=c["recent_loss"].copy(), recent_move=c["recent_move"].copy(),
+                        valid={h: valid[h].copy() for h in HEADS})
+            self.states.append(snap)
+        if self.keep_full:            # full world state, to restart simulations from this month
+            self.full.append(s.copy())
         return action, probs
 
 
-def teacher_data(world: World, ids, n_paths=6, seed=C.SEED, months=C.HORIZON):
-    """Rule-persona lives for varied personas around each profile's defaults."""
+SNAP_FIELDS = ["person", "age", "mode", "tau", "income", "pensioner", "search", "degree", "tier", "rent", "city",
+               "household", "child_cost", "lifestyle", "buffer_months", "econ", "cash", "inv", "debt", "loan_pay"]
+
+
+def teacher_data(world: World, ids, n_paths=6, seed=C.SEED, months=C.HORIZON, keep_states=False, keep_full=False):
+    """Rule-persona lives for varied personas around each profile's defaults.
+
+    With keep_states, also returns the readable states and personas (for LLM prompts)."""
     from ..explore import goals_per_path
     prof = profiles().loc[ids]
     N = len(prof) * n_paths
@@ -144,7 +166,7 @@ def teacher_data(world: World, ids, n_paths=6, seed=C.SEED, months=C.HORIZON):
     s = world.initial_state(prof, n_paths, streams, buffer_months=RulePolicy.buffer_months(traits))
     pol = Recorder(world, traits, temp, goals_per_path(prof, n_paths))
     pol.reset(s, streams)
-    pol.log = []
+    pol.log, pol.states, pol.keep_states, pol.full, pol.keep_full = [], [], keep_states or keep_full, [], keep_full
     for _ in range(months):
         a, _ = pol.act(s, streams)
         s, info = world.step(s, a, streams)
@@ -152,6 +174,8 @@ def teacher_data(world: World, ids, n_paths=6, seed=C.SEED, months=C.HORIZON):
     X = np.stack([x for x, _, _ in pol.log], 1)
     M = np.stack([m for _, m, _ in pol.log], 1)
     P = np.stack([p for _, _, p in pol.log], 1)
+    if keep_states or keep_full:
+        return X, M, P, {"states": pol.states, "full": pol.full, "traits": traits, "temperature": temp, "people": prof}
     return X, M, P
 
 
@@ -163,21 +187,24 @@ def split_heads(t):
     return out
 
 
-def kl_loss(logits, M, P):
-    """Mean over steps of sum over heads KL(teacher || student), on valid options."""
+def kl_loss(logits, M, P, W=None):
+    """Weighted mean over steps of sum over heads KL(teacher || student), on valid options."""
     total = 0.0
     for lg, m, p in zip(logits, split_heads(M), split_heads(P)):
         lq = masked_log_softmax(lg, m)
         lp = torch.log(p.clamp_min(1e-9))
-        total = total + (p * (lp - lq) * m).sum(-1).mean()
+        kl = (p * (lp - lq) * m).sum(-1)
+        total = total + (kl.mean() if W is None else (kl * W).sum() / W.sum())
     return total
 
 
-def train_net(X, M, P, Xv, Mv, Pv, epochs=80, batch=64, lr=2e-3, seed=C.SEED, log=print):
+def train_net(X, M, P, Xv, Mv, Pv, epochs=80, batch=64, lr=2e-3, seed=C.SEED, log=print, W=None):
+    """W (lives x months): weight of each step's target; LLM answers get more than rule targets."""
     torch.manual_seed(seed)
     net = PersonaNet()
     opt = torch.optim.Adam(net.parameters(), lr=lr)
     X, M, P = torch.as_tensor(X), torch.as_tensor(M), torch.as_tensor(P)
+    W = torch.ones(X.shape[:2]) if W is None else torch.as_tensor(W, dtype=torch.float32)
     Xv, Mv, Pv = torch.as_tensor(Xv), torch.as_tensor(Mv), torch.as_tensor(Pv)
     gen = torch.Generator().manual_seed(seed)
     best, state = float("inf"), None
@@ -186,7 +213,7 @@ def train_net(X, M, P, Xv, Mv, Pv, epochs=80, batch=64, lr=2e-3, seed=C.SEED, lo
         perm = torch.randperm(len(X), generator=gen)
         for i in range(0, len(X), batch):
             idx = perm[i:i + batch]
-            loss = kl_loss(net(X[idx])[0], M[idx], P[idx])
+            loss = kl_loss(net(X[idx])[0], M[idx], P[idx], W[idx])
             opt.zero_grad()
             loss.backward()
             opt.step()
@@ -219,18 +246,33 @@ def load_net(path=C.ARTIFACTS / "persona_net.pt"):
     return net
 
 
-def main(n_profiles=400, n_paths=6, log=print):
+def split_ids(n_profiles=400):
+    """Profiles for teacher lives: (training ids, held-out ids). Shared by clone, LLM demos and foresight."""
+    ids = np.random.default_rng(C.SEED).permutation(profiles().index.values)[:n_profiles]
+    n_test = n_profiles // 5
+    return ids[n_test:], ids[:n_test]
+
+
+def main(n_profiles=400, n_paths=6, use_llm=False, llm_weight=10.0, llm_sharpen=(1.0, 2.0, 2.0, 1.0), log=print):
     t0 = time.time()
+    if use_llm:
+        from .llm import DEMOS
+        if not DEMOS.exists():
+            raise SystemExit(f"No LLM answers yet ({DEMOS}). Run `python -m twin llm-demos --calls 300` first.")
     world = World.load()
     prof = profiles()
-    rng = np.random.default_rng(C.SEED)
-    ids = rng.permutation(prof.index.values)[:n_profiles]
-    n_test = n_profiles // 5
+    train_ids, test_ids = split_ids(n_profiles)
+    ids = np.concatenate([test_ids, train_ids])
     log(f"teacher lives: {n_profiles} profiles x {n_paths} personas x {C.HORIZON} months ...")
-    X, M, P = teacher_data(world, ids[n_test:], n_paths)
-    Xv, Mv, Pv = teacher_data(world, ids[:n_test], n_paths, seed=C.SEED + 1)
+    X, M, P = teacher_data(world, train_ids, n_paths)
+    Xv, Mv, Pv = teacher_data(world, test_ids, n_paths, seed=C.SEED + 1)
+    W, n_llm = None, 0
+    if use_llm:
+        from .llm import apply_demos
+        P, W, n_llm = apply_demos(P, M, train_ids, n_paths, weight=llm_weight, power=llm_sharpen)
+        log(f"LLM persona answers: {n_llm} decision points, weight {llm_weight:g} each, sharpened x{llm_sharpen} (status, housing, spending, assets)")
     log(f"training on {len(X)} lives, testing on {len(Xv)} lives of unseen profiles ...")
-    net, best = train_net(X, M, P, Xv, Mv, Pv, log=log)
+    net, best = train_net(X, M, P, Xv, Mv, Pv, log=log, W=W)
     torch.save(net.state_dict(), C.ARTIFACTS / "persona_net.pt")
     heads = per_head_kl(net, Xv, Mv, Pv)
 
@@ -249,6 +291,8 @@ def main(n_profiles=400, n_paths=6, log=print):
                         "status_changes_per_year": [ra["status change"], rb["status change"]],
                         "lifestyle_changes_per_year": [ra["lifestyle change"], rb["lifestyle change"]]})
     res = {"held_out_kl_total": best, "held_out_kl_by_head": heads, "lives_rule_vs_neural": compare,
+           "llm_decision_points": n_llm, "llm_weight": llm_weight if use_llm else None,
+           "llm_sharpen": llm_sharpen if use_llm else None,
            "train_lives": int(len(X)), "test_lives": int(len(Xv)), "seconds": round(time.time() - t0, 1)}
     (C.ARTIFACTS / "persona_net.json").write_text(json.dumps(res, indent=1))
     log(f"held-out KL by head: {({k: round(v, 4) for k, v in heads.items()})}")

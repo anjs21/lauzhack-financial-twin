@@ -202,7 +202,8 @@ def test_actions_respect_masks(world):
     paths = simulate(world, profiles().iloc[:30], [steady()] * 30, n_paths=40, seed=6, horizon=120)
     status, mode = paths.action[:, :, 0], paths.mode[:, :-1]
     assert not ((status == 4) & ~np.isin(mode, [C.PART_TIME, C.FULL_TIME])).any()
-    assert not ((status == 1) & (mode == C.STUDENT)).any()
+    # Opening students can enroll at the first review.
+    assert not ((status[:, 1:] == 1) & (mode[:, 1:] == C.STUDENT)).any()
     assert ((status == 1).sum(1) <= 1).all()                    # one master's per life
     assert not ((paths.household[:, 1:] == C.FAMILY) & (paths.tier[:, 1:] == 0)).any()
 
@@ -243,3 +244,62 @@ def test_frugal_personas_upgrade_lifestyle_less(world):
     spender = simulate(world, people, steady(frugality=0.05, impatience=0.95), n_paths=500, seed=8)
     assert (frugal.lifestyle == 2).mean() < (spender.lifestyle == 2).mean()
     assert np.median(frugal.nw[:, -1]) > np.median(spender.nw[:, -1])
+
+
+# --------------------------------------------------------------------------- LLM persona, foresight
+def test_llm_answer_parsing():
+    from twin.policy.llm import parse
+    valid = {"status": np.array([1, 0, 0, 1, 1.0]), "housing": np.array([1, 1, 0.0]),
+             "spending": np.array([1, 1, 1.0]), "assets": np.array([0, 1, 1.0])}
+    ok = {"status": {"0": 0.7, "1": 0.2, "3": 0.1}, "housing": {"-1": 0.2, "0": 0.8, "1": 0.5},
+          "spending": {"0": 1}, "assets": {"1": "0.6", "0": 0.4}}
+    p = parse(ok, valid)
+    heads = np.split(p, [5, 8, 11])
+    assert all(abs(h.sum() - 1) < 1e-6 for h in heads)
+    assert heads[0][1] == 0 and heads[1][2] == 0 and heads[3][0] == 0      # options not open stay at zero
+    assert heads[0][0] > heads[0][3] > 0
+    assert parse({"status": {"9": 1}}, valid) is None and parse({}, valid) is None
+
+
+def test_llm_client_caches_and_never_needs_a_key_for_cached_prompts(tmp_path):
+    import types
+    from twin.policy.llm import Client
+    calls = []
+
+    class Fake:
+        chat = property(lambda self: self)
+        completions = property(lambda self: self)
+
+        def create(self, **kw):
+            calls.append(kw["model"])
+            msg = types.SimpleNamespace(content='{"status": {"0": 1}}')
+            return types.SimpleNamespace(choices=[types.SimpleNamespace(message=msg)])
+    c = Client("m", cache=tmp_path / "c.jsonl", sdk_client=Fake())
+    assert c.ask("hello") == {"status": {"0": 1}} and c.ask("hello") == {"status": {"0": 1}}
+    again = Client("m", cache=tmp_path / "c.jsonl")                       # no SDK, no key: served from disk
+    assert again.ask("hello") == {"status": {"0": 1}} and calls == ["m"]
+
+
+@pytest.mark.skipif(not (C.ARTIFACTS / "foresight_net.pt").exists(), reason="python -m twin foresight")
+def test_foresight_zero_stays_close_to_the_persona(world):
+    from twin.explore import goal_met
+    from twin.policy.foresight import at_level
+    from twin.policy.net import NeuralPolicy
+    people = profiles().iloc[[10]]
+    p = from_profile(people.iloc[0])
+    a = simulate(world, people, p, n_paths=600, seed=3, policy_cls=NeuralPolicy)
+    b = simulate(world, people, p, n_paths=600, seed=3, policy_cls=at_level(0.0))
+    assert abs(goal_met(a)[0].mean() - goal_met(b)[0].mean()) < 0.06
+    assert abs(np.median(a.nw[:, -1]) / np.median(b.nw[:, -1]) - 1) < 0.1
+
+
+@needs_model
+def test_life_utility_follows_preferences(world):
+    from twin.policy.foresight import life_utility
+    lean = steady(frugality=0.98, impatience=0.02)
+    lean.intentions = [Intention("spending", -1, 1.0, when="2025-01")]
+    rich = custom(cash=500000, income=12000)
+    u = life_utility(simulate(world, rich, lean, n_paths=200, seed=2, horizon=120))
+    paths = simulate(world, rich, lean, n_paths=200, seed=2, horizon=120)
+    assert np.allclose(u, life_utility(paths)) and np.isfinite(u).all()
+    assert (u > paths.nw[:, -1] - 120 * 2500).all()                      # bounded monthly terms
