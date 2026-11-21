@@ -1,0 +1,42 @@
+export type Person = {
+  name: string; age: number; city: string; status: string; household_type: string;
+  income: number; rent: number; cash: number; investments: number; debt: number;
+  rate: number; high_goal: string; high_target: number;
+};
+export type Scenario = { kind: 'baseline' | 'part_time' | 'spend_less' | 'cheaper_home'; salary: number };
+export type Summary = {
+  months: string[]; fan_cash: number[][]; fan_net_worth: number[][];
+  high_goal_odds: number; shortfall_odds: number; credit_breach_odds: number;
+  final_net_worth: { p5: number; p50: number; p95: number };
+  stories: { story: string; share: number; high_goal_odds: number }[];
+};
+export type Evidence = {
+  person: Person; traits: Record<string, number>; scenario: Scenario; n_paths: number; seed: number;
+  baseline: Summary; alternative: Summary | null;
+  comparison: { goal_change_pp: number; goal_change_mc95_pp: number[]; median_final_net_worth: number[] } | null;
+  assumptions: string[];
+};
+export type Message = { role: 'user' | 'assistant'; content: string };
+export type Connection = { url: string; key: string };
+export const money = (value: number) => new Intl.NumberFormat('en-CH', { maximumFractionDigits: 0 }).format(value);
+export const percent = (value: number) => `${Math.round(value * 100)}%`;
+export const scenarioNames = { baseline: 'Your current path', part_time: 'Make room for life', spend_less: 'Spend a little less', cheaper_home: 'Rethink your home' };
+
+export async function api<T>(connection: Connection, path: string, body?: unknown, method = body ? 'POST' : 'GET'): Promise<T> {
+  const url = new URL(connection.url);
+  if (url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error('Use the base workspace URL, without a path or credentials.');
+  if (url.protocol !== 'https:' && !(url.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(url.hostname))) throw new Error('Use an HTTPS workspace URL (or localhost for local development).');
+  if (window.location.protocol === 'https:' && url.protocol !== 'https:') throw new Error('This hosted page needs an HTTPS tunnel to your laptop.');
+  let response: Response;
+  try {
+    response = await fetch(`${url.origin}${path}`, {
+      method, headers: { Authorization: `Bearer ${connection.key}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(120000), cache: 'no-store', redirect: 'error',
+    });
+  } catch {
+    throw new Error('Your workspace could not be reached. Check that the laptop API and tunnel are running, and that this site is in TWIN_ALLOWED_ORIGINS.');
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Some persona details are invalid. Check your entries and try again.');
+  return data as T;
+}

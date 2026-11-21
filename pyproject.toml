@@ -17,3 +17,4 @@ twin = ["world/priors.yaml", "examples/*.json"]
 
 [project.optional-dependencies]
 live = ["streamlit>=1.35"]
+api = ["fastapi>=0.115", "uvicorn[standard]>=0.30", "httpx>=0.27"]
