@@ -1,0 +1,119 @@
+{
+ "held_out_kl_total": 0.0016839487943798304,
+ "held_out_kl_by_head": {
+  "status": 0.0010297292610630393,
+  "housing": 0.00015336251817643642,
+  "spending": 0.00022488336253445596,
+  "assets": 0.0002759737253654748
+ },
+ "lives_rule_vs_neural": [
+  {
+   "profile": "P01132",
+   "status": "self_employed",
+   "age": 23.0,
+   "high_goal_odds": [
+    0.011,
+    0.013
+   ],
+   "median_final_net_worth": [
+    696627.3297935511,
+    698288.1877758045
+   ],
+   "status_changes_per_year": [
+    0.0512,
+    0.0444
+   ],
+   "lifestyle_changes_per_year": [
+    0.1021,
+    0.1028
+   ]
+  },
+  {
+   "profile": "P00283",
+   "status": "retired",
+   "age": 69.0,
+   "high_goal_odds": [
+    0.997,
+    0.997
+   ],
+   "median_final_net_worth": [
+    404795.33318199764,
+    403648.4342001155
+   ],
+   "status_changes_per_year": [
+    0.0,
+    0.0010999999999999998
+   ],
+   "lifestyle_changes_per_year": [
+    0.0986,
+    0.0972
+   ]
+  },
+  {
+   "profile": "P00514",
+   "status": "retired",
+   "age": 67.0,
+   "high_goal_odds": [
+    0.006,
+    0.01
+   ],
+   "median_final_net_worth": [
+    -89036.99653345154,
+    -95848.06346296286
+   ],
+   "status_changes_per_year": [
+    0.0002,
+    0.0025
+   ],
+   "lifestyle_changes_per_year": [
+    0.14930000000000002,
+    0.1525
+   ]
+  },
+  {
+   "profile": "P00401",
+   "status": "unemployed",
+   "age": 34.0,
+   "high_goal_odds": [
+    0.0,
+    0.0
+   ],
+   "median_final_net_worth": [
+    211718.70995982143,
+    217681.76754403237
+   ],
+   "status_changes_per_year": [
+    0.1575,
+    0.1732
+   ],
+   "lifestyle_changes_per_year": [
+    0.10700000000000001,
+    0.1061
+   ]
+  },
+  {
+   "profile": "P01130",
+   "status": "employed",
+   "age": 42.0,
+   "high_goal_odds": [
+    0.255,
+    0.24
+   ],
+   "median_final_net_worth": [
+    153870.3492024308,
+    150941.6114777047
+   ],
+   "status_changes_per_year": [
+    0.0245,
+    0.041999999999999996
+   ],
+   "lifestyle_changes_per_year": [
+    0.0991,
+    0.1002
+   ]
+  }
+ ],
+ "train_lives": 1920,
+ "test_lives": 480,
+ "seconds": 122.3
+}

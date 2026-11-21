@@ -1,0 +1,190 @@
+{
+ "design": {
+  "paths_per_profile": 200,
+  "ensemble_seeds": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "priors_drift": {
+   "pay_growth_per_year": 0.0142,
+   "cost_growth_per_year": 0.0101
+  }
+ },
+ "backtest_network": {
+  "final_cash_coverage_50": 0.4775,
+  "final_cash_coverage_90": 0.885,
+  "final_cash_pit_deciles": [
+   101,
+   110,
+   101,
+   124,
+   116,
+   97,
+   123,
+   136,
+   134,
+   158
+  ],
+  "profiles_below_zero_observed": 61,
+  "profiles_below_zero_expected": 60.88,
+  "profiles_below_zero_90pct": [
+   59.0,
+   62.05
+  ],
+  "monthly_flow_crps": 406.39674,
+  "final_cash_crps": 1700.25949
+ },
+ "backtest_baseline": {
+  "final_cash_coverage_50": 0.505,
+  "final_cash_coverage_90": 0.88833,
+  "final_cash_pit_deciles": [
+   93,
+   93,
+   128,
+   107,
+   107,
+   140,
+   136,
+   119,
+   136,
+   141
+  ],
+  "profiles_below_zero_observed": 61,
+  "profiles_below_zero_expected": 61.13,
+  "profiles_below_zero_90pct": [
+   59.0,
+   63.0
+  ],
+  "monthly_flow_crps": 420.81169,
+  "final_cash_crps": 2032.59687
+ },
+ "held_out_people": {
+  "monthly_flow_crps_network": 409.43789,
+  "monthly_flow_crps_baseline": 420.81169,
+  "by_status": {
+   "employed": {
+    "network": 401.2,
+    "baseline": 418.8
+   },
+   "part_time": {
+    "network": 244.5,
+    "baseline": 247.2
+   },
+   "retired": {
+    "network": 298.3,
+    "baseline": 312.7
+   },
+   "self_employed": {
+    "network": 1004.0,
+    "baseline": 988.6
+   },
+   "student": {
+    "network": 234.0,
+    "baseline": 236.6
+   },
+   "unemployed": {
+    "network": 226.3,
+    "baseline": 220.0
+   }
+  }
+ },
+ "patterns": {
+  "data": {
+   "bonus_share": 0.55938,
+   "feb_aug_extra_cost": 361.57551,
+   "bill_cost_per_1000_pay": -8.43456,
+   "student_sep_fee": 831.29224,
+   "noise_sd_by_pay_quintile": [
+    331.71322,
+    350.50517,
+    429.6093,
+    500.76668,
+    581.6351
+   ],
+   "next_month_corr": -0.02622,
+   "mean_flow_by_mode": [
+    -2392.19135,
+    676.67712,
+    4295.88847,
+    -155.49489
+   ]
+  },
+  "network": {
+   "bonus_share": 0.55444,
+   "feb_aug_extra_cost": 348.85534,
+   "bill_cost_per_1000_pay": -3.58565,
+   "student_sep_fee": 846.99424,
+   "noise_sd_by_pay_quintile": [
+    319.75512,
+    371.75245,
+    409.22652,
+    478.66383,
+    568.67049
+   ],
+   "next_month_corr": -0.03758,
+   "mean_flow_by_mode": [
+    -2405.05546,
+    686.14759,
+    4299.14775,
+    -144.24279
+   ]
+  },
+  "baseline": {
+   "bonus_share": 0.5559,
+   "feb_aug_extra_cost": 369.43918,
+   "bill_cost_per_1000_pay": -0.6792,
+   "student_sep_fee": 859.82118,
+   "noise_sd_by_pay_quintile": [
+    410.94446,
+    411.24751,
+    409.55118,
+    409.67836,
+    412.27815
+   ],
+   "next_month_corr": -0.02708,
+   "mean_flow_by_mode": [
+    -2393.03314,
+    677.49944,
+    4295.67278,
+    -171.73885
+   ]
+  },
+  "checks_network": {
+   "bonus_share": true,
+   "feb_aug_extra_cost": true,
+   "bills_unrelated_to_pay": true,
+   "student_sep_fee": true,
+   "noise_sd_by_pay_quintile": true,
+   "next_month_corr": true,
+   "mean_flow_by_mode": true
+  },
+  "checks_baseline": {
+   "bonus_share": true,
+   "feb_aug_extra_cost": true,
+   "bills_unrelated_to_pay": true,
+   "student_sep_fee": true,
+   "noise_sd_by_pay_quintile": false,
+   "next_month_corr": true,
+   "mean_flow_by_mode": true
+  }
+ },
+ "verdict_network": {
+  "T1_crps_no_worse_than_baseline": true,
+  "T2_coverage_50": true,
+  "T2_coverage_90": true,
+  "T3_below_zero_count": true,
+  "T4_patterns": true
+ },
+ "verdict_baseline": {
+  "T1_crps_no_worse_than_baseline": true,
+  "T2_coverage_50": true,
+  "T2_coverage_90": true,
+  "T3_below_zero_count": true,
+  "T4_patterns": false
+ },
+ "passed": true,
+ "seconds": 85.1
+}

@@ -1,0 +1,18 @@
+{
+  "id": "mia",
+  "name": "Mia",
+  "age": 27,
+  "city": "Lausanne",
+  "status": "employed",
+  "household_type": "single",
+  "income": 5200,
+  "rent": 1500,
+  "cash": 12000,
+  "investments": 3000,
+  "debt": 0,
+  "rate": 0,
+  "high_goal": "Emergency savings",
+  "high_target": 15000,
+  "med_goal": "Education flexibility",
+  "med_target": 30000
+}

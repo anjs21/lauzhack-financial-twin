@@ -261,6 +261,7 @@ pre.code .c { color: var(--muted); }
   <h1>Learn the world, sample the person</h1>
   <p class="lede">The twin shows the range of lives one person could lead over the next ten years, given how they tend to decide. It does not optimise. Two learned parts make that possible: a world model that learns from the ledger how a month unfolds, and a persona policy that chooses the way this person would, at random and with memory of their own path.</p>
   <p class="small">States, actions and catalog coverage: <a href="mdp-spec.html">MDP spec</a>.</p>
+  <p class="callout"><b>Status, 21 November 2026: steps 1–7 are built</b> in <code>twin/</code> (see <code>twin/README.md</code>). The flow network passed all four acceptance tests and beat the hand-calibrated baseline on held-out people (CRPS 409 vs 421) and on end-2026 cash (1,700 vs 2,033). 16 validation tests pass; one person's 2,000 lives take under a second. Not built yet: LLM persona demonstrations, which need an API key.</p>
   <div class="tiles">
     <div class="tile"><div class="v num">2,000</div><div class="l">lives sampled per person, 120 months each</div></div>
     <div class="tile"><div class="v num">28,800</div><div class="l">profile-months the world model learns from (1,200 people × 24 months)</div></div>

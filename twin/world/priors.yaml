@@ -1,0 +1,84 @@
+# Everything the world model needs that the ledger cannot teach.
+# "data:" values were measured on the synthetic data (analysis/action_importance);
+# every other number is an assumption to tune. Each block is also a catalog lever:
+# change one value and re-run the explorer to get that scenario.
+
+drift:                          # data: per-profile trends of regular-month net flow
+  pay_growth_per_year: 0.0142
+  cost_growth_per_year: 0.0101
+
+living_costs:                   # data: non-rent living costs, January-2025 CHF a month
+  city_median:
+    Basel: 1507
+    Bern: 1490
+    Biel: 1400
+    Fribourg: 1338
+    Geneva: 1610
+    Lausanne: 1542
+    Lucerne: 1477
+    Lugano: 1442
+    Neuchatel: 1410
+    St Gallen: 1393
+    Winterthur: 1511
+    Zurich: 1647
+  share_of_income: 0.016
+  typical_student_fees_per_year: 1897   # data: Feb + Sep student fees in the ledger
+
+lifestyle:
+  multipliers: [0.9, 1.0, 1.1]          # lean, standard, comfortable
+
+economy:
+  start: normal
+  switch_per_month:                     # from -> to
+    normal: {inflation: 0.005, recession: 0.005}
+    inflation: {normal: 0.04}
+    recession: {normal: 0.06}
+  cost_growth_per_year: {normal: 0.0101, inflation: 0.03, recession: 0.0101}
+  returns_per_year:                     # mean, standard deviation; about 4% a year in the long run
+    normal: [0.06, 0.10]
+    inflation: [0.01, 0.12]
+    recession: [-0.15, 0.25]
+
+jobs:
+  loss_per_month: {normal: 0.003, inflation: 0.003, recession: 0.010}
+  offer_per_month: {normal: 0.20, inflation: 0.20, recession: 0.10}
+  promotion_per_month: {normal: 0.007, inflation: 0.007, recession: 0.003}
+  promotion_rank_step: 0.25             # normal-score units of the pay rank
+  rank_noise_on_change: 0.30            # how loosely the pay rank carries across work modes
+  forced_retirement_age: 70
+
+masters:
+  months: 24                            # data: every S001 study plan lasts two years
+  tuition_levels_per_year: [1200, 2500, 4800, 8000]   # data: S001 tuition levels
+  degree_rank_shift: 0.20               # pay rank +20 percentiles after graduating
+  delay_probability: 0.10
+  delay_months: 6
+  max_start_age: 45
+
+retirement:
+  pension_age: 65
+
+household:
+  partner_per_month: 0.004              # single, under 45
+  partner_max_age: 45
+  child_per_month: 0.007                # couple, under 42
+  child_max_age: 42
+  separation_per_month: 0.002
+  child_cost_per_month: 1800
+  parental_leave_months: 4
+  parental_leave_pay: 0.8
+
+housing:
+  moving_cost: 2000
+
+credit:
+  rate_per_year: 0.08
+  limit_months_of_pay: 3
+  limit_floor: 5000
+
+windfall:
+  per_month: 0.0005
+  size: [5000, 50000]
+
+loans:
+  term_months: 60                       # the data gives principal and rate only

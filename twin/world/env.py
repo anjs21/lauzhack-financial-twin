@@ -1,0 +1,336 @@
+"""The world: one month of a person's life, for many paths at once.
+
+    s' ~ T(s, a): apply the action -> draw events and the economy -> draw the month's net
+    flow from the learned network -> update the books (exact).
+
+Every random component draws from its own seeded stream (one fixed-size draw per stream
+and month), so two runs with the same seed see the same luck (common random numbers) and a
+stream can be "shared" across paths to switch that source of spread off.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, fields
+
+import numpy as np
+import pandas as pd
+
+from .. import config as C
+from ..data import load_priors
+from .flow import SCALE, FlowModel, features
+from .redraw import IncomeModel, RentModel, income_kind, load as load_redraw, shift_rank
+
+STREAMS = {"traits": 1, "model": 2, "policy": 3, "events": 4, "flow": 5, "market": 6}
+
+
+class Streams:
+    """Seeded random draws per (stream, month); a shared stream gives every path the same draw."""
+
+    def __init__(self, seed: int, n: int, shared=()):
+        self.seed, self.n, self.shared = seed, n, set(shared)
+
+    def _size(self, name):
+        return 1 if name in self.shared else self.n
+
+    def uniform(self, name, t, k=1):
+        u = np.random.default_rng([self.seed, STREAMS[name], t]).random((k, self._size(name)))
+        return np.broadcast_to(u, (k, self.n))
+
+    def normal(self, name, t, k=1):
+        z = np.random.default_rng([self.seed, STREAMS[name], t, 1]).standard_normal((k, self._size(name)))
+        return np.broadcast_to(z, (k, self.n))
+
+
+@dataclass
+class State:
+    person: np.ndarray        # row of the person in the people table
+    age: np.ndarray
+    mode: np.ndarray          # 0 student, 1 part-time, 2 full-time, 3 not working
+    tau: np.ndarray           # months in the current mode
+    rank: np.ndarray          # pay rank in (0, 1): carries earning power across modes
+    income: np.ndarray        # net_income, nominal CHF a month (student income and pensions included)
+    pensioner: np.ndarray
+    self_employed: np.ndarray
+    search: np.ndarray        # 0 not looking, 1 looking for part-time, 2 for full-time work
+    study_left: np.ndarray    # months left in the master's
+    delayed: np.ndarray
+    degree: np.ndarray        # already did (or is doing) the master's: one per life
+    tuition: np.ndarray       # CHF a year if this person studies
+    tier: np.ndarray          # 0 shared flat, 1 small flat, 2 family flat
+    rent_z: np.ndarray        # the person's place in the rent distribution (kept across moves)
+    rent: np.ndarray          # nominal CHF a month
+    city: np.ndarray
+    household: np.ndarray     # 0 single, 1 couple, 2 family
+    child_cost: np.ndarray    # a child born during the simulation (data families are already in the flows)
+    lifestyle: np.ndarray     # 0 lean, 1 standard, 2 comfortable
+    buffer_months: np.ndarray # the persona's cash buffer target, months of outgoings
+    econ: np.ndarray          # 0 normal, 1 inflation, 2 recession
+    P: np.ndarray             # price index (1 in January 2025)
+    G: np.ndarray             # pay index
+    cash: np.ndarray
+    inv: np.ndarray
+    debt: np.ndarray
+    loan_pay: np.ndarray
+    loan_rate: np.ndarray
+    member: np.ndarray        # ensemble member of this path (model uncertainty)
+    offset: np.ndarray        # person offset in real CHF thousands, drawn once per path
+    t: int = 0
+
+    def copy(self):
+        return State(**{f.name: (getattr(self, f.name).copy() if f.name != "t" else self.t) for f in fields(self)})
+
+    @property
+    def n(self):
+        return len(self.cash)
+
+
+@dataclass
+class Config:
+    events: bool = True        # job loss, offers, promotions, family, economy switches, windfalls
+    loans: bool = True
+    credit_interest: bool = True
+
+
+class World:
+    def __init__(self, flow: FlowModel, income: IncomeModel, rent: RentModel, priors: dict | None = None,
+                 config: Config | None = None):
+        self.flow, self.income_model, self.rent_model = flow, income, rent
+        self.pr = priors or load_priors()
+        self.cfg = config or Config()
+        lc = self.pr["living_costs"]
+        self.city_living = np.array([lc["city_median"][c] for c in C.CITIES], float)
+        self.living_share = lc["share_of_income"]
+        self.typical_fees = lc["typical_student_fees_per_year"]
+        self.lifestyle_mult = np.array(self.pr["lifestyle"]["multipliers"], float)
+        eco = self.pr["economy"]
+        self.cost_growth = np.array([eco["cost_growth_per_year"][e] for e in C.ECONOMY])
+        self.ret = np.array([eco["returns_per_year"][e] for e in C.ECONOMY])
+        j = self.pr["jobs"]
+        self.p_loss = np.array([j["loss_per_month"][e] for e in C.ECONOMY])
+        self.p_offer = np.array([j["offer_per_month"][e] for e in C.ECONOMY])
+        self.p_promo = np.array([j["promotion_per_month"][e] for e in C.ECONOMY])
+
+    @classmethod
+    def load(cls, path=C.ARTIFACTS, priors=None, config=None):
+        income, rent = load_redraw(path / "redraw.json")
+        return cls(FlowModel.load(path / "flow"), income, rent, priors, config)
+
+    # ------------------------------------------------------------------------------ setup
+    def initial_state(self, people: pd.DataFrame, n_paths: int, streams: Streams, buffer_months=3.0) -> State:
+        """Repeat each person n_paths times. `people` has the columns of data.profiles()."""
+        rep = lambda col: np.repeat(people[col].values, n_paths)  # noqa: E731
+        N = len(people) * n_paths
+        mode, pens = rep("mode").astype(int), rep("pensioner").astype(bool)
+        kind = income_kind(mode, pens)
+        income0 = rep("income0").astype(float)
+        tier, city = rep("tier").astype(int), rep("city_idx").astype(int)
+        u = streams.uniform("model", 0, 3)
+        z = streams.normal("model", 0, 1)
+        b, var = self.flow.offset_for(people.index.values)
+        levels = np.array(self.pr["masters"]["tuition_levels_per_year"], float)
+        tuition = rep("tuition").astype(float)
+        tuition = np.where(np.isnan(tuition), levels[(u[1] * len(levels)).astype(int).clip(0, len(levels) - 1)], tuition)
+        debt, rate = rep("debt0").astype(float), rep("rate0").astype(float)
+        term = self.pr["loans"]["term_months"]
+        i = rate / 12
+        with np.errstate(divide="ignore", invalid="ignore"):
+            pay = np.where(i > 0, debt * i / (1 - (1 + i) ** -term), debt / term)
+        if not self.cfg.loans:
+            debt, pay = np.zeros(N), np.zeros(N)
+        months = self.pr["masters"]["months"]
+        return State(
+            person=np.repeat(np.arange(len(people)), n_paths), age=rep("age").astype(float), mode=mode,
+            tau=np.zeros(N, int), rank=self.income_model.rank(kind, income0), income=income0, pensioner=pens,
+            self_employed=rep("self_employed").astype(bool), search=np.zeros(N, int),
+            study_left=np.where(mode == C.STUDENT, 1 + (u[2] * months).astype(int).clip(0, months - 1), 0),
+            delayed=np.zeros(N, bool), degree=mode == C.STUDENT, tuition=tuition, tier=tier,
+            rent_z=self.rent_model.z_of(rep("rent0"), tier, city), rent=rep("rent0").astype(float), city=city,
+            household=rep("household").astype(int), child_cost=np.zeros(N, bool), lifestyle=np.ones(N, int),
+            buffer_months=np.broadcast_to(np.asarray(buffer_months, float), (N,)).copy(),
+            econ=np.zeros(N, int), P=np.ones(N), G=np.ones(N), cash=rep("cash0").astype(float),
+            inv=rep("inv0").astype(float), debt=debt, loan_pay=np.where(debt > 0, pay, 0.0), loan_rate=rate,
+            member=(u[0] * len(self.flow.members)).astype(int).clip(0, len(self.flow.members) - 1),
+            offset=np.repeat(b, n_paths) + np.repeat(np.sqrt(var), n_paths) * z[0], t=0)
+
+    # --------------------------------------------------------------------------- helpers
+    def living_base(self, s: State):
+        """Non-rent living costs at standard lifestyle, nominal CHF a month."""
+        return (self.city_living[s.city] + self.living_share * s.income / s.P) * s.P
+
+    def outgoings(self, s: State):
+        """Regular monthly outgoings: rent, living costs at the chosen lifestyle, child, loan."""
+        child = self.pr["household"]["child_cost_per_month"] * s.P * s.child_cost
+        return s.rent + self.living_base(s) * self.lifestyle_mult[s.lifestyle] + child + s.loan_pay
+
+    def masks(self, s: State):
+        """Valid options per head: status (N, 5), housing/spending/assets (N, 3) for -1, 0, +1."""
+        N = s.n
+        work = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
+        young_enough = s.age < self.pr["jobs"]["forced_retirement_age"]
+        status = np.ones((N, 5), bool)
+        status[:, 1] = (s.mode != C.STUDENT) & ~s.degree & (s.age <= self.pr["masters"]["max_start_age"])
+        status[:, 2] = (s.mode != C.PART_TIME) & (s.search != 1) & young_enough
+        status[:, 3] = (s.mode != C.FULL_TIME) & (s.search != 2) & young_enough
+        status[:, 4] = work
+        min_tier = np.where(s.household == C.FAMILY, 1, 0)
+        housing = np.stack([s.tier > min_tier, np.ones(N, bool), s.tier < 2], 1)
+        spending = np.stack([s.lifestyle > 0, np.ones(N, bool), s.lifestyle < 2], 1)
+        buffer = s.buffer_months * self.outgoings(s)
+        assets = np.stack([(s.inv > 0) & (s.cash < buffer), np.ones(N, bool), s.cash > buffer], 1)
+        return status, housing, spending, assets
+
+    def _set_income(self, s: State):
+        s.income = self.income_model.quantile(income_kind(s.mode, s.pensioner), s.rank) * s.G
+
+    def _move(self, s: State, rows, new_tier):
+        s.tier[rows] = new_tier[rows]
+        s.rent[rows] = self.rent_model.rent(s.tier[rows], s.city[rows], s.rent_z[rows]) * s.P[rows]
+
+    # ------------------------------------------------------------------------------ step
+    def step(self, s: State, action: np.ndarray, streams: Streams):
+        """Advance one month. action: (N, 4) = status 0..4, housing/spending/assets as -1/0/+1."""
+        s = s.copy()
+        t, N, pr = s.t, s.n, self.pr
+        info = {k: np.zeros(N, bool) for k in ["job_loss", "offer", "graduated", "partner", "child",
+                                              "separation", "forced_move", "windfall", "moved", "status_change"]}
+        cash0 = s.cash.copy()
+        st_mask, h_mask, sp_mask, a_mask = self.masks(s)
+        a = np.asarray(action, int)
+        status = np.where(st_mask[np.arange(N), a[:, 0]], a[:, 0], 0)
+        housing = np.where(h_mask[np.arange(N), a[:, 1] + 1], a[:, 1], 0)
+        spending = np.where(sp_mask[np.arange(N), a[:, 2] + 1], a[:, 2], 0)
+        asset = np.where(a_mask[np.arange(N), a[:, 3] + 1], a[:, 3], 0)
+        ev = streams.uniform("events", t, 16)
+        noise = streams.normal("events", t, 2)
+        moving = np.zeros(N)
+
+        # 1. the action ------------------------------------------------------------------
+        rank_noise = pr["jobs"]["rank_noise_on_change"]
+        m = status == 1                                             # start a master's
+        s.mode[m], s.tau[m], s.study_left[m], s.search[m], s.pensioner[m] = C.STUDENT, 0, pr["masters"]["months"], 0, False
+        s.delayed[m], s.degree[m] = False, True
+        for opt, target in ((2, C.PART_TIME), (3, C.FULL_TIME)):
+            switch = (status == opt) & np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])   # same job, other hours:
+            s.mode[switch], s.tau[switch] = target, 0                                 # pay rank unchanged
+            look = (status == opt) & np.isin(s.mode, [C.STUDENT, C.NOT_WORKING])     # needs an offer
+            s.search[look] = opt - 1
+        leave = status == 4
+        s.mode[leave], s.tau[leave], s.search[leave] = C.NOT_WORKING, 0, 0
+        s.pensioner[leave] = s.age[leave] >= pr["retirement"]["pension_age"]
+        info["status_change"] = status > 0
+
+        new_tier = s.tier + housing
+        moved = housing != 0
+        self._move(s, moved, new_tier)
+        moving += moved * pr["housing"]["moving_cost"] * s.P
+        info["moved"] = moved
+        s.lifestyle = s.lifestyle + spending
+
+        buffer = s.buffer_months * self.outgoings(s)
+        x = np.where(asset == 1, np.maximum(s.cash - buffer, 0), 0.0) \
+            - np.where(asset == -1, np.minimum(s.inv, np.maximum(buffer - s.cash, 0)), 0.0)
+        s.cash, s.inv = s.cash - x, s.inv + x                     # transfers: net worth unchanged
+
+        # 2. events and the economy --------------------------------------------------------
+        oneoff = np.zeros(N)
+        if self.cfg.events:
+            e = pr["economy"]["switch_per_month"]
+            u = ev[0]
+            new = s.econ.copy()
+            nrm = s.econ == 0
+            new[nrm & (u < e["normal"]["inflation"])] = 1
+            new[nrm & (u >= e["normal"]["inflation"]) & (u < e["normal"]["inflation"] + e["normal"]["recession"])] = 2
+            new[(s.econ == 1) & (u < e["inflation"]["normal"])] = 0
+            new[(s.econ == 2) & (u < e["recession"]["normal"])] = 0
+            s.econ = new
+
+            working = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
+            lost = working & (ev[1] < self.p_loss[s.econ])
+            pension_age = pr["retirement"]["pension_age"]
+            s.search[lost] = np.where(s.age[lost] < pension_age, np.where(s.mode[lost] == C.FULL_TIME, 2, 1), 0)
+            s.mode[lost], s.tau[lost] = C.NOT_WORKING, 0
+            s.pensioner[lost] = s.age[lost] >= pension_age
+            info["job_loss"] = lost
+
+            looking = (s.search > 0) & np.isin(s.mode, [C.STUDENT, C.NOT_WORKING]) & ~lost
+            got = looking & (ev[2] < self.p_offer[s.econ])
+            s.mode[got] = np.where(s.search[got] == 1, C.PART_TIME, C.FULL_TIME)
+            s.tau[got], s.search[got], s.study_left[got], s.pensioner[got] = 0, 0, 0, False
+            s.rank[got] = shift_rank(s.rank[got], rank_noise * noise[0][got])   # a new job: rank moves a little
+            info["offer"] = got
+
+            working = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
+            promo = working & ~got & (ev[3] < self.p_promo[s.econ])
+            s.rank[promo] = shift_rank(s.rank[promo], pr["jobs"]["promotion_rank_step"])
+
+            hh = pr["household"]
+            partner = (s.household == C.SINGLE) & (s.age < hh["partner_max_age"]) & (ev[4] < hh["partner_per_month"])
+            child = (s.household == C.COUPLE) & (s.age < hh["child_max_age"]) & (ev[5] < hh["child_per_month"])
+            sep = (s.household == C.COUPLE) & ~child & (ev[6] < hh["separation_per_month"])
+            s.household[partner], s.household[child], s.household[sep] = C.COUPLE, C.FAMILY, C.SINGLE
+            s.child_cost[child] = True
+            leave_cost = hh["parental_leave_months"] * (1 - hh["parental_leave_pay"]) * s.income
+            oneoff += np.where(child & working, leave_cost, 0.0)
+            info["partner"], info["child"], info["separation"] = partner, child, sep
+
+            w = pr["windfall"]
+            win = ev[7] < w["per_month"]
+            oneoff -= np.where(win, (w["size"][0] + (w["size"][1] - w["size"][0]) * ev[8]) * s.P, 0.0)
+            info["windfall"] = win
+
+        # The master's runs its course; pensions start at 65; work stops at 70.
+        studying = s.mode == C.STUDENT
+        s.study_left[studying] -= 1
+        done = studying & (s.study_left <= 0)
+        late = done & ~s.delayed & (ev[9] < pr["masters"]["delay_probability"])
+        s.study_left[late], s.delayed[late] = pr["masters"]["delay_months"], True
+        grad = done & ~late
+        s.mode[grad], s.tau[grad], s.search[grad] = C.NOT_WORKING, 0, 2
+        s.rank[grad] = np.clip(s.rank[grad] + pr["masters"]["degree_rank_shift"], 1e-4, 1 - 1e-4)
+        info["graduated"] = grad
+        to_pension = (s.mode == C.NOT_WORKING) & ~s.pensioner & (s.age >= pr["retirement"]["pension_age"])
+        s.pensioner[to_pension], s.search[to_pension] = True, 0
+        forced = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME]) & (s.age >= pr["jobs"]["forced_retirement_age"])
+        s.mode[forced], s.tau[forced], s.pensioner[forced] = C.NOT_WORKING, 0, True
+
+        crowded = (s.household == C.FAMILY) & (s.tier == 0)        # a child in a shared flat forces a move
+        self._move(s, crowded, np.ones(N, int))
+        moving += crowded * pr["housing"]["moving_cost"] * s.P
+        info["forced_move"] = crowded
+        self._set_income(s)
+
+        # 3. the month's net flow from the network ---------------------------------------------
+        draws = streams.uniform("flow", t, 1)[0]
+        z = streams.normal("flow", t, 1)[0]
+        moy = (C.START_MONTH - 1 + t) % 12 + 1
+        X = features(s.mode, s.self_employed, s.pensioner, s.income / s.P, s.rent / s.P, s.city, np.full(N, moy))
+        flow = (self.flow.sample(X, s.member, draws, z) + s.offset) * SCALE * s.P
+        lifestyle_adj = -(self.lifestyle_mult[s.lifestyle] - 1) * self.living_base(s)
+        child_cost = pr["household"]["child_cost_per_month"] * s.P * s.child_cost
+        tuition = np.where(s.mode == C.STUDENT, np.maximum(s.tuition - self.typical_fees, 0) / 12 * s.P, 0.0)
+        interest = np.minimum(cash0, 0) * pr["credit"]["rate_per_year"] / 12 if self.cfg.credit_interest else 0.0
+
+        # 4. the books (exact) --------------------------------------------------------------------
+        loan_interest = s.debt * s.loan_rate / 12
+        loan_payment = np.minimum(s.loan_pay, s.debt + loan_interest)
+        s.debt = np.maximum(s.debt + loan_interest - loan_payment, 0.0)
+        s.loan_pay = np.where(s.debt > 0, s.loan_pay, 0.0)
+        net = flow + lifestyle_adj - child_cost - tuition - oneoff - moving - loan_payment + interest
+        s.cash = s.cash + net
+        mu, sd = self.ret[s.econ, 0] / 12, self.ret[s.econ, 1] / np.sqrt(12)
+        r = mu + sd * streams.normal("market", t, 1)[0]
+        s.inv = s.inv * (1 + r)
+
+        # 5. clocks ------------------------------------------------------------------------------
+        g = pr["drift"]["pay_growth_per_year"]
+        s.P = s.P * (1 + self.cost_growth[s.econ]) ** (1 / 12)
+        s.G = s.G * (1 + g) ** (1 / 12)
+        s.rent = s.rent * (1 + self.cost_growth[s.econ]) ** (1 / 12)
+        s.age = s.age + 1 / 12
+        s.tau = s.tau + 1
+        s.t = t + 1
+        self._set_income(s)
+        limit = np.maximum(pr["credit"]["limit_months_of_pay"] * s.income, pr["credit"]["limit_floor"])
+        info.update(flow=flow, net=net, transfer=x, loan_payment=loan_payment, loan_interest=loan_interest,
+                    returns=r, action=np.stack([status, housing, spending, asset], 1),
+                    below_zero=s.cash < 0, credit_breach=s.cash < -limit)
+        return s, info

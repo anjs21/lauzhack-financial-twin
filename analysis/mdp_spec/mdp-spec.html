@@ -504,11 +504,11 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
   <div class="section-head">
     <div class="eyebrow">Preferences <span class="m">u(s, a)</span></div>
     <h2>What a persona values, in CHF a month</h2>
-    <p>The twin does not optimise. These values describe a persona: its policy leans toward options it values, with randomness set by its temperature, and every sampled life is scored with them. The defaults are placeholders; each person sets their own.</p>
+    <p>The twin does not optimise. These values describe what a persona cares about; the rule persona expresses them as trait-weighted leanings, with randomness set by its temperature. The explorer reports goals, shortfalls and net worth per sampled life; scoring lives with this utility is a next step. The defaults are placeholders; each person sets their own.</p>
   </div>
   <div class="formula">
     <div class="eq">u<sub>t</sub> = lifestyle(L) + home(H, F) + free time(W) − 2,000·[C &lt; 0] − 300·[status or housing change] + goal value</div>
-    <div class="eq">end of path: + C + I − loans in Dec 2034 · a breached credit limit ends the path at −100,000</div>
+    <div class="eq">end of path: + C + I − loans in Dec 2034 · a breached credit limit is flagged</div>
   </div>
   <div class="tablewrap">
     <table class="pref stack">
