@@ -1,0 +1,106 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "gpu_load_seconds": 63.4,
+  "prompt_tokens_mean": 179,
+  "choice_mode": {
+    "prompts": 4096,
+    "seconds": 2.67,
+    "decisions_per_s": 1532,
+    "mean_prob_mass_on_valid_letters": 0.999,
+    "mean_policy": [
+      0.247,
+      0.305,
+      0.003,
+      0.445
+    ]
+  },
+  "reason_mode": {
+    "prompts": 1024,
+    "seconds": 0.9,
+    "decisions_per_s": 1144,
+    "answer_parse_rate": 1.0,
+    "example": "B) Apply to a few jobs (low effort\n\nI would apply to a few jobs to keep my options open without wasting too much time and energy."
+  },
+  "probe_runway_P_accept_low_offer": {
+    "driven": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "relaxed": {
+      "searching_1m": {
+        "0.5": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "6": 0.0,
+        "12": 0.0
+      },
+      "searching_6m": {
+        "0.5": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "6": 0.0,
+        "12": 0.0
+      }
+    },
+    "anxious": {
+      "searching_1m": {
+        "0.5": 0.002,
+        "1": 0.003,
+        "2": 0.001,
+        "3": 0.004,
+        "6": 0.0,
+        "12": 0.002
+      },
+      "searching_6m": {
+        "0.5": 0.002,
+        "1": 0.009,
+        "2": 0.002,
+        "3": 0.003,
+        "6": 0.001,
+        "12": 0.002
+      }
+    },
+    "balanced": {
+      "searching_1m": {
+        "0.5": 0.245,
+        "1": 0.223,
+        "2": 0.223,
+        "3": 0.349,
+        "6": 0.029,
+        "12": 0.223
+      },
+      "searching_6m": {
+        "0.5": 0.245,
+        "1": 0.165,
+        "2": 0.182,
+        "3": 0.438,
+        "6": 0.085,
+        "12": 0.068
+      }
+    }
+  },
+  "probe_runway_rank_corr_mean": 0.307,
+  "probe_runway_note": "rank correlation of P(accept) with runway; sensible behaviour is negative",
+  "probe_persona_P_high_effort": {
+    "driven": 1.0,
+    "relaxed": 0.0,
+    "anxious": 0.0,
+    "balanced": 0.0
+  }
+}
