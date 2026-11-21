@@ -1,0 +1,121 @@
+scenario_id,category,scenario,proposed_mdp_role,primary_action_family,classification_basis
+S001,Education & skills,Full-time master’s,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S002,Education & skills,Part-time master’s,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S003,Education & skills,Scholarship award,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S004,Education & skills,Tuition increase,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S005,Education & skills,Internship year,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S006,Education & skills,Bootcamp reskilling,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S007,Education & skills,Doctoral track,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S008,Education & skills,Study abroad,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S009,Education & skills,Student loan,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S010,Education & skills,Delayed graduation,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S011,Career & employment,Early job start,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S012,Career & employment,Salary negotiation,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S013,Career & employment,Promotion,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S014,Career & employment,Unemployment gap,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S015,Career & employment,Freelancing,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S016,Career & employment,Career switch,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S017,Career & employment,Four-day week,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S018,Career & employment,Equity compensation,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S019,Career & employment,Contract work,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S020,Career & employment,Second income,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S021,Relocation & geography,Move to Zurich,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S022,Relocation & geography,Move to Geneva,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S023,Relocation & geography,Move to Berlin,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S024,Relocation & geography,Move to London,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S025,Relocation & geography,Move to Singapore,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S026,Relocation & geography,Remote work abroad,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S027,Relocation & geography,Return migration,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S028,Relocation & geography,Currency depreciation,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S029,Relocation & geography,Dual-currency income,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S030,Relocation & geography,High relocation cost,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S031,Housing & property,Rent alone,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S032,Housing & property,Move in with flatmates,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S033,Housing & property,Buy starter home,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S034,Housing & property,Higher down payment,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S035,Housing & property,Mortgage rate reset,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S036,Housing & property,Home renovation,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S037,Housing & property,Rent increase,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S038,Housing & property,Buy later,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S039,Housing & property,Property price decline,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S040,Housing & property,Unexpected maintenance,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S041,Spending & lifestyle,Budget reduction,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S042,Spending & lifestyle,Car purchase,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S043,Spending & lifestyle,Public transport switch,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S044,Spending & lifestyle,Travel sabbatical,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S045,Spending & lifestyle,Subscription audit,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S046,Spending & lifestyle,Lifestyle inflation,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S047,Spending & lifestyle,Large purchase,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S048,Spending & lifestyle,Emergency expense,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S049,Spending & lifestyle,Shared household,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S050,Spending & lifestyle,Energy cost spike,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S051,Savings & liquidity,Emergency fund target,goal_or_preference,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S052,Savings & liquidity,Automated saving,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S053,Savings & liquidity,Savings rate increase,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S054,Savings & liquidity,Short-term cash goal,goal_or_preference,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S055,Savings & liquidity,Liquidity lockup,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S056,Savings & liquidity,Interest on deposits,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S057,Savings & liquidity,Unexpected windfall,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S058,Savings & liquidity,Income interruption,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S059,Savings & liquidity,Buffer depletion,derived_state_or_constraint_event,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S060,Savings & liquidity,Multiple goals,goal_or_preference,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S061,Investments & allocation,Start investing,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S062,Investments & allocation,Higher equity share,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S063,Investments & allocation,Bond allocation,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S064,Investments & allocation,Fee reduction,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S065,Investments & allocation,Market drawdown,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S066,Investments & allocation,Recovery sequence,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S067,Investments & allocation,Contribution holiday,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S068,Investments & allocation,Rebalancing rule,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S069,Investments & allocation,Concentrated holding,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S070,Investments & allocation,Currency exposure,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S071,Debt & credit,Student loan repayment,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S072,Debt & credit,Credit-card balance,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S073,Debt & credit,Refinance loan,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S074,Debt & credit,Early repayment,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S075,Debt & credit,Interest rate shock,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S076,Debt & credit,Debt consolidation,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S077,Debt & credit,New personal loan,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S078,Debt & credit,Missed payment,derived_state_or_constraint_event,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S079,Debt & credit,Borrowing cap,constraint,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S080,Debt & credit,Variable amortization,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S081,Family & life events,Partner cohabitation,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S082,Family & life events,Childcare costs,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S083,Family & life events,Parental leave,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S084,Family & life events,Family support,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S085,Family & life events,Marriage costs,controllable_action,major_purchase,Manual modelling judgment; outcome of an attempted action may be stochastic
+S086,Family & life events,Caregiving break,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S087,Family & life events,Divorce scenario,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S088,Family & life events,Dependent education,controllable_action,budget_housing_and_household,Manual modelling judgment; outcome of an attempted action may be stochastic
+S089,Family & life events,Insurance claim,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S090,Family & life events,Disability interruption,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S091,Retirement & pensions,Retire at 60,controllable_action,retirement_and_pension,Manual modelling judgment; outcome of an attempted action may be stochastic
+S092,Retirement & pensions,Retire at 67,controllable_action,retirement_and_pension,Manual modelling judgment; outcome of an attempted action may be stochastic
+S093,Retirement & pensions,Pension contribution increase,controllable_action,retirement_and_pension,Manual modelling judgment; outcome of an attempted action may be stochastic
+S094,Retirement & pensions,Career gap effect,derived_state_or_constraint_event,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S095,Retirement & pensions,Retirement relocation,controllable_action,relocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S096,Retirement & pensions,Inflation in retirement,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S097,Retirement & pensions,Withdrawal strategy,controllable_action,liquidity_and_investment_allocation,Manual modelling judgment; outcome of an attempted action may be stochastic
+S098,Retirement & pensions,Longer lifespan,scenario_parameter,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S099,Retirement & pensions,Pension lump sum,controllable_action,retirement_and_pension,Manual modelling judgment; outcome of an attempted action may be stochastic
+S100,Retirement & pensions,Healthcare costs later,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S101,Macroeconomic & systemic shocks,High inflation,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S102,Macroeconomic & systemic shocks,Deflation episode,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S103,Macroeconomic & systemic shocks,Rate hike,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S104,Macroeconomic & systemic shocks,Recession,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S105,Macroeconomic & systemic shocks,FX volatility,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S106,Macroeconomic & systemic shocks,Energy shock,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S107,Macroeconomic & systemic shocks,Tax policy change,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S108,Macroeconomic & systemic shocks,Housing downturn,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S109,Macroeconomic & systemic shocks,Market liquidity shock,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S110,Macroeconomic & systemic shocks,Compound crisis,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S111,Entrepreneurship & innovation,Start a business,controllable_action,business,Manual modelling judgment; outcome of an attempted action may be stochastic
+S112,Entrepreneurship & innovation,Side project,controllable_action,education_and_career,Manual modelling judgment; outcome of an attempted action may be stochastic
+S113,Entrepreneurship & innovation,Seed funding,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S114,Entrepreneurship & innovation,Startup failure,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S115,Entrepreneurship & innovation,Revenue delay,exogenous_outcome_or_shock,,Manual modelling judgment; outcome of an attempted action may be stochastic
+S116,Entrepreneurship & innovation,Hire employee,controllable_action,business,Manual modelling judgment; outcome of an attempted action may be stochastic
+S117,Entrepreneurship & innovation,Equity dilution,controllable_action,business,Manual modelling judgment; outcome of an attempted action may be stochastic
+S118,Entrepreneurship & innovation,Founder salary,controllable_action,business,Manual modelling judgment; outcome of an attempted action may be stochastic
+S119,Entrepreneurship & innovation,Business loan,controllable_action,debt_and_financing,Manual modelling judgment; outcome of an attempted action may be stochastic
+S120,Entrepreneurship & innovation,Exit event,controllable_action,business,Manual modelling judgment; outcome of an attempted action may be stochastic

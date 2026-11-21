@@ -1,0 +1,197 @@
+{
+  "status": "Proposed design for review; not an implemented environment or a learned model",
+  "scope": "One shared, finite-horizon, constrained MDP for all 1,200 synthetic profiles; profile-specific context and available actions",
+  "time": {
+    "step": "one month",
+    "horizon_months": 120,
+    "initial_snapshot_date": "2025-01-01",
+    "history_usage": "2025-2026 records are offline synthetic calibration/descriptive evidence, not information observed at January 2025. A historical backtest must respect its cutoff.",
+    "long_actions": "Advance one month per step; retain education, job search, moving and contractual countdowns in state. Do not jump over months or let multi-month actions complete instantly."
+  },
+  "data_supported": [
+    "Initial cash, investment valuation, loan principal and APR snapshots",
+    "Initial employment status, age, city and household type",
+    "Reference net income and rent, monthly net cash movement",
+    "Goal labels, target dates, and mechanically generated target amounts"
+  ],
+  "baseline_calibration": {
+    "net_flow_mode": "For a minimal replay use net_transactions as total net flow plus explicit intervention deltas; do not add reference salary again or subtract reference rent again.",
+    "decomposed_mode": "For the monthly accounting engine require an explicit income and expense budget. Reference income minus historical mean net flow is only a residual proxy, not measured spending, because monthly income and transfers are unknown.",
+    "missing_fields": "Choose disclosed defaults or request scenario inputs for essential/discretionary expense split, eligibility, pension income, withdrawal access, loan terms and programme costs. Do not silently infer these from age or job status.",
+    "date_consistency": "Initialize cash, investments and debt from the same January 2025 snapshot. A later start needs an explicit roll-forward of every balance, not just replacing cash with December 2026 cash."
+  },
+  "not_identified_by_data": [
+    "Action-conditioned transition probabilities or causal action effects",
+    "Actual monthly gross income and detailed expenses",
+    "Job offers, negotiation success, education eligibility or salary premium",
+    "Investment composition, liquidity restrictions, returns and taxes",
+    "Pension balances, entitlements, retirement income or contribution rules",
+    "Loan eligibility, credit limits, amortization terms and refinancing fees",
+    "Household transitions, foreign currency balances, property or business valuations",
+    "Individual utility, acceptable risk, minimum living costs and time costs"
+  ],
+  "state": {
+    "dynamic": [
+      "month_index and calendar date",
+      "cash_chf, investment_value_chf, restricted_cash_chf and any other acquired asset values",
+      "loan list: principal, rate, minimum payment, remaining term and rate type",
+      "employment status, accepted job terms, work fraction, reference net income",
+      "education qualification and remaining study months",
+      "housing/location and household/dependent status",
+      "current rent, essential expenses, discretionary budget and committed recurring costs",
+      "retirement status and assumed pension/benefit income",
+      "active commitments and pending outcomes with countdowns, fees and cancellation conditions",
+      "current shock regime and remaining duration if shock dynamics have memory",
+      "goal allocations, consumed goal flags, one-time milestone flags",
+      "funding gap or default status"
+    ],
+    "fixed_episode_context": [
+      "initial age (derive current age from month)",
+      "user-confirmed goals and deadlines, including reserve versus spending-goal semantics",
+      "user preferences and risk constraints",
+      "explicit scenario parameters and their synthetic/user/assumed provenance",
+      "eligibility and access assumptions not present in source files"
+    ],
+    "derived_not_independent": [
+      "net worth, monthly surplus, runway, goal distance and time remaining",
+      "Compute these from state; do not maintain inconsistent duplicate balances"
+    ],
+    "markov_condition": "Conditional on state, fixed context and action, the simulator must not need unrecorded history to generate the next state. If a parameter is updated from history, retain its sufficient statistics or belief state."
+  },
+  "action_representation": {
+    "description": "A sparse structured monthly action: at most one major life decision plus compatible budget, allocation and financing controls. Mandatory expenses and scheduled debt service happen automatically.",
+    "avoid": "A Cartesian product of every catalogue scenario and every amount; choosing salary increases, promotions, scholarships or market returns as guaranteed outcomes",
+    "candidate_generation": "For the hackathon enumerate a few feasible amounts and offers from state, retain continuous accounting, and prune incompatible candidates. Discretization is for search, not rounding the ledger.",
+    "goal_changes": "Only the user changes objectives; the policy may not lower target amounts or extend deadlines to claim success."
+  },
+  "action_families": [
+    {
+      "id": "continue",
+      "priority": "P0",
+      "action": "Keep current commitments and advance a month",
+      "parameters": [],
+      "guards": "Always retain a continuation/failure transition even when no elective action is feasible",
+      "effects": "Apply income, expenses, scheduled payments, pending events and shocks",
+      "evidence": "Required baseline for every profile"
+    },
+    {
+      "id": "adjust_budget",
+      "priority": "P0",
+      "action": "Set discretionary monthly budget",
+      "parameters": ["new recurring discretionary spending"],
+      "guards": "User-specified essential floor and reducible budget; do not claim these are observed transaction categories",
+      "effects": "Persist budget change and capture preference cost; do not repeatedly subtract the same saving",
+      "evidence": "209 profiles have negative average monthly net cash movement; a hypothetical CHF 500 monthly uplift prevents 14 recorded shortfalls"
+    },
+    {
+      "id": "career_and_workload",
+      "priority": "P0",
+      "action": "Search for work, accept an available offer, negotiate, or change work fraction",
+      "parameters": ["offer ID or workload", "search/negotiation effort"],
+      "guards": "Availability, qualifications, work/study capacity and current commitments; handle self-employment with explicit assumed income/cost regimes",
+      "effects": "Search/negotiation has a cost and a delayed or uncertain result; accepted offers change future income under stated terms",
+      "evidence": "All 39 student and 37 unemployed profiles have negative mean net cash movement; no offers or success probabilities are observed"
+    },
+    {
+      "id": "housing_and_relocation",
+      "priority": "P0 for same-currency housing offers; P2 for international modelling",
+      "action": "Accept a specified housing/relocation offer",
+      "parameters": ["offer rent", "moving costs", "refundable deposit", "start month", "location"],
+      "guards": "Affordability including upfront costs, lease timing, household suitability and compatible employment",
+      "effects": "Change recurring housing costs after move; refundable deposits become restricted assets, not consumption",
+      "evidence": "457 profiles have reference rent above 40% of reference net income; threshold is descriptive, not a legal affordability rule"
+    },
+    {
+      "id": "liquidity_and_investment_transfer",
+      "priority": "P0",
+      "action": "Transfer money between cash and investments; allocate cash to reserve or spending goals",
+      "parameters": ["signed transfer amount", "goal allocation"],
+      "guards": "Available uncommitted cash or sellable assets, explicit withdrawal fees/restrictions, no simultaneous redundant buy/sell",
+      "effects": "Equal and opposite balance changes before costs; no immediate net-worth reward. Goal earmarking does not create money.",
+      "evidence": "1,199 investment snapshots; 60/61 cash-shortfall profiles own investments, but only 19 have enough opening investments to cover their recorded maximum gap"
+    },
+    {
+      "id": "debt_and_financing",
+      "priority": "P0 for debt servicing and extra repayment; P1 for new borrowing/refinancing",
+      "action": "Repay extra principal, accept an eligible loan, or refinance an existing loan",
+      "parameters": ["extra principal", "loan offer and terms"],
+      "guards": "Outstanding balance, financing eligibility, credit cap, fees, repayment affordability and compatible actions",
+      "effects": "Scheduled payment automatic; principal and interest distinct. Borrowing increases cash and debt equally. Refinancing replaces old debt rather than duplicating or erasing it.",
+      "evidence": "283 loans with zero scheduled payments in source; adding an assumed 60-month schedule produces 4 additional recorded-path shortfalls"
+    },
+    {
+      "id": "education",
+      "priority": "P1",
+      "action": "Enroll in full-time/part-time education or training",
+      "parameters": ["program", "duration", "tuition schedule", "compatible workload"],
+      "guards": "Eligibility, no duplicate enrollment, capacity constraints and funding plan",
+      "effects": "Store study countdown, fees and income effects; graduation is a transition, and subsequent job/salary outcome is an assumption",
+      "evidence": "39 student profiles; only the master's scenario has numerical assumptions, for 120 profiles; source eligibility is unknown"
+    },
+    {
+      "id": "retirement_and_drawdown",
+      "priority": "P1; withdrawals reuse P0 transfer action",
+      "action": "Choose retirement timing or an explicit retirement-income arrangement",
+      "parameters": ["retirement month", "pension assumption"],
+      "guards": "User-defined eligibility and income assumptions; cannot claim Swiss pension calculation from supplied data",
+      "effects": "Change employment and recurring income; drawdown uses the same investment/cash accounting as other profiles",
+      "evidence": "216 retired profiles; 81 have negative mean monthly cash movement, despite only 4 recorded shortfalls"
+    },
+    {
+      "id": "major_commitment",
+      "priority": "P2",
+      "action": "Accept a user-specified purchase, family-cost change or business plan",
+      "parameters": ["upfront cost", "recurring flows", "timing", "asset acquired", "financing"],
+      "guards": "Committed funds, capacity and funding; templates require explicit data beyond this repo",
+      "effects": "Schedule costs/income, account for acquired assets and state transitions; no unsupported property/pension/business valuation claims",
+      "evidence": "300 profiles have a second goal; 90 housing-deposit and 77 education-flexibility goals. Household and self-employment labels alone do not specify transition costs."
+    }
+  ],
+  "transition_contract": {
+    "order": [
+      "Validate action parameters and compatibility against state-dependent action mask",
+      "Apply agreed beginning-of-month decisions, loan drawdowns and upfront costs; test liquidity at this point",
+      "Realize explicitly modelled shocks and pending outcomes according to documented timing",
+      "Accrue investment returns and loan interest under stated conventions",
+      "Post income, consumption, tuition and mandatory debt service",
+      "Apply end-of-month discretionary transfers and extra debt principal payments within available balances",
+      "Update commitments, graduation/search timers, goal payments/flags and date",
+      "Reconcile cash, investment assets, debt and net worth; emit reward components and feasibility flags"
+    ],
+    "cash_identity": "closing_cash = opening_cash + income - consumption - one_off_consumption - tuition + borrowing - total_debt_payment - investment_purchase + investment_sale - other_asset_purchase + other_asset_sale - fees - deposit_transfer + deposit_release",
+    "investment_identity": "closing_investments = opening_investments + market_gain + investment_purchase - investment_sale",
+    "debt_identity": "closing_debt = opening_debt + borrowing + accrued_interest - total_debt_payment",
+    "other_asset_identity": "closing_other_assets = opening_other_assets + valuation_change + acquired_asset_value - disposed_asset_carrying_value; sale proceeds and gains/losses reconcile explicitly",
+    "net_worth_identity": "net_worth = cash + investments + restricted_cash + other_assets - debt",
+    "timing": "Interest and returns depend on the exact event ordering; calculate them from the relevant balances, not an inconsistent monthly approximation",
+    "missing_funding": "Record an explicit infeasible/funding-gap transition or a specified borrowing action. Never silently provide unlimited overdraft.",
+    "stochasticity": "Start with deterministic transitions (a valid special case of an MDP). Add named stress paths first. Unemployment, promotion, tuition shocks, inflation and returns are environment outcomes with assumed laws, not freely selectable benefits."
+  },
+  "objective": {
+    "recommendation": "Expose feasibility, goals and wealth separately; compare Pareto trade-offs rather than infer a universal best life decision",
+    "reward_components": [
+      "funding shortfall and constraint violations",
+      "goal achievement at each goal's deadline, paid only once",
+      "user-defined education/workload/lifestyle preference utility and action friction",
+      "terminal real net worth including outstanding debt and committed liabilities"
+    ],
+    "scalar_if_required": "sum_t gamma^t * (preference_utility_t - action_disutility_t - lambda_gap*funding_gap_t - lambda_breach*violation_t + deadline_goal_reward_t) + gamma^T*lambda_wealth*terminal_real_net_worth",
+    "conditions": [
+      "Normalize money by a documented fixed scale; weights and discount factor are explicit user/design assumptions",
+      "Cap goal rewards and track paid flags; avoid repeat rewards for withdrawing and re-depositing money",
+      "Do not reward borrowed cash or transfers as income",
+      "Enforce minimum consumption and commitments; otherwise zero spending or zero repayments wins artificially",
+      "Account for debt at the terminal date; avoid rewarding end-of-horizon borrowing",
+      "Reserve goals can overlap; spending goals must consume or earmark funds explicitly",
+      "Show education and retirement value/preferences; cash-only optimization otherwise favors working indefinitely"
+    ]
+  },
+  "evaluation": {
+    "before_rl": "Implement simulator and compare continue, reserve-first/debt-aware rules, and a small model-based candidate search on identical scenarios",
+    "baselines": ["continue current commitments", "maintain chosen cash reserve then repay debt/invest surplus", "short-horizon feasible candidate search"],
+    "metrics": ["shortfall frequency and depth", "goal achievement by deadline", "terminal net worth", "preference utility", "invalid-action count"],
+    "tests": ["cash identity", "transfer preserves net worth", "borrowing preserves net worth before fees", "principal repayment preserves net worth before interest", "no negative debt", "finite loan terms", "no duplicate study enrollment", "timers and shocks update correctly", "cannot double-spend goal allocations", "seeded reproducibility"],
+    "generalization": "Split profiles by ID stratified by employment cohort; never randomly mix a person's months across train/test. Hold out assumption settings and shock paths as well. Historical fitting must respect the time cutoff. Report each cohort separately, since employed profiles dominate the sample and can hide failures for students or unemployed users.",
+    "claim_limit": "Even success on held-out synthetic profiles validates only the assumed simulator, not real-world optimal financial decisions."
+  }
+}

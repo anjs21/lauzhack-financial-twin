@@ -1,0 +1,7 @@
+employment_status,profiles,negative_mean_cash_flow,cash_shortfall_profiles,shortfall_pct,median_monthly_net_chf,median_rent_to_reference_income,debt_profiles
+employed,682,8,1,0.1,4335.71,0.262,162
+part_time,120,36,3,2.5,715.4,0.483,31
+retired,216,81,4,1.9,371.5,0.5,55
+self_employed,106,8,1,0.9,4233.52,0.261,21
+student,39,39,32,82.1,-2327.02,1.663,9
+unemployed,37,37,20,54.1,-2676.31,2.907,5
