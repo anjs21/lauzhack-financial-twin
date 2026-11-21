@@ -1,0 +1,182 @@
+state_x,state_y,scope,method,effect_name,effect,p_value,n,caveat,q_value_bh,significant_fdr_005
+age_at_start,opening_cash_chf,all profiles,Pearson,Pearson,0.4230432458307135,2.7355597776835827e-53,1200,,1.414675199316367e-52,True
+age_at_start,opening_cash_chf,all profiles,Spearman,Spearman,0.43700792232638,3.886136017992707e-57,1200,,2.068795938990235e-56,True
+age_at_start,opening_cash_chf,all profiles,Kendall,Kendall,0.2925834793824197,3.251874012674121e-51,1200,,1.6349699897055996e-50,True
+age_at_start,opening_investments_chf,all profiles,Pearson,Pearson,0.6691753091487753,1.1335910985134606e-156,1200,,1.4655713487924025e-155,True
+age_at_start,opening_investments_chf,all profiles,Spearman,Spearman,0.6904800431857814,1.0558383552081651e-170,1200,,1.5925561857723157e-169,True
+age_at_start,opening_investments_chf,all profiles,Kendall,Kendall,0.5257086658327016,3.958948627702958e-161,1200,,5.512074627801811e-160,True
+age_at_start,opening_debt_chf,all profiles,Pearson,Pearson,-0.013074353680497534,0.6509403475513943,1200,,0.8858661872691908,False
+age_at_start,opening_debt_chf,all profiles,Spearman,Spearman,-0.0063395430322222175,0.826352841952286,1200,,0.9837799328166172,False
+age_at_start,opening_debt_chf,all profiles,Kendall,Kendall,-0.004720232495662233,0.8332152768402037,1200,,0.9837799328166172,False
+age_at_start,reference_monthly_net_income_chf,all profiles,Pearson,Pearson,-0.21549994458898294,4.481685242274256e-14,1200,,1.502194497873408e-13,True
+age_at_start,reference_monthly_net_income_chf,all profiles,Spearman,Spearman,-0.25544043451593845,2.4942095451400273e-19,1200,,9.60536016319883e-19,True
+age_at_start,reference_monthly_net_income_chf,all profiles,Kendall,Kendall,-0.17712580152101962,7.980942335481876e-20,1200,,3.1403273102656944e-19,True
+age_at_start,reference_monthly_rent_chf,all profiles,Pearson,Pearson,-0.031709298616362756,0.27239074210077485,1200,,0.49302724320240254,False
+age_at_start,reference_monthly_rent_chf,all profiles,Spearman,Spearman,-0.04259699505246179,0.14028387000882647,1200,,0.275993265995626,False
+age_at_start,reference_monthly_rent_chf,all profiles,Kendall,Kendall,-0.028794719728649804,0.13846269299714767,1200,,0.2754038179393816,False
+age_at_start,mean_monthly_net_chf,all profiles,Pearson,Pearson,-0.21618343250572997,3.711982191001313e-14,1200,,1.2676769369268637e-13,True
+age_at_start,mean_monthly_net_chf,all profiles,Spearman,Spearman,-0.2440027367646732,1.0029517362701385e-17,1200,,3.704780903365205e-17,True
+age_at_start,mean_monthly_net_chf,all profiles,Kendall,Kendall,-0.16854110609189274,4.2553193036771916e-18,1200,,1.6046099874282744e-17,True
+age_at_start,sd_monthly_net_chf,all profiles,Pearson,Pearson,-0.19095357288680934,2.568639034538799e-11,1200,,8.156555530728467e-11,True
+age_at_start,sd_monthly_net_chf,all profiles,Spearman,Spearman,-0.23266379380258945,3.2520050969709624e-16,1200,,1.1772258451034885e-15,True
+age_at_start,sd_monthly_net_chf,all profiles,Kendall,Kendall,-0.15287212352192947,3.674753606969109e-15,1200,,1.3041772605125662e-14,True
+age_at_start,final_cash_chf,all profiles,Pearson,Pearson,0.026859441720260793,0.3525593759171806,1200,,0.607745209914378,False
+age_at_start,final_cash_chf,all profiles,Spearman,Spearman,0.0011594957955687242,0.967994055664874,1200,,0.9854602450138231,False
+age_at_start,final_cash_chf,all profiles,Kendall,Kendall,0.000730452748653441,0.9700200550601841,1200,,0.9854602450138231,False
+opening_cash_chf,opening_investments_chf,all profiles,Pearson,Pearson,0.28616942224849407,4.732975545975674e-24,1200,,1.9037079418257708e-23,True
+opening_cash_chf,opening_investments_chf,all profiles,Spearman,Spearman,0.33568838589471245,5.39510799489682e-33,1200,,2.3250346358960106e-32,True
+opening_cash_chf,opening_investments_chf,all profiles,Kendall,Kendall,0.22636363636363635,7.486088140859904e-32,1200,,3.1511208220828897e-31,True
+opening_cash_chf,opening_debt_chf,all profiles,Pearson,Pearson,-0.002693305747377318,0.9257432571188511,1200,,0.9854602450138231,False
+opening_cash_chf,opening_debt_chf,all profiles,Spearman,Spearman,0.0009371111831763429,0.9741302075681004,1200,,0.9854602450138231,False
+opening_cash_chf,opening_debt_chf,all profiles,Kendall,Kendall,0.0004352413022966513,0.9843776308803701,1200,,0.9854602450138231,False
+opening_cash_chf,reference_monthly_net_income_chf,all profiles,Pearson,Pearson,0.0031921767613981578,0.912040379753757,1200,,0.9854602450138231,False
+opening_cash_chf,reference_monthly_net_income_chf,all profiles,Spearman,Spearman,-0.02001479171168659,0.48851068275326803,1200,,0.7447395858806874,False
+opening_cash_chf,reference_monthly_net_income_chf,all profiles,Kendall,Kendall,-0.013735066538136857,0.4760592063080237,1200,,0.7447395858806874,False
+opening_cash_chf,reference_monthly_rent_chf,all profiles,Pearson,Pearson,0.007407279936546659,0.7976946406411798,1200,,0.9837799328166172,False
+opening_cash_chf,reference_monthly_rent_chf,all profiles,Spearman,Spearman,0.00323237377809355,0.9109373384828576,1200,,0.9854602450138231,False
+opening_cash_chf,reference_monthly_rent_chf,all profiles,Kendall,Kendall,0.002395053096367757,0.9011020710739954,1200,,0.9854602450138231,False
+opening_cash_chf,mean_monthly_net_chf,all profiles,Pearson,Pearson,-0.0027561925813232553,0.9240145980849012,1200,,0.9854602450138231,False
+opening_cash_chf,mean_monthly_net_chf,all profiles,Spearman,Spearman,-0.019303499516319107,0.5040964461502337,1200,,0.7540616260594406,False
+opening_cash_chf,mean_monthly_net_chf,all profiles,Kendall,Kendall,-0.01337503475118154,0.48769786249897995,1200,,0.7447395858806874,False
+opening_cash_chf,sd_monthly_net_chf,all profiles,Pearson,Pearson,-0.025365515933439206,0.37999106423346024,1200,,0.6488526662854368,False
+opening_cash_chf,sd_monthly_net_chf,all profiles,Spearman,Spearman,-0.041488910756188026,0.15090599710991606,1200,,0.29057431358398733,False
+opening_cash_chf,sd_monthly_net_chf,all profiles,Kendall,Kendall,-0.027992771754239646,0.14638242969560186,1200,,0.28489483628928963,False
+opening_cash_chf,final_cash_chf,all profiles,Pearson,Pearson,0.5028286053824795,6.856051278469322e-78,1200,Final cash = opening cash + 24 * mean monthly net; mechanically coupled.,4.136484271343158e-77,True
+opening_cash_chf,final_cash_chf,all profiles,Spearman,Spearman,0.47047893088814646,4.0059506727601265e-67,1200,Final cash = opening cash + 24 * mean monthly net; mechanically coupled.,2.3389582960309124e-66,True
+opening_cash_chf,final_cash_chf,all profiles,Kendall,Kendall,0.3260050041701418,3.4854107518813684e-64,1200,Final cash = opening cash + 24 * mean monthly net; mechanically coupled.,1.971435456532899e-63,True
+opening_investments_chf,opening_debt_chf,all profiles,Pearson,Pearson,-0.0007366570449236394,0.9796625634052808,1200,,0.9854602450138231,False
+opening_investments_chf,opening_debt_chf,all profiles,Spearman,Spearman,0.0026289580642840527,0.9275124350182407,1200,,0.9854602450138231,False
+opening_investments_chf,opening_debt_chf,all profiles,Kendall,Kendall,0.00221929970973045,0.9204684550627763,1200,,0.9854602450138231,False
+opening_investments_chf,reference_monthly_net_income_chf,all profiles,Pearson,Pearson,-0.17681689553759986,6.942697025634724e-10,1200,,2.1298782400676014e-09,True
+opening_investments_chf,reference_monthly_net_income_chf,all profiles,Spearman,Spearman,-0.17366529104128767,1.3977033868764953e-09,1200,,4.102761844076194e-09,True
+opening_investments_chf,reference_monthly_net_income_chf,all profiles,Kendall,Kendall,-0.11669593876562365,1.4053659355399118e-09,1200,,4.102761844076194e-09,True
+opening_investments_chf,reference_monthly_rent_chf,all profiles,Pearson,Pearson,-0.05484632088252078,0.057514269889780444,1200,,0.11965612471322139,False
+opening_investments_chf,reference_monthly_rent_chf,all profiles,Spearman,Spearman,-0.06718121343692116,0.019942395999342107,1200,,0.04456263797383854,True
+opening_investments_chf,reference_monthly_rent_chf,all profiles,Kendall,Kendall,-0.04510567494140299,0.019265952297774596,1200,,0.04358921707371503,True
+opening_investments_chf,mean_monthly_net_chf,all profiles,Pearson,Pearson,-0.169954684904145,3.1340623624636433e-09,1200,,9.004210914379673e-09,True
+opening_investments_chf,mean_monthly_net_chf,all profiles,Spearman,Spearman,-0.15437273220328623,7.688010853794057e-08,1200,,2.0463675949069474e-07,True
+opening_investments_chf,mean_monthly_net_chf,all profiles,Kendall,Kendall,-0.10415902140672782,6.50331968025275e-08,1200,,1.7568669583966385e-07,True
+opening_investments_chf,sd_monthly_net_chf,all profiles,Pearson,Pearson,-0.14482946011943643,4.694463858091222e-07,1200,,1.2314463163978423e-06,True
+opening_investments_chf,sd_monthly_net_chf,all profiles,Spearman,Spearman,-0.12873120745222738,7.700109354807716e-06,1200,,1.8834051259732386e-05,True
+opening_investments_chf,sd_monthly_net_chf,all profiles,Kendall,Kendall,-0.08434250764525994,1.2077581852184677e-05,1200,,2.9147230869939022e-05,True
+opening_investments_chf,final_cash_chf,all profiles,Pearson,Pearson,-0.0023310832166170237,0.9357067457449719,1200,,0.9854602450138231,False
+opening_investments_chf,final_cash_chf,all profiles,Spearman,Spearman,0.02402930140923709,0.4056054022834642,1200,,0.6797646093824724,False
+opening_investments_chf,final_cash_chf,all profiles,Kendall,Kendall,0.016577703641923826,0.38970733504321975,1200,,0.6592245574095587,False
+opening_debt_chf,reference_monthly_net_income_chf,all profiles,Pearson,Pearson,-0.00522714678096016,0.8564568987129473,1200,,0.9854602450138231,False
+opening_debt_chf,reference_monthly_net_income_chf,all profiles,Spearman,Spearman,0.006127631541057462,0.8320694654469978,1200,,0.9837799328166172,False
+opening_debt_chf,reference_monthly_net_income_chf,all profiles,Kendall,Kendall,0.004604511432957959,0.8358916710657714,1200,,0.9837799328166172,False
+opening_debt_chf,reference_monthly_rent_chf,all profiles,Pearson,Pearson,0.011557258269499885,0.6891923935739289,1200,,0.9240283202731936,False
+opening_debt_chf,reference_monthly_rent_chf,all profiles,Spearman,Spearman,0.018329118911380508,0.5258649092670952,1200,,0.7582099571213522,False
+opening_debt_chf,reference_monthly_rent_chf,all profiles,Kendall,Kendall,0.014162589447277805,0.5240222106294722,1200,,0.7582099571213522,False
+opening_debt_chf,mean_monthly_net_chf,all profiles,Pearson,Pearson,-0.005944079973509285,0.8370282301312655,1200,,0.9837799328166172,False
+opening_debt_chf,mean_monthly_net_chf,all profiles,Spearman,Spearman,0.0005987698029869218,0.9834687118855343,1200,,0.9854602450138231,False
+opening_debt_chf,mean_monthly_net_chf,all profiles,Kendall,Kendall,0.0004050760635236161,0.985460245013823,1200,,0.9854602450138231,False
+opening_debt_chf,sd_monthly_net_chf,all profiles,Pearson,Pearson,-0.03353081060284198,0.24578133450849357,1200,,0.45862290253646737,False
+opening_debt_chf,sd_monthly_net_chf,all profiles,Spearman,Spearman,-0.014399068552492069,0.6182695298991827,1200,,0.8608214223980929,False
+opening_debt_chf,sd_monthly_net_chf,all profiles,Kendall,Kendall,-0.011230087463218547,0.6133985334940344,1200,,0.8606599578482188,False
+opening_debt_chf,final_cash_chf,all profiles,Pearson,Pearson,-0.006498687609515181,0.8220657019939012,1200,,0.9837799328166172,False
+opening_debt_chf,final_cash_chf,all profiles,Spearman,Spearman,-0.010252081638527054,0.722753115510445,1200,,0.938394988125199,False
+opening_debt_chf,final_cash_chf,all profiles,Kendall,Kendall,-0.008295440662584691,0.7089981187269954,1200,,0.9381905279324793,False
+reference_monthly_net_income_chf,reference_monthly_rent_chf,all profiles,Pearson,Pearson,0.0632229389048768,0.028523109000044327,1200,,0.06220099673503642,False
+reference_monthly_net_income_chf,reference_monthly_rent_chf,all profiles,Spearman,Spearman,0.05665156384362615,0.04976268037595006,1200,,0.10473308311682512,False
+reference_monthly_net_income_chf,reference_monthly_rent_chf,all profiles,Kendall,Kendall,0.03794000269669543,0.049005186563588425,1200,,0.10435222080011182,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,all profiles,Pearson,Pearson,0.9720082368433997,0.0,1200,,0.0,True
+reference_monthly_net_income_chf,mean_monthly_net_chf,all profiles,Spearman,Spearman,0.9667817668046673,0.0,1200,,0.0,True
+reference_monthly_net_income_chf,mean_monthly_net_chf,all profiles,Kendall,Kendall,0.8409082853131619,0.0,1200,,0.0,True
+reference_monthly_net_income_chf,sd_monthly_net_chf,all profiles,Pearson,Pearson,0.6423774916565188,1.33081274650879e-140,1200,,1.1470338434194808e-139,True
+reference_monthly_net_income_chf,sd_monthly_net_chf,all profiles,Spearman,Spearman,0.6508275051767873,1.7098404475248843e-145,1200,,1.8204771823647298e-144,True
+reference_monthly_net_income_chf,sd_monthly_net_chf,all profiles,Kendall,Kendall,0.4613695172155112,1.2165619533337363e-126,1200,,1.0008986979700286e-125,True
+reference_monthly_net_income_chf,final_cash_chf,all profiles,Pearson,Pearson,0.8418063590678548,4e-323,1200,,1.023e-321,True
+reference_monthly_net_income_chf,final_cash_chf,all profiles,Spearman,Spearman,0.8267544470981479,1.4128498153711728e-301,1200,,3.1965727072772786e-300,True
+reference_monthly_net_income_chf,final_cash_chf,all profiles,Kendall,Kendall,0.6267101937103222,6.0594182917004484e-232,1200,,9.97049737088892e-231,True
+reference_monthly_rent_chf,mean_monthly_net_chf,all profiles,Pearson,Pearson,-0.16181611984251887,1.7321833046105983e-08,1200,,4.750381486886641e-08,True
+reference_monthly_rent_chf,mean_monthly_net_chf,all profiles,Spearman,Spearman,-0.167714578565184,5.059672629974232e-09,1200,,1.4089242246543632e-08,True
+reference_monthly_rent_chf,mean_monthly_net_chf,all profiles,Kendall,Kendall,-0.11375737681221597,3.582642194306609e-09,1200,,1.013215995577338e-08,True
+reference_monthly_rent_chf,sd_monthly_net_chf,all profiles,Pearson,Pearson,-0.010740710634036895,0.7101221123024842,1200,,0.9381905279324793,False
+reference_monthly_rent_chf,sd_monthly_net_chf,all profiles,Spearman,Spearman,0.007205143904969975,0.803100403250252,1200,,0.9837799328166172,False
+reference_monthly_rent_chf,sd_monthly_net_chf,all profiles,Kendall,Kendall,0.004204895888863879,0.82729319624569,1200,,0.9837799328166172,False
+reference_monthly_rent_chf,final_cash_chf,all profiles,Pearson,Pearson,-0.13612990247129741,2.2143142549165476e-06,1200,,5.64494197380134e-06,True
+reference_monthly_rent_chf,final_cash_chf,all profiles,Spearman,Spearman,-0.1343090136422126,3.0278603080108957e-06,1200,,7.611704385416279e-06,True
+reference_monthly_rent_chf,final_cash_chf,all profiles,Kendall,Kendall,-0.08947879446679563,3.4391872079240087e-06,1200,,8.527299789510214e-06,True
+mean_monthly_net_chf,sd_monthly_net_chf,all profiles,Pearson,Pearson,0.6579566779851191,9.61331320053707e-150,1200,,1.1600064595314731e-148,True
+mean_monthly_net_chf,sd_monthly_net_chf,all profiles,Spearman,Spearman,0.6507346393990551,1.9389249723309362e-145,1200,,1.949696777732775e-144,True
+mean_monthly_net_chf,sd_monthly_net_chf,all profiles,Kendall,Kendall,0.4610063942174034,1.9103058632138403e-126,1200,,1.5033276575726308e-125,True
+mean_monthly_net_chf,final_cash_chf,all profiles,Pearson,Pearson,0.8629969611928552,0.0,1200,Final cash = opening cash + 24 * mean monthly net; mechanically coupled.,0.0,True
+mean_monthly_net_chf,final_cash_chf,all profiles,Spearman,Spearman,0.8531421896820761,0.0,1200,Final cash = opening cash + 24 * mean monthly net; mechanically coupled.,0.0,True
+mean_monthly_net_chf,final_cash_chf,all profiles,Kendall,Kendall,0.6606199610786766,1.7381048475339813e-257,1200,Final cash = opening cash + 24 * mean monthly net; mechanically coupled.,3.4955219711516734e-256,True
+sd_monthly_net_chf,final_cash_chf,all profiles,Pearson,Pearson,0.55591585291533,2.806600602190862e-98,1200,,1.9538258038328694e-97,True
+sd_monthly_net_chf,final_cash_chf,all profiles,Spearman,Spearman,0.5435524955225663,3.3570145909543102e-93,1200,,2.2504431146767782e-92,True
+sd_monthly_net_chf,final_cash_chf,all profiles,Kendall,Kendall,0.3753044203502919,1.8609083189025954e-84,1200,,1.1614634680047233e-83,True
+employment_status,age_at_start,all profiles,Kruskal-Wallis,epsilon_squared,0.4673262163859901,2.0030706995649105e-119,1200,,1.450223186484995e-118,True
+employment_status,opening_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0461730117025992,1.1422343426794551e-11,1200,,3.758989382272389e-11,True
+employment_status,opening_investments_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.15500925146923134,3.753949451713636e-39,1200,,1.7880653967372847e-38,True
+employment_status,opening_debt_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.6245275682400404,1200,,0.8628968690950176,False
+employment_status,reference_monthly_net_income_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.5509377993261222,5.362903631736035e-141,1200,,4.853427786721112e-140,True
+employment_status,reference_monthly_rent_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.47395383530822965,1200,,0.7447395858806874,False
+employment_status,mean_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.5512847765954313,4.3635876288922574e-141,1200,,4.156891372786835e-140,True
+employment_status,sd_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.4792456015815427,1.6885659784276175e-122,1200,,1.273460175397495e-121,True
+employment_status,final_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.3642959024884032,7.1579565969066076e-93,1200,,4.627107657286057e-92,True
+household_type,age_at_start,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.7153946538171345,1200,,0.9383074807311693,False
+household_type,opening_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.9779726561659612,1200,,0.9854602450138231,False
+household_type,opening_investments_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.4340778399385151,1200,,0.7208081562281765,False
+household_type,opening_debt_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.8796887104625835,1200,,0.9854602450138231,False
+household_type,reference_monthly_net_income_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0021565742604223986,0.1339739406401559,1200,,0.2694364806207579,False
+household_type,reference_monthly_rent_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.5604652043311233,1.2820296647527431e-145,1200,,1.4502960582515406e-144,True
+household_type,mean_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.010043513591390243,0.0018063868923126113,1200,,0.004191743942417727,True
+household_type,sd_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.46864103828937165,1200,,0.7447395858806874,False
+household_type,final_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.005184260428388619,0.026742069542911872,1200,,0.059028226673988396,False
+city,age_at_start,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.6481056795307699,1200,,0.8858661872691908,False
+city,opening_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.007362943508935809,0.04893085939540381,1200,,0.10435222080011182,False
+city,opening_investments_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.9399208481447713,1200,,0.9854602450138231,False
+city,opening_debt_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.47099666741307744,1200,,0.7447395858806874,False
+city,reference_monthly_net_income_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.963446568878785,1200,,0.9854602450138231,False
+city,reference_monthly_rent_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.05276250959742444,2.424653452340209e-11,1200,,7.836826337028175e-11,True
+city,mean_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.003873716787636652,0.15656234864920862,1200,,0.298292474794808,False
+city,sd_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.9174279556326783,1200,,0.9854602450138231,False
+city,final_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.5278146662833723,1200,,0.7582099571213522,False
+has_debt,age_at_start,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.9022230424734787,1200,,0.9854602450138231,False
+has_debt,opening_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.9255076276394664,1200,,0.9854602450138231,False
+has_debt,opening_investments_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.8785902609826738,1200,,0.9854602450138231,False
+has_debt,opening_debt_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.976294580225336,1.4948863854933753e-256,1200,Debt indicator is defined from this amount.,2.705744357743009e-255,True
+has_debt,reference_monthly_net_income_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.7310148802522268,1200,,0.938394988125199,False
+has_debt,reference_monthly_rent_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.4850849640482049,1200,,0.7447395858806874,False
+has_debt,mean_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.892690451668304,1200,,0.9854602450138231,False
+has_debt,sd_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.7860302651490935,1200,,0.9837799328166172,False
+has_debt,final_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.8016142342659087,1200,,0.9837799328166172,False
+cash_shortfall,age_at_start,all profiles,Kruskal-Wallis,epsilon_squared,0.03288552952662412,2.0727348841537699e-10,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,6.468362310893661e-10,True
+cash_shortfall,opening_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.047405017654939124,2.9146910895348004e-14,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,1.0145367061649978e-13,True
+cash_shortfall,opening_investments_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.018082504204709474,1.930657193201545e-06,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,4.992127885278281e-06,True
+cash_shortfall,opening_debt_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0,0.3490720481797508,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,0.6075196223128355,False
+cash_shortfall,reference_monthly_net_income_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.1310208188678075,3.153105572601111e-36,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,1.3919807527824415e-35,True
+cash_shortfall,reference_monthly_rent_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.0014697583866876997,0.09660169859050699,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,0.19645963421215468,False
+cash_shortfall,mean_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.13470638642768515,3.4202066246039984e-37,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,1.5873266642392916e-36,True
+cash_shortfall,sd_monthly_net_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.030360267371176326,9.76335298068684e-10,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,2.945278149173863e-09,True
+cash_shortfall,final_cash_chf,all profiles,Kruskal-Wallis,epsilon_squared,0.14400909756228886,1.2582739238591886e-39,1200,Shortfall is derived from the same cash trajectory; retrospective outcome.,6.15534000590576e-39,True
+employment_status,household_type,all profiles,Chi-square permutation (1999),bias_corrected_cramers_v,0.0,0.8425,1200,Sparse expected counts; seeded permutation p-value (resolution 0.0005).,0.9838225806451614,False
+employment_status,city,all profiles,Chi-square permutation (1999),bias_corrected_cramers_v,0.0,0.731,1200,Sparse expected counts; seeded permutation p-value (resolution 0.0005).,0.938394988125199,False
+employment_status,has_debt,all profiles,Chi-square,bias_corrected_cramers_v,0.0,0.5939874836954646,1200,,0.8399354261631179,False
+employment_status,cash_shortfall,all profiles,Chi-square permutation (1999),bias_corrected_cramers_v,0.7653290913762878,0.0005,1200,Sparse expected counts; seeded permutation p-value (resolution 0.0005).,0.0011753246753246752,True
+household_type,city,all profiles,Chi-square,bias_corrected_cramers_v,0.027291884612775884,0.34252141287929233,1200,,0.6050206521668681,False
+household_type,has_debt,all profiles,Chi-square,bias_corrected_cramers_v,0.0,0.7788771083268926,1200,,0.9837799328166172,False
+household_type,cash_shortfall,all profiles,Chi-square,bias_corrected_cramers_v,0.0,0.46011090247129016,1200,,0.7447395858806874,False
+city,has_debt,all profiles,Chi-square,bias_corrected_cramers_v,0.0,0.4896354183414464,1200,,0.7447395858806874,False
+city,cash_shortfall,all profiles,Chi-square permutation (1999),bias_corrected_cramers_v,0.07706852851512044,0.082,1200,Sparse expected counts; seeded permutation p-value (resolution 0.0005).,0.16865909090909093,False
+has_debt,cash_shortfall,all profiles,Chi-square,bias_corrected_cramers_v,0.009032963685093834,0.29455911714577665,1200,,0.5278732693404512,False
+age_at_start,reference_monthly_net_income_chf,employment=employed,Spearman,Spearman,-0.04485880100350611,0.24202776570639314,682,Descriptive stratification only; not a causal effect estimate.,0.45632318325892873,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,employment=employed,Spearman,Spearman,0.9544029418686922,0.0,682,Descriptive stratification only; not a causal effect estimate.,0.0,True
+opening_cash_chf,mean_monthly_net_chf,employment=employed,Spearman,Spearman,0.042815181174004464,0.2641718154474554,682,Descriptive stratification only; not a causal effect estimate.,0.4829807938988831,False
+age_at_start,reference_monthly_net_income_chf,employment=part_time,Spearman,Spearman,-0.05929536651286766,0.5200191972855531,120,Descriptive stratification only; not a causal effect estimate.,0.7582099571213522,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,employment=part_time,Spearman,Spearman,0.816049725675394,7.20157403287475e-30,120,Descriptive stratification only; not a causal effect estimate.,2.962465681705295e-29,True
+opening_cash_chf,mean_monthly_net_chf,employment=part_time,Spearman,Spearman,-0.0590666018473505,0.5216334555948396,120,Descriptive stratification only; not a causal effect estimate.,0.7582099571213522,False
+age_at_start,reference_monthly_net_income_chf,employment=retired,Spearman,Spearman,-0.05219869717155193,0.44532618891020537,216,Descriptive stratification only; not a causal effect estimate.,0.7327640017522471,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,employment=retired,Spearman,Spearman,0.7278970718564106,6.357046933736063e-37,216,Descriptive stratification only; not a causal effect estimate.,2.8765637375155682e-36,True
+opening_cash_chf,mean_monthly_net_chf,employment=retired,Spearman,Spearman,0.0034913490277331235,0.95931392022978,216,Descriptive stratification only; not a causal effect estimate.,0.9854602450138231,False
+age_at_start,reference_monthly_net_income_chf,employment=self_employed,Spearman,Spearman,0.11265384869793725,0.25024502370798574,106,Descriptive stratification only; not a causal effect estimate.,0.4621872376647491,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,employment=self_employed,Spearman,Spearman,0.964158500642366,9.575945563236114e-62,106,Descriptive stratification only; not a causal effect estimate.,5.252261051350718e-61,True
+opening_cash_chf,mean_monthly_net_chf,employment=self_employed,Spearman,Spearman,0.09275763911630602,0.3442935202938531,106,Descriptive stratification only; not a causal effect estimate.,0.6050206521668681,False
+age_at_start,reference_monthly_net_income_chf,employment=student,Spearman,Spearman,-0.09692459909899483,0.5572136517003773,39,Descriptive stratification only; not a causal effect estimate.,0.7941391413997503,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,employment=student,Spearman,Spearman,0.6334008097165992,1.5054104346414886e-05,39,Descriptive stratification only; not a causal effect estimate.,3.585253798290913e-05,True
+opening_cash_chf,mean_monthly_net_chf,employment=student,Spearman,Spearman,-0.04352226720647774,0.7924904288718269,39,Descriptive stratification only; not a causal effect estimate.,0.9837799328166172,False
+age_at_start,reference_monthly_net_income_chf,employment=unemployed,Spearman,Spearman,0.07307237912532052,0.6673399731345313,37,Descriptive stratification only; not a causal effect estimate.,0.9014069786369415,False
+reference_monthly_net_income_chf,mean_monthly_net_chf,employment=unemployed,Spearman,Spearman,0.3885727833096254,0.017467634696313804,37,Descriptive stratification only; not a causal effect estimate.,0.04002078329155441,True
+opening_cash_chf,mean_monthly_net_chf,employment=unemployed,Spearman,Spearman,0.11569464201043148,0.49531222871208325,37,Descriptive stratification only; not a causal effect estimate.,0.747095944974059,False

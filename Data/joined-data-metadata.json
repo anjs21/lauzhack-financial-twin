@@ -1,0 +1,31 @@
+{
+  "inputs": {
+    "synthetic-profiles.csv": 1200,
+    "synthetic-cash-balances.csv": 28800,
+    "synthetic-accounts.csv": 1200,
+    "synthetic-assets.csv": 2399,
+    "synthetic-goals.csv": 1500,
+    "synthetic-liabilities.csv": 283,
+    "scenario-assumptions.csv": 240,
+    "scenario-catalog.csv": 120
+  },
+  "output": "Data/joined-data.csv",
+  "rows": 79223,
+  "columns": 59,
+  "catalog_only_rows": 119,
+  "join_keys": [
+    "profile_id",
+    "profile_id + account_id for cash accounts",
+    "scenario_id = scenario catalog id"
+  ],
+  "column_naming": "Source prefix plus double underscore, except shared identifier keys.",
+  "grain": "Profile \u00d7 month \u00d7 asset \u00d7 goal \u00d7 liability \u00d7 assumption; plus unlinked catalog rows.",
+  "warnings": [
+    "One-to-many joins repeat cash, income, balances, goals, and asset values. Do not sum these columns without deduplicating at the original source grain.",
+    "Common currency, as_of_date, notes, and amount columns are not join keys. Their source versions are preserved separately.",
+    "asset__account_id identifies the owned asset account; account_id identifies the cash account. Investment holdings are joined through profile ownership.",
+    "Scenario parameters are linked inputs, not evidence the scenario was applied to the supplied cash history.",
+    "Blank cells indicate missing/unlinked source records, not zero amounts.",
+    "This flattened CSV is for inspection. Split profiles and reconstruct source grains before statistical analysis or model training."
+  ]
+}
