@@ -1,0 +1,211 @@
+{
+  "train_rows": 268990,
+  "train_offer_rate_pts": 25.18,
+  "sim_speed_agent_months_per_s": 717642,
+  "models": {
+    "constant": {
+      "coefficients": {
+        "intercept": -1.238
+      },
+      "same_world_new_seeds (N=100, mix A)": {
+        "log_loss": 0.5603,
+        "ece_pts": 0.36,
+        "mean_pred_pts": 25.18,
+        "mean_obs_pts": 24.82,
+        "monthly_rate_abs_err_pts": 13.57
+      },
+      "scale_10x (N=1000, mix A)": {
+        "log_loss": 0.5551,
+        "ece_pts": 0.84,
+        "mean_pred_pts": 25.18,
+        "mean_obs_pts": 24.34,
+        "monthly_rate_abs_err_pts": 12.65
+      },
+      "behaviour_change (N=100, mix B)": {
+        "log_loss": 0.5412,
+        "ece_pts": 2.12,
+        "mean_pred_pts": 25.18,
+        "mean_obs_pts": 23.06,
+        "monthly_rate_abs_err_pts": 10.16
+      },
+      "scale+behaviour (N=1000, mix B)": {
+        "log_loss": 0.5433,
+        "ece_pts": 1.92,
+        "mean_pred_pts": 25.18,
+        "mean_obs_pts": 23.25,
+        "monthly_rate_abs_err_pts": 9.82
+      }
+    },
+    "individual_only": {
+      "coefficients": {
+        "intercept": -1.738,
+        "edu": 0.492,
+        "exp": 0.775,
+        "udur": -0.069,
+        "log_apps": 0.724,
+        "recession": -1.372
+      },
+      "same_world_new_seeds (N=100, mix A)": {
+        "log_loss": 0.484,
+        "ece_pts": 2.8,
+        "mean_pred_pts": 24.66,
+        "mean_obs_pts": 24.82,
+        "monthly_rate_abs_err_pts": 8.09
+      },
+      "scale_10x (N=1000, mix A)": {
+        "log_loss": 0.4759,
+        "ece_pts": 1.98,
+        "mean_pred_pts": 24.07,
+        "mean_obs_pts": 24.34,
+        "monthly_rate_abs_err_pts": 8.97
+      },
+      "behaviour_change (N=100, mix B)": {
+        "log_loss": 0.5021,
+        "ece_pts": 7.45,
+        "mean_pred_pts": 30.16,
+        "mean_obs_pts": 23.06,
+        "monthly_rate_abs_err_pts": 12.0
+      },
+      "scale+behaviour (N=1000, mix B)": {
+        "log_loss": 0.5059,
+        "ece_pts": 7.56,
+        "mean_pred_pts": 30.27,
+        "mean_obs_pts": 23.25,
+        "monthly_rate_abs_err_pts": 12.3
+      }
+    },
+    "+tightness": {
+      "coefficients": {
+        "intercept": 0.095,
+        "edu": 0.039,
+        "exp": 0.079,
+        "udur": -0.424,
+        "log_apps": 0.914,
+        "recession": -0.005,
+        "log_theta": 0.942
+      },
+      "same_world_new_seeds (N=100, mix A)": {
+        "log_loss": 0.4245,
+        "ece_pts": 0.59,
+        "mean_pred_pts": 24.69,
+        "mean_obs_pts": 24.82,
+        "monthly_rate_abs_err_pts": 2.29
+      },
+      "scale_10x (N=1000, mix A)": {
+        "log_loss": 0.4328,
+        "ece_pts": 0.86,
+        "mean_pred_pts": 24.71,
+        "mean_obs_pts": 24.34,
+        "monthly_rate_abs_err_pts": 1.84
+      },
+      "behaviour_change (N=100, mix B)": {
+        "log_loss": 0.4229,
+        "ece_pts": 1.14,
+        "mean_pred_pts": 23.03,
+        "mean_obs_pts": 23.06,
+        "monthly_rate_abs_err_pts": 2.35
+      },
+      "scale+behaviour (N=1000, mix B)": {
+        "log_loss": 0.4431,
+        "ece_pts": 1.88,
+        "mean_pred_pts": 23.84,
+        "mean_obs_pts": 23.25,
+        "monthly_rate_abs_err_pts": 2.25
+      }
+    },
+    "+tightness+composition": {
+      "coefficients": {
+        "intercept": 0.077,
+        "edu": 0.227,
+        "exp": 0.116,
+        "udur": -0.42,
+        "log_apps": 0.916,
+        "recession": -0.039,
+        "log_theta": 0.926,
+        "share_msc": -0.243
+      },
+      "same_world_new_seeds (N=100, mix A)": {
+        "log_loss": 0.4241,
+        "ece_pts": 0.63,
+        "mean_pred_pts": 24.7,
+        "mean_obs_pts": 24.82,
+        "monthly_rate_abs_err_pts": 2.49
+      },
+      "scale_10x (N=1000, mix A)": {
+        "log_loss": 0.4321,
+        "ece_pts": 0.98,
+        "mean_pred_pts": 24.7,
+        "mean_obs_pts": 24.34,
+        "monthly_rate_abs_err_pts": 1.97
+      },
+      "behaviour_change (N=100, mix B)": {
+        "log_loss": 0.4225,
+        "ece_pts": 1.12,
+        "mean_pred_pts": 22.95,
+        "mean_obs_pts": 23.06,
+        "monthly_rate_abs_err_pts": 2.42
+      },
+      "scale+behaviour (N=1000, mix B)": {
+        "log_loss": 0.4426,
+        "ece_pts": 1.85,
+        "mean_pred_pts": 23.74,
+        "mean_obs_pts": 23.25,
+        "monthly_rate_abs_err_pts": 2.35
+      }
+    }
+  },
+  "oracle_behaviour_change_log_loss": 0.4217,
+  "learning_curve_+tightness+composition_on_behaviour_change": [
+    {
+      "episodes": 5,
+      "coef_log_theta": 1.001,
+      "coef_edu": 0.137,
+      "log_loss": 0.4244,
+      "ece_pts": 0.62,
+      "mean_pred_pts": 22.74,
+      "mean_obs_pts": 23.06,
+      "monthly_rate_abs_err_pts": 1.7
+    },
+    {
+      "episodes": 20,
+      "coef_log_theta": 0.967,
+      "coef_edu": 0.165,
+      "log_loss": 0.4241,
+      "ece_pts": 0.94,
+      "mean_pred_pts": 23.14,
+      "mean_obs_pts": 23.06,
+      "monthly_rate_abs_err_pts": 1.43
+    },
+    {
+      "episodes": 50,
+      "coef_log_theta": 0.938,
+      "coef_edu": 0.143,
+      "log_loss": 0.4227,
+      "ece_pts": 1.08,
+      "mean_pred_pts": 23.02,
+      "mean_obs_pts": 23.06,
+      "monthly_rate_abs_err_pts": 2.18
+    },
+    {
+      "episodes": 150,
+      "coef_log_theta": 0.925,
+      "coef_edu": 0.284,
+      "log_loss": 0.4224,
+      "ece_pts": 1.09,
+      "mean_pred_pts": 22.93,
+      "mean_obs_pts": 23.06,
+      "monthly_rate_abs_err_pts": 2.61
+    },
+    {
+      "episodes": 300,
+      "coef_log_theta": 0.926,
+      "coef_edu": 0.227,
+      "log_loss": 0.4225,
+      "ece_pts": 1.12,
+      "mean_pred_pts": 22.95,
+      "mean_obs_pts": 23.06,
+      "monthly_rate_abs_err_pts": 2.42
+    }
+  ],
+  "runtime_s": 164.7
+}

@@ -1,0 +1,106 @@
+{
+  "model": "Qwen/Qwen3-8B",
+  "gpu_load_seconds": 94.7,
+  "prompt_tokens_mean": 179,
+  "choice_mode": {
+    "prompts": 4096,
+    "seconds": 5.93,
+    "decisions_per_s": 690,
+    "mean_prob_mass_on_valid_letters": 0.526,
+    "mean_policy": [
+      0.573,
+      0.037,
+      0.002,
+      0.388
+    ]
+  },
+  "reason_mode": {
+    "prompts": 1024,
+    "seconds": 1.78,
+    "decisions_per_s": 574,
+    "answer_parse_rate": 1.0,
+    "example": "A) Apply to many jobs (high effort)  \nI need to make progress in my job search before my savings run out, and I don't want to delay my career goals any longer."
+  },
+  "probe_runway_P_accept_low_offer": {
+    "driven": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "relaxed": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "anxious": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "balanced": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    }
+  },
+  "probe_runway_rank_corr_mean": 1.0,
+  "probe_runway_note": "rank correlation of P(accept) with runway; sensible behaviour is negative",
+  "probe_persona_P_high_effort": {
+    "driven": 1.0,
+    "relaxed": 0.0,
+    "anxious": 0.633,
+    "balanced": 0.983
+  }
+}
