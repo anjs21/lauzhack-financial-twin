@@ -1,0 +1,891 @@
+{
+ "between_people": {
+  "pairs": [
+   {
+    "expense": "rent",
+    "n": 1200,
+    "pearson_r": 0.0632,
+    "pearson_ci": [
+     0.0067,
+     0.1194
+    ],
+    "spearman_rho": 0.0567,
+    "partial_r": 0.0265,
+    "partial_ci": [
+     -0.0306,
+     0.0834
+    ],
+    "chf_per_1000_income": 5.4487,
+    "chf_per_1000_ci": [
+     -5.949,
+     16.8463
+    ]
+   },
+   {
+    "expense": "living costs (non-rent)",
+    "n": 1094,
+    "pearson_r": 0.2286,
+    "pearson_ci": [
+     0.1717,
+     0.284
+    ],
+    "spearman_rho": 0.2001,
+    "partial_r": 0.2073,
+    "partial_ci": [
+     0.1494,
+     0.2638
+    ],
+    "chf_per_1000_income": 15.673,
+    "chf_per_1000_ci": [
+     10.7636,
+     20.5824
+    ]
+   },
+   {
+    "expense": "living costs, drift-free check",
+    "n": 1094,
+    "pearson_r": 0.1545,
+    "pearson_ci": [
+     0.0961,
+     0.2118
+    ],
+    "spearman_rho": 0.1285,
+    "partial_r": 0.1275,
+    "partial_ci": [
+     0.0682,
+     0.1858
+    ],
+    "chf_per_1000_income": 15.6162,
+    "chf_per_1000_ci": [
+     7.562,
+     23.6705
+    ]
+   },
+   {
+    "expense": "rent + living costs",
+    "n": 1094,
+    "pearson_r": 0.1343,
+    "pearson_ci": [
+     0.0756,
+     0.192
+    ],
+    "spearman_rho": 0.1234,
+    "partial_r": 0.1079,
+    "partial_ci": [
+     0.0484,
+     0.1666
+    ],
+    "chf_per_1000_income": 24.6592,
+    "chf_per_1000_ci": [
+     11.6003,
+     37.7181
+    ]
+   }
+  ],
+  "denoised": {
+   "living_costs_r": 0.3767,
+   "living_costs_ci": [
+    0.2728,
+    0.4871
+   ],
+   "rent_plus_living_r": 0.1369,
+   "rent_plus_living_ci": [
+    0.0784,
+    0.1995
+   ],
+   "reliability_of_living_cost_estimate": 0.3682,
+   "reliability_ci": [
+    0.2903,
+    0.4475
+   ]
+  },
+  "rent_elasticity_to_income": {
+   "estimate": 0.0261,
+   "ci": [
+    -0.0057,
+    0.058
+   ]
+  },
+  "living_cost_by_status_vs_employed": {
+   "part_time": {
+    "chf": 4.341,
+    "ci": [
+     -19.9895,
+     28.6716
+    ]
+   },
+   "retired": {
+    "chf": 72.795,
+    "ci": [
+     46.7988,
+     98.7911
+    ]
+   },
+   "student": {
+    "chf": -125.9908,
+    "ci": [
+     -165.3051,
+     -86.6764
+    ]
+   },
+   "unemployed": {
+    "chf": 17.8895,
+    "ci": [
+     -23.887,
+     59.666
+    ]
+   }
+  },
+  "r2_by_driver": {
+   "income (log)": {
+    "status": 0.7404,
+    "household": 0.0048,
+    "city": 0.0053,
+    "all three": 0.7438
+   },
+   "rent (log)": {
+    "status": 0.0039,
+    "household": 0.5768,
+    "city": 0.0665,
+    "all three": 0.6609,
+    "all three + income": 0.6616
+   },
+   "living costs": {
+    "status": 0.0714,
+    "household": 0.0014,
+    "city": 0.2441,
+    "all three": 0.3232,
+    "all three + income": 0.3523
+   }
+  },
+  "by_income_quintile": [
+   {
+    "quintile": "Q1",
+    "n": 219.0,
+    "income": 2926.47,
+    "rent": 1907.67,
+    "living": 1426.2666,
+    "spending_share": 1.2498
+   },
+   {
+    "quintile": "Q2",
+    "n": 219.0,
+    "income": 4317.89,
+    "rent": 1915.75,
+    "living": 1468.6866,
+    "spending_share": 0.7925
+   },
+   {
+    "quintile": "Q3",
+    "n": 218.0,
+    "income": 5423.765,
+    "rent": 1847.88,
+    "living": 1463.4047,
+    "spending_share": 0.6146
+   },
+   {
+    "quintile": "Q4",
+    "n": 219.0,
+    "income": 7875.17,
+    "rent": 2021.53,
+    "living": 1518.464,
+    "spending_share": 0.4579
+   },
+   {
+    "quintile": "Q5",
+    "n": 219.0,
+    "income": 10337.91,
+    "rent": 1992.82,
+    "living": 1518.2279,
+    "spending_share": 0.3448
+   }
+  ],
+  "spearman_within_status": {
+   "employed": {
+    "n": 682,
+    "rent": {
+     "rho": 0.1159,
+     "p": 0.0024
+    },
+    "living": {
+     "rho": 0.2141,
+     "p": 0.0
+    }
+   },
+   "part_time": {
+    "n": 120,
+    "rent": {
+     "rho": 0.0914,
+     "p": 0.321
+    },
+    "living": {
+     "rho": -0.1622,
+     "p": 0.0767
+    }
+   },
+   "retired": {
+    "n": 216,
+    "rent": {
+     "rho": -0.0102,
+     "p": 0.8817
+    },
+    "living": {
+     "rho": 0.2064,
+     "p": 0.0023
+    }
+   },
+   "self_employed": {
+    "n": 106,
+    "rent": {
+     "rho": -0.1206,
+     "p": 0.2181
+    },
+    "living": null
+   },
+   "student": {
+    "n": 39,
+    "rent": {
+     "rho": -0.0601,
+     "p": 0.7162
+    },
+    "living": {
+     "rho": 0.2144,
+     "p": 0.19
+    }
+   },
+   "unemployed": {
+    "n": 37,
+    "rent": {
+     "rho": 0.2357,
+     "p": 0.1603
+    },
+    "living": {
+     "rho": 0.1932,
+     "p": 0.2519
+    }
+   }
+  }
+ },
+ "other_expenses": {
+  "tuition_s001": {
+   "n": 120,
+   "rho": 0.1366,
+   "p": 0.137,
+   "levels_chf": [
+    1200.0,
+    2500.0,
+    4800.0,
+    8000.0
+   ],
+   "median_by_status": {
+    "employed": 4800.0,
+    "part_time": 3650.0,
+    "retired": 2500.0,
+    "self_employed": 4800.0,
+    "student": 2500.0,
+    "unemployed": 2500.0
+   }
+  },
+  "student_fee_september": {
+   "n": 39,
+   "median_chf": 929.7848,
+   "rho": -0.1049,
+   "p": 0.5252
+  },
+  "loans": {
+   "n_borrowers": 283,
+   "principal_vs_income": {
+    "rho": -0.0517,
+    "p": 0.3859
+   },
+   "rate_vs_income": {
+    "rho": 0.046,
+    "p": 0.4408
+   },
+   "has_loan_vs_income": {
+    "rho": 0.0099,
+    "p": 0.7312
+   },
+   "has_loan_vs_income_employed": {
+    "rho": 0.0052,
+    "p": 0.8922
+   },
+   "share_with_loan_by_status": {
+    "employed": 0.2375,
+    "part_time": 0.2583,
+    "retired": 0.2546,
+    "self_employed": 0.1981,
+    "student": 0.2308,
+    "unemployed": 0.1351
+   },
+   "note": "opening snapshot only; the ledger never services these loans"
+  }
+ },
+ "over_time": {
+  "noise": {
+   "employed": {
+    "fixed_chf": 207.9144,
+    "share_of_income": 0.0491,
+    "per_profile_sd_vs_income": {
+     "rho": 0.5668,
+     "p": 0.0
+    },
+    "per_profile_sd_vs_rent": {
+     "rho": 0.1153,
+     "p": 0.0026
+    },
+    "per_profile_sd_vs_living": {
+     "rho": 0.2229,
+     "p": 0.0
+    },
+    "by_income_quintile": [
+     {
+      "quintile": 1,
+      "mean_income": 4526.8104,
+      "noise_sd": 322.0396
+     },
+     {
+      "quintile": 2,
+      "mean_income": 6114.7968,
+      "noise_sd": 350.1223
+     },
+     {
+      "quintile": 3,
+      "mean_income": 7754.5222,
+      "noise_sd": 431.9864
+     },
+     {
+      "quintile": 4,
+      "mean_income": 9255.871,
+      "noise_sd": 495.6038
+     },
+     {
+      "quintile": 5,
+      "mean_income": 10795.6795,
+      "noise_sd": 573.9641
+     }
+    ]
+   },
+   "part_time": {
+    "fixed_chf": 254.2363,
+    "share_of_income": 0.0346,
+    "per_profile_sd_vs_income": {
+     "rho": 0.1006,
+     "p": 0.2744
+    },
+    "per_profile_sd_vs_rent": {
+     "rho": 0.0648,
+     "p": 0.4821
+    },
+    "per_profile_sd_vs_living": {
+     "rho": 0.1393,
+     "p": 0.1291
+    },
+    "by_income_quintile": [
+     {
+      "quintile": 1,
+      "mean_income": 2941.6071,
+      "noise_sd": 278.2854
+     },
+     {
+      "quintile": 2,
+      "mean_income": 3602.2946,
+      "noise_sd": 261.9494
+     },
+     {
+      "quintile": 3,
+      "mean_income": 4312.0712,
+      "noise_sd": 315.0478
+     },
+     {
+      "quintile": 4,
+      "mean_income": 4950.4096,
+      "noise_sd": 307.8166
+     },
+     {
+      "quintile": 5,
+      "mean_income": 5508.2754,
+      "noise_sd": 311.7635
+     }
+    ]
+   },
+   "retired": {
+    "fixed_chf": 236.3707,
+    "share_of_income": 0.0967,
+    "per_profile_sd_vs_income": {
+     "rho": 0.4659,
+     "p": 0.0
+    },
+    "per_profile_sd_vs_rent": {
+     "rho": 0.049,
+     "p": 0.4736
+    },
+    "per_profile_sd_vs_living": {
+     "rho": 0.2276,
+     "p": 0.0008
+    },
+    "by_income_quintile": [
+     {
+      "quintile": 1,
+      "mean_income": 2902.4482,
+      "noise_sd": 377.7661
+     },
+     {
+      "quintile": 2,
+      "mean_income": 3365.7012,
+      "noise_sd": 391.3343
+     },
+     {
+      "quintile": 3,
+      "mean_income": 3849.9651,
+      "noise_sd": 415.0588
+     },
+     {
+      "quintile": 4,
+      "mean_income": 4382.8691,
+      "noise_sd": 524.373
+     },
+     {
+      "quintile": 5,
+      "mean_income": 4918.2451,
+      "noise_sd": 515.8017
+     }
+    ]
+   },
+   "self_employed": {
+    "fixed_chf": 525.3828,
+    "share_of_income": 0.228,
+    "per_profile_sd_vs_income": {
+     "rho": 0.7726,
+     "p": 0.0
+    },
+    "per_profile_sd_vs_rent": {
+     "rho": -0.1704,
+     "p": 0.0808
+    },
+    "per_profile_sd_vs_living": null,
+    "by_income_quintile": [
+     {
+      "quintile": 1,
+      "mean_income": 3603.4209,
+      "noise_sd": 866.2245
+     },
+     {
+      "quintile": 2,
+      "mean_income": 5059.2967,
+      "noise_sd": 1227.4641
+     },
+     {
+      "quintile": 3,
+      "mean_income": 7280.2819,
+      "noise_sd": 1751.1801
+     },
+     {
+      "quintile": 4,
+      "mean_income": 9401.771,
+      "noise_sd": 2412.9778
+     },
+     {
+      "quintile": 5,
+      "mean_income": 10863.6586,
+      "noise_sd": 2393.7597
+     }
+    ]
+   },
+   "student": {
+    "fixed_chf": 175.4477,
+    "share_of_income": 0.1203,
+    "per_profile_sd_vs_income": {
+     "rho": 0.3709,
+     "p": 0.0201
+    },
+    "per_profile_sd_vs_rent": {
+     "rho": -0.0306,
+     "p": 0.8534
+    },
+    "per_profile_sd_vs_living": {
+     "rho": 0.3397,
+     "p": 0.0344
+    },
+    "by_income_quintile": [
+     {
+      "quintile": 1,
+      "mean_income": 579.2687,
+      "noise_sd": 204.4353
+     },
+     {
+      "quintile": 2,
+      "mean_income": 883.3212,
+      "noise_sd": 207.1793
+     },
+     {
+      "quintile": 3,
+      "mean_income": 1236.7143,
+      "noise_sd": 226.6776
+     },
+     {
+      "quintile": 4,
+      "mean_income": 1565.63,
+      "noise_sd": 213.1781
+     },
+     {
+      "quintile": 5,
+      "mean_income": 1817.49,
+      "noise_sd": 306.4015
+     }
+    ]
+   },
+   "unemployed": {
+    "fixed_chf": 215.5352,
+    "share_of_income": 0.1833,
+    "per_profile_sd_vs_income": {
+     "rho": 0.2541,
+     "p": 0.129
+    },
+    "per_profile_sd_vs_rent": {
+     "rho": -0.1005,
+     "p": 0.5539
+    },
+    "per_profile_sd_vs_living": {
+     "rho": 0.2067,
+     "p": 0.2196
+    },
+    "by_income_quintile": [
+     {
+      "quintile": 1,
+      "mean_income": 169.035,
+      "noise_sd": 216.8714
+     },
+     {
+      "quintile": 2,
+      "mean_income": 412.59,
+      "noise_sd": 199.9172
+     },
+     {
+      "quintile": 3,
+      "mean_income": 584.4414,
+      "noise_sd": 290.8978
+     },
+     {
+      "quintile": 4,
+      "mean_income": 936.0729,
+      "noise_sd": 224.6978
+     },
+     {
+      "quintile": 5,
+      "mean_income": 1160.0662,
+      "noise_sd": 320.9804
+     }
+    ]
+   }
+  },
+  "bills": {
+   "employed_part_time_retired_unemployed": {
+    "pooled": {
+     "p_regular_month": 0.0371,
+     "p_feb_aug": 0.3666,
+     "size_chf": [
+      438.2426,
+      1787.0203
+     ],
+     "mean_size_chf": 1112.6314
+    },
+    "by_income_tercile": {
+     "low": {
+      "p_regular_month": 0.0456,
+      "p_feb_aug": 0.3901,
+      "size_chf": [
+       355.3025,
+       1822.7135
+      ],
+      "mean_size_chf": 1089.008
+     },
+     "middle": {
+      "p_regular_month": 0.0338,
+      "p_feb_aug": 0.3666,
+      "size_chf": [
+       545.4572,
+       1740.0217
+      ],
+      "mean_size_chf": 1142.7395
+     },
+     "high": {
+      "p_regular_month": 0.0276,
+      "p_feb_aug": 0.3222,
+      "size_chf": [
+       495.8613,
+       1805.4624
+      ],
+      "mean_size_chf": 1150.6619
+     }
+    },
+    "extra_cost_of_feb_aug_month": {
+     "low": {
+      "extra_cost_feb_aug_chf": 370.8411,
+      "ci": [
+       334.084,
+       407.5982
+      ],
+      "income_range_chf": [
+       9.4,
+       4614.84
+      ]
+     },
+     "middle": {
+      "extra_cost_feb_aug_chf": 366.1309,
+      "ci": [
+       328.6254,
+       403.6365
+      ],
+      "income_range_chf": [
+       4615.23,
+       7619.76
+      ]
+     },
+     "high": {
+      "extra_cost_feb_aug_chf": 335.8233,
+      "ci": [
+       290.4384,
+       381.2081
+      ],
+      "income_range_chf": [
+       7623.45,
+       11972.04
+      ]
+     }
+    },
+    "extra_cost_chf_per_1000_income": {
+     "estimate": -9.8522,
+     "ci": [
+      -23.1286,
+      3.4241
+     ]
+    }
+   },
+   "employed_only": {
+    "pooled": {
+     "p_regular_month": 0.0337,
+     "p_feb_aug": 0.3457,
+     "size_chf": [
+      494.8334,
+      1778.5255
+     ],
+     "mean_size_chf": 1136.6795
+    },
+    "by_income_tercile": {
+     "low": {
+      "p_regular_month": 0.0392,
+      "p_feb_aug": 0.3915,
+      "size_chf": [
+       509.0445,
+       1745.4956
+      ],
+      "mean_size_chf": 1127.2701
+     },
+     "middle": {
+      "p_regular_month": 0.0337,
+      "p_feb_aug": 0.3013,
+      "size_chf": [
+       365.4286,
+       1877.5623
+      ],
+      "mean_size_chf": 1121.4955
+     },
+     "high": {
+      "p_regular_month": 0.0224,
+      "p_feb_aug": 0.317,
+      "size_chf": [
+       679.6363,
+       1760.7934
+      ],
+      "mean_size_chf": 1220.2149
+     }
+    },
+    "extra_cost_of_feb_aug_month": {
+     "low": {
+      "extra_cost_feb_aug_chf": 396.5503,
+      "ci": [
+       350.6891,
+       442.4116
+      ],
+      "income_range_chf": [
+       3666.13,
+       6438.59
+      ]
+     },
+     "middle": {
+      "extra_cost_feb_aug_chf": 299.655,
+      "ci": [
+       253.0204,
+       346.2897
+      ],
+      "income_range_chf": [
+       6440.67,
+       8986.44
+      ]
+     },
+     "high": {
+      "extra_cost_feb_aug_chf": 351.6172,
+      "ci": [
+       290.8703,
+       412.364
+      ],
+      "income_range_chf": [
+       8994.47,
+       11972.04
+      ]
+     }
+    },
+    "extra_cost_chf_per_1000_income": {
+     "estimate": -9.4486,
+     "ci": [
+      -23.2716,
+      4.3744
+     ]
+    }
+   }
+  },
+  "bonus": {
+   "share_with_bonus": 0.5587,
+   "share_by_income_tercile": {
+    "low": 0.5485,
+    "middle": 0.5683,
+    "high": 0.5592
+   },
+   "tercile_chi2_p": 0.8342,
+   "size_chf_vs_income": {
+    "rho": 0.5495,
+    "p": 0.0
+   },
+   "size_share_vs_income": {
+    "rho": -0.0339,
+    "p": 0.3499
+   },
+   "median_size_share_of_income": 0.582,
+   "same_people_both_years": {
+    "phi": 0.0247,
+    "p_2026_if_bonus_2025": 0.5696,
+    "p_2026_if_none_2025": 0.5449
+   },
+   "net_flow_change_2025_to_2026_if_bonus_dec_2025": {
+    "january": {
+     "chf_per_month": 66.8159,
+     "ci": [
+      -41.9209,
+      175.5526
+     ]
+    },
+    "regular_months": {
+     "chf_per_month": 4.0379,
+     "ci": [
+      -32.4393,
+      40.515
+     ]
+    },
+    "feb_aug": {
+     "chf_per_month": 9.5099,
+     "ci": [
+      -102.1152,
+      121.135
+     ]
+    }
+   },
+   "mean_bonus_dec_2025_chf": 4574.6816,
+   "feb_aug_surprise_in_bonus_years": {
+    "chf_per_month": -26.9629,
+    "ci": [
+     -86.5358,
+     32.6099
+    ]
+   }
+  },
+  "persistence": {
+   "lag1_r": -0.0709,
+   "placebo_r_non_adjacent": -0.027,
+   "month_after_bill_minus_after_none": {
+    "diff_chf": -14.5557,
+    "ci": [
+     -48.145,
+     19.0336
+    ],
+    "n": [
+     878,
+     3342
+    ]
+   },
+   "share_feb_aug_with_detected_bill": 0.2081,
+   "feb_bill_vs_aug_bill_same_year_phi": 0.0625
+  },
+  "persistence_if_months_independent": {
+   "lag1_r": {
+    "mean": -0.0833,
+    "range95": [
+     -0.1029,
+     -0.0714
+    ]
+   },
+   "placebo_r_non_adjacent": {
+    "mean": -0.0268,
+    "range95": [
+     -0.029,
+     -0.0246
+    ]
+   },
+   "feb_bill_vs_aug_bill_same_year_phi": {
+    "mean": 0.0286,
+    "range95": [
+     -0.0141,
+     0.0697
+    ]
+   },
+   "month_after_bill_minus_after_none": {
+    "mean": -32.6172,
+    "range95": [
+     -75.4661,
+     5.3343
+    ]
+   }
+  },
+  "drift": {
+   "common_cost_inflation": {
+    "pay": {
+     "per_year": 0.0143,
+     "ci": [
+      0.0099,
+      0.0188
+     ]
+    },
+    "costs": {
+     "per_year": 0.0102,
+     "ci": [
+      0.0027,
+      0.0177
+     ]
+    }
+   },
+   "separate_rates": {
+    "pay": {
+     "per_year": 0.0145,
+     "ci": [
+      0.0098,
+      0.0192
+     ]
+    },
+    "rent": {
+     "per_year": 0.0083,
+     "ci": [
+      -0.0109,
+      0.0276
+     ]
+    },
+    "living": {
+     "per_year": 0.0136,
+     "ci": [
+      -0.0184,
+      0.0456
+     ]
+    }
+   }
+  }
+ }
+}

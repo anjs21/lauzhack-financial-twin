@@ -1,0 +1,74 @@
+{
+  "description": "Proposed monthly MDP for the 1,200 synthetic profiles. Codes and policy thresholds are design choices. All money is CHF.",
+  "horizon_months": 120,
+  "state_order": ["month", "work_mode", "education", "net_income", "housing_tier", "spending_tier", "cash", "portfolio"],
+  "state": {
+    "month": {"type": "integer", "range": [0, 120], "meaning": "Opening month index. Month 120 is terminal. Opening age and calendar date determine age and deadlines."},
+    "work_mode": {
+      "type": "nominal integer",
+      "codes": {"0": "student", "1": "part_time", "2": "employed", "3": "self_employed", "4": "unemployed", "5": "retired"},
+      "groups": {"student": [0], "employment": [1, 2, 3], "unemployed_or_retired": [4, 5]},
+      "initialize_from": "synthetic-profiles.employment_status"
+    },
+    "education": {
+      "type": "tagged integer",
+      "range": [-1, 24],
+      "meaning": "-1 = completed the modelled master's, 0 = no active or completed modelled master's, 1..24 = study months remaining including this month. Positive values require student mode. Initialize to 0 absent explicit education information.",
+      "completion": "After the last month's tuition and study income, set education to -1. Start the next month outside work with the specified job-seeker income. Employment can begin when an eligible offer is accepted.",
+      "existing_students": "A starting student with education=0 is finishing their current course. Give it an explicit end date in episode context (demo default after one month). Continuing past that date moves the student to job-seeker status unless they have started the master's or accepted work."
+    },
+    "net_income": {"type": "money", "range": ">= 0 CHF/month", "meaning": "Current recurring take-home pay, student income, job-seeker income or pension. Initialize from reference_monthly_net_income_chf. Accepting a contract replaces the rate with its quoted amount. Subsequent pay changes persist here."},
+    "housing_tier": {"type": "ordinal integer", "range": [-1, 1], "initial": 0, "codes": {"-1": "lower rent", "0": "reference rent", "1": "higher rent"}, "multipliers": [0.8, 1.0, 1.2], "basis": "Multiply the current month's reference rent by the tier multiplier. A rent shock changes the reference rent schedule."},
+    "spending_tier": {"type": "ordinal integer", "range": [-1, 1], "initial": 0, "codes": {"-1": "lean", "0": "usual", "1": "flexible"}, "multipliers": [0.9, 1.0, 1.1], "basis": "Apply the multiplier to the discretionary budget only. Essential bills, housing, tuition and debt service are accounted separately. The split is an input assumption."},
+    "cash": {"type": "money", "range": ">= 0 in a live state", "meaning": "Opening spendable cash. A negative provisional closing balance leads to a terminal funding-gap outcome carrying the exact unmet CHF amount."},
+    "portfolio": {"type": "money", "range": ">= 0 CHF", "meaning": "Market value of one liquid investment portfolio. Initialize from the investment asset snapshot, or zero if absent."}
+  },
+  "action_order": ["status_change", "housing_change", "spending", "asset_transactions"],
+  "action": {
+    "status_change": {
+      "type": "nominal instruction", "range": [0, 6],
+      "codes": {"0": "continue", "1": "enroll in the two-year master's", "2": "accept part-time work", "3": "accept full-time work", "4": "start self-employment", "5": "leave paid work for an unpaid break", "6": "retire"},
+      "transition": "Codes 1..6 target work modes 0..5 respectively. Enrollment sets the study clock to 24 before the current month's study costs. An unpaid break sets recurring income to zero. Retirement sets it to the assumed pension. A job or business sets its own specified income and any entry cost.",
+      "mask": "Continue is available to everyone. Enrollment requires education=0 and eligibility. Active master's students commit to completing their program in this version. Employment changes require an available offer or business plan. A break requires paid work. Retirement requires a configured eligible age and income schedule. Retired is absorbing with respect to work mode. Mask redundant entries into the current mode except initial master's enrollment by a student."
+    },
+    "housing_change": {"type": "one-tier step", "range": [-1, 1], "codes": {"-1": "move down one rent tier", "0": "keep housing", "1": "move up one rent tier"}, "mask": "Reject steps beyond either endpoint or unavailable housing options. Charge a moving fee on each actual move. Apply the new rent from the moving month."},
+    "spending": {"type": "one-tier step", "range": [-1, 1], "codes": {"-1": "reduce discretionary budget one tier", "0": "keep current budget", "1": "raise discretionary budget one tier"}, "mask": "Reject steps beyond either endpoint. The new level persists. A -1 followed by 0 keeps the lean budget when starting at usual."},
+    "asset_transactions": {
+      "type": "one-time sale, hold or purchase", "range": [-1, 1],
+      "codes": {"-1": "sell up to one lot", "0": "hold", "1": "buy up to one lot"},
+      "lot": "One lot equals one month of the profile's opening reference rent plus monthly essential non-housing expenses. Freeze that positive CHF amount at initialization.",
+      "size_and_mask": "Sell min(lot, current portfolio). Buy min(lot, cash remaining after this month's known mandatory costs and chosen spending). Reserve committed cash before purchases, forbid leverage and mask zero-size orders. Trades exchange cash and portfolio value one for one before explicitly modelled fees."
+    }
+  },
+  "fixed_context_visible_to_policy": [
+    "Opening age, city, household, dated cash goals, horizon and user preferences.",
+    "Dated reference rent and living-cost schedules, essential/discretionary split, trade lot and moving costs.",
+    "Mode-specific pay or pension offers, availability by month and completed credential, tuition, course duration and entry fees. Quote the offer before the choice. In the compact model offer terms and availability are fixed functions of context, month and state.",
+    "Scheduled payments and outstanding principal of opening loans by month. Use the source opening principal and rate with a disclosed assumed repayment term. Fixed debt service reduces cash automatically. Subtract remaining debt in terminal wealth.",
+    "Initialize all balance-sheet items as of January 2025. Build spending, rent and income as separate flows; including recorded net cash flows again would double count them."
+  ],
+  "transition": [
+    "Validate the joint action at the start of month t. Determine its known income, outgoings and fees. Execute any selected sale before known bills. A hold/continue path that exhausts funding records the size of its shortfall.",
+    "Post new mode income, rent, essential and discretionary costs, debt service, tuition and any move or entry fee. Execute an affordable selected purchase after known bills.",
+    "Apply monthly return to the remaining investment balance and any configured month-end shock. A negative closing cash balance ends the rollout with the measured shortfall. A market return must be at least -100%. This timing models month-end liquidity.",
+    "Decrement the study clock once, process completion, set next month's pay if the mode changes, and advance t. Scheduled events depend on the calendar. Any new random event with a persistent effect must update a stored variable or have an explicit remaining-duration state."
+  ],
+  "reporting_bands": {
+    "basis": "Divide each of cash, portfolio and monthly net income by the fixed CHF lot to compare profiles. For income the ratio is months of opening essential costs covered by one month's income. For balances it is months of coverage.",
+    "codes": {"0": "[0,1)", "1": "[1,3)", "2": "[3,6)", "3": "[6,infinity)"},
+    "scope": "These are display or approximate policy features. The simulator keeps exact CHF and the profile context. Bins alone can merge states with different feasible actions."
+  },
+  "decision_criterion": "Compare funding gap, cash versus the user's priority goal at its deadline, terminal cash plus portfolio minus residual debt, and user preference for status, housing and spending. Supply preferences at episode start. With a scalar reward, score goal attainment once at its deadline and assign a penalty for failed funding. Display the components separately.",
+  "catalogue_scope": [
+    {"catalogue": ["S001", "S011", "S017", "S091", "S111"], "representation": "Status transitions for study, work, reduced hours, retirement and simple freelance entry. Freelance entry abstracts business assets and equity."},
+    {"catalogue": ["S031", "S032", "S041", "S045", "S046"], "representation": "Rent and discretionary tiers represent the recurring cost effect of living alone, sharing, or changing a budget."},
+    {"catalogue": ["S051", "S054", "S061", "S067", "S097"], "representation": "Dated cash targets and purchases, holds or sales can represent a reserve policy, contribution pause or drawdown."},
+    {"catalogue": ["S014", "S037", "S048", "S065", "S082", "S101", "S104"], "representation": "Scenario schedules or transition shocks can change income, rent, bills and portfolio returns. Job loss sets job-seeker mode and its income. A fixed six-month gap uses calendar-defined offer availability."},
+    {"catalogue": ["S002", "S023", "S033", "S062", "S074", "S099", "S117"], "representation": "Simultaneous work and study, country/FX positions, home ownership, portfolio mix, optional principal repayment, pension lump sums and founder equity require extensions."}
+  ],
+  "examples": [
+    {"decision": "Begin a master's, share a lower-rent flat, keep spending and investments", "catalogue": ["S001", "S032"], "action": [1,-1,0,0], "initial_conditions": "Eligible student, no active master's, reference housing and moving fee funded."},
+    {"decision": "Take part-time work and trim spending to preserve a cash goal", "catalogue": ["S017", "S041", "S054"], "action": [2,0,-1,0], "initial_conditions": "Full-time worker with an available offer and usual spending."},
+    {"decision": "Stay retired and fund living costs by selling one investment lot", "catalogue": ["S097"], "action": [0,0,0,-1], "initial_conditions": "Retired investor with a positive sellable balance."}
+  ]
+}

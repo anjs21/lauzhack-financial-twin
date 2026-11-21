@@ -1,0 +1,5 @@
+expense,n,pearson_r,spearman_rho,partial_r,chf_per_1000_income,pearson_lo,pearson_hi,partial_lo,partial_hi,chf_per_1000_lo,chf_per_1000_hi
+rent,1200,0.0632,0.0567,0.0265,5.4487,0.0067,0.1194,-0.0306,0.0834,-5.949,16.8463
+living costs (non-rent),1094,0.2286,0.2001,0.2073,15.673,0.1717,0.284,0.1494,0.2638,10.7636,20.5824
+"living costs, drift-free check",1094,0.1545,0.1285,0.1275,15.6162,0.0961,0.2118,0.0682,0.1858,7.562,23.6705
+rent + living costs,1094,0.1343,0.1234,0.1079,24.6592,0.0756,0.192,0.0484,0.1666,11.6003,37.7181

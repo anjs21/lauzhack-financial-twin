@@ -27,6 +27,7 @@ Every number that is not in the data sits in the dict `A` at the top of the scri
 | `best_financial_lever_by_status.csv` | Which lever is best per profile (lowest risk, then goals, then wealth) |
 | `state_importance.csv` | Permutation importance of starting-state variables for baseline outcomes |
 | `sensitivity_tiers.csv` | Tiers under pessimistic, reference and optimistic assumptions |
+| `income_expense_correlation.json`, `income_expense_pairs.csv` | From `income_expense_correlation.py` (~10 s): whether rent, living costs, bills, fees, tuition and loans move with income, between people and month to month |
 
 ## Headline results
 

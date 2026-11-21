@@ -1,0 +1,1509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Financial Twin MDP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --fg: #0b0b0b; --fg2: #52514e; --muted: #6f6d68;
+  --grid: #e1e0d9; --axis: #c3c2b7; --line: rgba(11, 11, 11, 0.10); --hover: rgba(11, 11, 11, 0.04);
+  --accent: #1c5cab; --tint: #eef4fc;
+  /* ordinal ramp for "how far inside the MDP": agent move > random event > built-in > parameter; gray = left out */
+  --c-action: #184f95; --c-event: #2a78d6; --c-builtin: #5598e7; --c-param: #86b6ef; --c-out: #dcdbd5;
+  --on-action: #ffffff; --on-event: #ffffff; --on-builtin: #0b0b0b; --on-param: #0b0b0b; --on-out: #52514e;
+  --font-display: "Instrument Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #9b9a93;
+    --grid: #2c2c2a; --axis: #4a4a46; --line: rgba(255, 255, 255, 0.10); --hover: rgba(255, 255, 255, 0.05);
+    --accent: #86b6ef; --tint: #14243a;
+    --c-action: #9ec5f4; --c-event: #6da7ec; --c-builtin: #2a78d6; --c-param: #184f95; --c-out: #383835;
+    --on-action: #0b0b0b; --on-event: #0b0b0b; --on-builtin: #ffffff; --on-param: #f0efec; --on-out: #c3c2b7;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #9b9a93;
+  --grid: #2c2c2a; --axis: #4a4a46; --line: rgba(255, 255, 255, 0.10); --hover: rgba(255, 255, 255, 0.05);
+  --accent: #86b6ef; --tint: #14243a;
+  --c-action: #9ec5f4; --c-event: #6da7ec; --c-builtin: #2a78d6; --c-param: #184f95; --c-out: #383835;
+  --on-action: #0b0b0b; --on-event: #0b0b0b; --on-builtin: #ffffff; --on-param: #f0efec; --on-out: #c3c2b7;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.6 var(--font-body); }
+.page {
+  max-width: 980px; margin: 0 auto; padding-block: 44px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-weight: 700; font-size: clamp(2rem, 6vw, 2.9rem); line-height: 1.06; letter-spacing: -0.025em; }
+h2 { font-weight: 600; font-size: 1.5rem; line-height: 1.2; letter-spacing: -0.012em; }
+h3 { font-weight: 600; font-size: 1.05rem; line-height: 1.3; }
+p { margin: 0; max-width: 70ch; }
+sub { font-size: 0.7em; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+.eyebrow { font: 500 0.72rem/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: 0.09em; color: var(--fg2); }
+.num { font-variant-numeric: tabular-nums; }
+
+header.top { display: grid; gap: 18px; padding-bottom: 34px; }
+.lede { font-size: 1.1rem; line-height: 1.55; max-width: 66ch; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 6px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.tile .v { font: 600 1.8rem/1.1 var(--font-body); letter-spacing: -0.01em; }
+.tile .l { font-size: 0.84rem; line-height: 1.4; color: var(--fg2); }
+
+section { display: grid; gap: 18px; padding-block: 36px; border-top: 1px solid var(--line); min-width: 0; }
+section > * { min-width: 0; }
+.section-head { display: grid; gap: 8px; }
+
+/* Tables */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--grid); }
+thead th { font: 600 0.72rem/1.3 var(--font-body); color: var(--fg2); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.state { min-width: 760px; }
+.state td:first-child { white-space: nowrap; font-weight: 600; }
+.state td:nth-child(3), .state td:nth-child(4) { color: var(--fg2); font-size: 0.84rem; }
+.sym { display: inline-block; min-width: 1.7em; font: 600 0.9rem/1 var(--font-mono); color: var(--accent); }
+.vals { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.vals .v { display: inline-flex; align-items: baseline; gap: 5px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); font-size: 0.82rem; line-height: 1.45; white-space: nowrap; }
+.vals .v b { font: 600 0.78rem/1 var(--font-mono); }
+.eyebrow .m { text-transform: none; letter-spacing: 0.02em; }
+.events td:nth-child(2) { white-space: nowrap; }
+td .sub { display: block; font-size: 0.78rem; color: var(--fg2); }
+.pref td:first-child { white-space: nowrap; }
+.ext td:nth-child(4) { white-space: nowrap; }
+.arr { color: var(--muted); font-size: 0.8rem; }
+.note { font-size: 0.8rem; color: var(--fg2); margin-top: 5px; line-height: 1.45; }
+
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+.kv { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 0.86rem; line-height: 1.45; }
+.kv dt { color: var(--fg2); font-weight: 500; }
+.kv dd { margin: 0; }
+
+/* Actions */
+.acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.act { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 12px; align-content: start; }
+.act-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.act-top .tag { font: 500 0.7rem/1 var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--fg2); white-space: nowrap; }
+.opts { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 7px 10px; margin: 0; font-size: 0.88rem; line-height: 1.45; }
+.opts dt { justify-self: start; }
+.opts dt span { display: inline-block; min-width: 2.4rem; text-align: center; padding: 1px 7px; border-radius: 6px; background: var(--tint); color: var(--accent); font: 600 0.8rem/1.5 var(--font-mono); }
+.opts dd { margin: 0; }
+.act .mask, .act .ids { font-size: 0.8rem; color: var(--fg2); line-height: 1.45; border-top: 1px solid var(--line); padding-top: 9px; }
+.act .ids { border-top: 0; padding-top: 0; font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+
+/* Status diagram */
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 10px 6px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.diagram .box { fill: var(--bg); stroke: var(--axis); stroke-width: 1; }
+.diagram .pill { fill: var(--tint); }
+.diagram .t1 { font: 600 14px var(--font-display); fill: var(--fg); }
+.diagram .t2 { font: 400 11.5px var(--font-body); fill: var(--fg2); }
+.diagram .t3 { font: 600 11.5px var(--font-mono); fill: var(--accent); }
+.diagram .lbl { font: 500 11.5px var(--font-body); fill: var(--fg2); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+.diagram .mv { fill: none; stroke: var(--accent); stroke-width: 2; marker-end: url(#ah-mv); }
+.diagram .rnd { fill: none; stroke: var(--fg2); stroke-width: 1.6; stroke-dasharray: 5 4; marker-end: url(#ah-rnd); }
+.diagram .ah-mv { fill: var(--accent); }
+.diagram .ah-rnd { fill: var(--fg2); }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+figcaption { font-size: 0.84rem; color: var(--fg2); max-width: 74ch; }
+.keys { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.82rem; color: var(--fg2); }
+.keys span { display: inline-flex; align-items: center; gap: 7px; }
+
+/* Dynamics */
+.formula { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 12px; }
+.eq { font: 500 0.88rem/1.7 var(--font-mono); overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
+.params { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; font-size: 0.86rem; }
+.params div { display: grid; grid-template-columns: 8.2rem minmax(0, 1fr) auto; gap: 10px; align-items: baseline; border-bottom: 1px solid var(--line); padding-block: 6px; }
+.params .k { color: var(--fg2); }
+.src { display: inline-block; font: 500 0.66rem/1 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 5px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap; }
+.src.d { color: var(--accent); background: var(--tint); border-color: transparent; }
+.src.a { color: var(--muted); }
+
+/* Lists */
+.notes { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; counter-reset: n; }
+.notes li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 8px; max-width: 78ch; }
+.notes li::before { counter-increment: n; content: counter(n); font: 500 0.78rem/1.9 var(--font-mono); color: var(--fg2); }
+.notes b { font-weight: 600; }
+.notes .ids { font: 400 0.76rem/1 var(--font-mono); color: var(--muted); }
+
+/* Coverage chart */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.84rem; color: var(--fg2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+.sw.action, .seg.action { background: var(--c-action); color: var(--on-action); }
+.sw.event, .seg.event { background: var(--c-event); color: var(--on-event); }
+.sw.builtin, .seg.builtin { background: var(--c-builtin); color: var(--on-builtin); }
+.sw.param, .seg.param { background: var(--c-param); color: var(--on-param); }
+.sw.out, .seg.out { background: var(--c-out); color: var(--on-out); }
+.cov { display: grid; gap: 7px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.cov-row { display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); gap: 14px; align-items: center; }
+.cov-row .lab { font-size: 0.87rem; line-height: 1.25; }
+.cov-row.total { padding-bottom: 10px; margin-bottom: 4px; border-bottom: 1px solid var(--grid); }
+.cov-row.total .lab { font-weight: 600; }
+.cov-bar { display: flex; gap: 2px; height: 24px; min-width: 0; }
+.cov-row.total .cov-bar { height: 30px; }
+.seg { display: flex; align-items: center; justify-content: center; min-width: 0; overflow: hidden; font: 600 0.74rem/1 var(--font-body); font-variant-numeric: tabular-nums; cursor: default; }
+.seg:first-child { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.seg:last-child { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.seg:hover, .seg:focus-visible { filter: brightness(1.08) saturate(1.05); }
+.seg:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; }
+details.all { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+details.all > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: 0.92rem; }
+details.all > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+details.all .tablewrap { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; max-height: 560px; overflow: auto; }
+#cat-table { min-width: 640px; }
+#cat-table td:first-child { font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg2); white-space: nowrap; }
+#cat-table td.cls { white-space: nowrap; }
+#cat-table td.cls .sw { margin-right: 7px; vertical-align: -1px; }
+#cat-table tr.grp th { position: sticky; top: 0; background: var(--surface); font: 600 0.74rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg2); padding-top: 14px; }
+#cat-table thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+
+/* Tooltip */
+.tt { position: fixed; z-index: 20; max-width: 340px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16); font-size: 0.8rem; line-height: 1.35; pointer-events: none; display: grid; gap: 6px; }
+.tt .h { font: 600 0.86rem/1.3 var(--font-display); }
+.tt .item { display: grid; gap: 1px; }
+.tt .item b { font-weight: 600; }
+.tt .item span, .tt .idl { color: var(--fg2); }
+.tt .idl { font-family: var(--font-mono); font-size: 0.74rem; line-height: 1.5; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem; color: var(--fg2); display: grid; gap: 6px; }
+
+@media (max-width: 860px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .acts, .pair, .params { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  /* tables become one card per row */
+  table.stack { min-width: 0; }
+  table.stack thead { display: none; }
+  table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+  table.stack tr { padding: 10px 14px; border-bottom: 1px solid var(--grid); }
+  table.stack tr:last-child { border-bottom: 0; }
+  table.stack td { border: 0; padding: 2px 0; text-align: left; white-space: normal; }
+  table.stack td:first-child { font-weight: 600; padding-bottom: 4px; }
+  table.stack td::before { color: var(--muted); font: 400 0.86rem/1.5 var(--font-body); }
+  .state td:nth-child(3)::before { content: "Changed by: "; }
+  .state td:nth-child(4)::before { content: "Catalog: "; }
+  .events td:nth-child(2)::before { content: "Per month: "; }
+  .events td:nth-child(3)::before { content: "Effect: "; }
+  .ext td:nth-child(2)::before { content: "Adds: "; }
+  .ext td:nth-child(3)::before { content: "Unlocks: "; }
+  .ext td:nth-child(4)::before { content: "Scenarios: "; }
+  .ext td:nth-child(5)::before { content: "Why it waits: "; }
+  table.stack td .sub { display: inline; }
+  table.stack td .sub::before { content: " · "; }
+  .state td:nth-child(3), .state td:nth-child(4) { font-size: 0.82rem; }
+}
+@media (max-width: 560px) {
+  .cov-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .params div { grid-template-columns: minmax(0, 1fr) auto; }
+  .params div .k { grid-column: 1 / -1; }
+  .kv { grid-template-columns: minmax(0, 1fr); gap: 0 0; }
+  .kv dd { margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <div class="eyebrow">LauzHack 2026 · UBS AI Financial Twin · MDP specification</div>
+  <h1>A life in eight states and four moves</h1>
+  <p class="lede">One step is one month, from January 2025 to December 2034. The agent chooses work, housing, spending and investing. Jobs, family, bills and the economy move at random. 85 of the 120 catalog scenarios run in this MDP; the other 35 need states left out on purpose.</p>
+  <div class="tiles">
+    <div class="tile"><div class="v num">8 + t</div><div class="l">state variables: six categories, two CHF balances, plus the month</div></div>
+    <div class="tile"><div class="v num">135</div><div class="l">joint actions (5 × 3 × 3 × 3), fewer after masks</div></div>
+    <div class="tile"><div class="v num">48,600</div><div class="l">states per month once cash and investments are put in bins</div></div>
+    <div class="tile"><div class="v num">85 / 120</div><div class="l">catalog scenarios covered: 51 inside an episode, 34 as parameter settings</div></div>
+  </div>
+</header>
+
+<section id="state">
+  <div class="section-head">
+    <div class="eyebrow">State <span class="m">s<sub>t</sub></span></div>
+    <h2>Eight variables carry a life</h2>
+    <p>Six small categories describe the situation, two CHF balances hold the money, and the economy is one regime shared by everyone. All else about a person stays fixed as context.</p>
+  </div>
+  <div class="tablewrap">
+    <table class="state stack">
+      <thead><tr><th>Variable</th><th>Values</th><th>Changed by</th><th>Catalog</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="sym">W</span>Work status</td>
+          <td><div class="vals"><span class="v"><b>S</b> student</span><span class="v"><b>E60</b><b>E80</b><b>E100</b> employed, % of full time</span><span class="v"><b>N</b> not working</span></div>
+              <div class="note">N before 65 is unemployed or on a break (CHF 530 a month); from 65 it is retired (pension).</div></td>
+          <td>status move · job loss · job found · graduation</td>
+          <td>Education, Career, Retirement</td>
+        </tr>
+        <tr>
+          <td><span class="sym">k</span>Pay level</td>
+          <td><div class="vals"><span class="v"><b>1</b> 4.5k</span><span class="arr">›</span><span class="v"><b>2</b> 6.1k</span><span class="arr">›</span><span class="v"><b>3</b> 7.8k</span><span class="arr">›</span><span class="v"><b>4</b> 9.3k</span><span class="arr">›</span><span class="v"><b>5</b> 10.8k</span></div>
+              <div class="note">Full-time CHF a month: the five employee pay quintiles in the data. E60 and E80 earn 60% and 80%; the pension is 50%.</div></td>
+          <td>promotion (random) · degree (random, on graduating)</td>
+          <td>Career, Education</td>
+        </tr>
+        <tr>
+          <td><span class="sym">H</span>Housing tier</td>
+          <td><div class="vals"><span class="v"><b>0</b> shared flat</span><span class="arr">›</span><span class="v"><b>1</b> small flat</span><span class="arr">›</span><span class="v"><b>2</b> family flat</span></div>
+              <div class="note">Rent = CHF 2,471 × city × 0.46 / 0.68 / 1.00 (fitted on the data, R² 0.66).</div></td>
+          <td>housing move (forced up when a child arrives in a shared flat)</td>
+          <td>Housing, Relocation</td>
+        </tr>
+        <tr>
+          <td><span class="sym">F</span>Household</td>
+          <td><div class="vals"><span class="v">single</span><span class="v">couple</span><span class="v">family</span></div>
+              <div class="note">A family adds CHF 1,800 a month and needs at least a small flat.</div></td>
+          <td>partner moves in · child · separation (all random)</td>
+          <td>Family</td>
+        </tr>
+        <tr>
+          <td><span class="sym">L</span>Lifestyle</td>
+          <td><div class="vals"><span class="v"><b>0</b> lean</span><span class="arr">›</span><span class="v"><b>1</b> standard</span><span class="arr">›</span><span class="v"><b>2</b> comfortable</span></div>
+              <div class="note">Non-rent living costs × 0.9 / 1.0 / 1.1.</div></td>
+          <td>spending move</td>
+          <td>Spending</td>
+        </tr>
+        <tr>
+          <td><span class="sym">M</span>Economy</td>
+          <td><div class="vals"><span class="v">normal</span><span class="v">inflation</span><span class="v">recession</span></div>
+              <div class="note">Sets portfolio returns, cost growth and job risk for everyone at once.</div></td>
+          <td>regime switches (random)</td>
+          <td>Macro, Investments</td>
+        </tr>
+        <tr>
+          <td><span class="sym">C</span>Cash</td>
+          <td><div class="vals"><span class="v">CHF, may go below 0</span></div>
+              <div class="note">Below 0 is a credit line at 8% a year, limit 3 × monthly pay. Bins: &lt;0 · 0–1 · 1–3 · 3–6 · 6–12 · 12+ months of outgoings.</div></td>
+          <td>monthly cash flow · asset move</td>
+          <td>Savings, Debt</td>
+        </tr>
+        <tr>
+          <td><span class="sym">I</span>Investments</td>
+          <td><div class="vals"><span class="v">CHF ≥ 0</span></div>
+              <div class="note">Bins: 0 · &lt;1 · 1–3 · 3+ years of outgoings.</div></td>
+          <td>market returns · asset move</td>
+          <td>Investments</td>
+        </tr>
+        <tr>
+          <td><span class="sym">t</span>Month</td>
+          <td><div class="vals"><span class="v">0 … 119</span></div>
+              <div class="note">Gives age, the December bonus, February and August bills, and the goal deadlines.</div></td>
+          <td>clock</td>
+          <td>Retirement</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pair">
+    <div class="card">
+      <h3>Fixed context per profile</h3>
+      <dl class="kv">
+        <dt>City</dt><dd>rent × 0.84–1.16, living costs CHF 1,340–1,650 (12 cities)</dd>
+        <dt>Age</dt><dd>18–76 at start; pension from 65</dd>
+        <dt>Goals</dt><dd>one high goal due Dec 2029 (CHF 10k–240k); 300 profiles add a medium goal due Dec 2032</dd>
+        <dt>Loans</dt><dd>283 profiles, 2.5–8.5% a year, repaid on a fixed 60-month schedule</dd>
+        <dt>Pay noise</dt><dd>employees CHF 200 + 5% of pay a month; self-employed 23% of pay</dd>
+      </dl>
+    </div>
+    <div class="card">
+      <h3>Start state from the data</h3>
+      <dl class="kv">
+        <dt>W</dt><dd>employed and self-employed (788) → E100 · part-time (120) → E60 · students (39) → S · unemployed (37) and retired (216) → N</dd>
+        <dt>k</dt><dd>level nearest full-time pay (part-time ÷ 0.6, pension ÷ 0.5); students 1, unemployed 2</dd>
+        <dt>H, F</dt><dd>single → H1 · couple, family → H2 · shared housing → single in H0</dd>
+        <dt>C, I</dt><dd>opening cash and portfolio (medians CHF 53k and 32k)</dd>
+        <dt>L, M</dt><dd>standard, normal</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="actions">
+  <div class="section-head">
+    <div class="eyebrow">Action <span class="m">a<sub>t</sub></span> = (status, housing, spending, assets)</div>
+    <h2>Four moves, a handful of options each</h2>
+    <p>All four are chosen every month. Masks remove options that make no sense in the current state, and status and housing moves cost money and utility, so the policy has no reason to flip-flop.</p>
+  </div>
+  <div class="acts">
+    <article class="act">
+      <div class="act-top"><h3>Status move</h3><span class="tag">5 options</span></div>
+      <dl class="opts">
+        <dt><span>stop</span></dt><dd>leave work or study for N: quit, sabbatical, care break, early retirement (the pension still starts at 65)</dd>
+        <dt><span>−1</span></dt><dd>fewer hours: E100 → E80 → E60</dd>
+        <dt><span>0</span></dt><dd>stay</dd>
+        <dt><span>+1</span></dt><dd>more hours: E60 → E80 → E100. From N or S, look for a full-time job: found with 20% a month, 10% in a recession</dd>
+        <dt><span>study</span></dt><dd>full-time master's in S: tuition CHF 1,200–8,000 a year and CHF 1,200 pay; ends at random after about two years in N, half the time one pay level up</dd>
+      </dl>
+      <p class="mask">Masks: −1 only from E80 or E100 · stop not from N · study only up to age 45 and not from S</p>
+      <p class="ids">S001 · S011 · S017 · S044 · S086 · S091 · S092</p>
+    </article>
+    <article class="act">
+      <div class="act-top"><h3>Housing move</h3><span class="tag">3 options</span></div>
+      <dl class="opts">
+        <dt><span>−1</span></dt><dd>one tier cheaper: family flat → small flat saves CHF 780 a month, small → shared saves CHF 550 (Bern prices)</dd>
+        <dt><span>0</span></dt><dd>stay</dd>
+        <dt><span>+1</span></dt><dd>one tier bigger</dd>
+      </dl>
+      <p class="mask">CHF 2,000 per move · a family needs at least a small flat, so a child born in a shared flat forces +1</p>
+      <p class="ids">S031 · S032 · S049</p>
+    </article>
+    <article class="act">
+      <div class="act-top"><h3>Spending</h3><span class="tag">3 options</span></div>
+      <dl class="opts">
+        <dt><span>−1</span></dt><dd>lifestyle one tier down: living costs −10%</dd>
+        <dt><span>0</span></dt><dd>keep</dd>
+        <dt><span>+1</span></dt><dd>lifestyle one tier up: living costs +10%</dd>
+      </dl>
+      <p class="mask">Base living costs are the city median plus 1.6% of income (both from the data). Cutting back costs utility, so upgrades are sticky.</p>
+      <p class="ids">S041 · S043 · S045 · S046 · S053</p>
+    </article>
+    <article class="act">
+      <div class="act-top"><h3>Asset transaction</h3><span class="tag">3 options</span></div>
+      <dl class="opts">
+        <dt><span>−1</span></dt><dd>sell investments to refill cash to a buffer of 3 months of outgoings</dd>
+        <dt><span>0</span></dt><dd>hold</dd>
+        <dt><span>+1</span></dt><dd>invest all cash above that buffer</dd>
+      </dl>
+      <p class="mask">Masks: +1 needs cash above the buffer · −1 needs investments and cash below the buffer</p>
+      <p class="ids">S051 · S052 · S053 · S061 · S067 · S097</p>
+    </article>
+  </div>
+
+  <figure>
+    <div class="diagram" role="img" aria-label="Work status transitions. Agent moves: plus one to search for a job from not working or from studying, stop from employed to not working, study from not working or employed, minus one and plus one between 60, 80 and 100 percent hours. Random events: job loss from employed to not working, graduation from student to not working.">
+      <svg viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <marker id="ah-mv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ah-mv" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ah-rnd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ah-rnd" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+        <rect class="box" x="250" y="14" width="180" height="54" rx="8"/>
+        <text class="t1" x="340" y="37" text-anchor="middle">S · Student</text>
+        <text class="t2" x="340" y="56" text-anchor="middle">tuition · CHF 1,200 pay</text>
+
+        <rect class="box" x="16" y="196" width="196" height="64" rx="8"/>
+        <text class="t1" x="114" y="221" text-anchor="middle">N · Not working</text>
+        <text class="t2" x="114" y="241" text-anchor="middle">CHF 530 · pension from 65</text>
+
+        <rect class="box" x="448" y="180" width="216" height="96" rx="8"/>
+        <text class="t1" x="556" y="201" text-anchor="middle">E · Employed</text>
+        <rect class="pill" x="462" y="212" width="52" height="28" rx="6"/>
+        <rect class="pill" x="532" y="212" width="52" height="28" rx="6"/>
+        <rect class="pill" x="602" y="212" width="52" height="28" rx="6"/>
+        <text class="t3" x="488" y="230" text-anchor="middle">60%</text>
+        <text class="t3" x="558" y="230" text-anchor="middle">80%</text>
+        <text class="t3" x="628" y="230" text-anchor="middle">100%</text>
+        <text class="t2" x="523" y="230" text-anchor="middle">⇄</text>
+        <text class="t2" x="593" y="230" text-anchor="middle">⇄</text>
+        <text class="t2" x="556" y="262" text-anchor="middle">−1 / +1 change hours</text>
+
+        <path class="mv" d="M212 206 L446 206"/>
+        <text class="lbl" x="329" y="198" text-anchor="middle">+1 · look for a job, found 20%/mo</text>
+        <path class="mv" d="M448 230 L214 230"/>
+        <text class="lbl" x="329" y="224" text-anchor="middle">stop</text>
+        <path class="rnd" d="M448 254 L214 254"/>
+        <text class="lbl" x="329" y="272" text-anchor="middle">job loss · 0.3%/mo</text>
+
+        <path class="mv" d="M90 195 C90 110, 150 41, 248 41"/>
+        <text class="lbl" x="118" y="86" text-anchor="end">study</text>
+        <path class="rnd" d="M300 69 C300 130, 190 130, 172 194"/>
+        <text class="lbl" x="222" y="157">graduates · about 2 years</text>
+        <path class="mv" d="M390 69 C390 130, 520 120, 520 178"/>
+        <text class="lbl" x="468" y="104">+1 · look for a job</text>
+        <path class="mv" d="M630 179 C630 100, 560 41, 432 41"/>
+        <text class="lbl" x="600" y="76">study</text>
+      </svg>
+    </div>
+    <div class="keys">
+      <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--accent)" stroke-width="2"/></svg>agent move</span>
+      <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--fg2)" stroke-width="1.6" stroke-dasharray="5 4"/></svg>random event</span>
+    </div>
+    <figcaption>Work status. Looking for a job is the agent's choice, but finding one is random, and so is when studies end.</figcaption>
+  </figure>
+</section>
+
+<section id="dynamics">
+  <div class="section-head">
+    <div class="eyebrow">Transition <span class="m">P(s′ | s, a)</span></div>
+    <h2>One month of money, plus a few random events</h2>
+    <p><span class="src d">data</span> marks values calibrated on the 2025–2026 ledger; <span class="src a">assumed</span> marks placeholders to tune.</p>
+  </div>
+  <div class="formula">
+    <div class="eq">C′ = C + income − rent − living − bills − tuition − loan − moving − invest + noise + 8%/12 · min(C, 0)</div>
+    <div class="eq">I′ = (I + invest) · (1 + return<sub>M</sub>)</div>
+    <div class="params">
+      <div><span class="k">Pay, E</span><span>hours × level pay, +1.4% a year</span><span class="src d">data</span></div>
+      <div><span class="k">December bonus</span><span>E: 56% of years, 0.23–1.01 × monthly pay</span><span class="src d">data</span></div>
+      <div><span class="k">Pay, S · N &lt; 65</span><span>CHF 1,200 · CHF 530</span><span class="src d">data</span></div>
+      <div><span class="k">Pension, N ≥ 65</span><span>50% of level pay</span><span class="src d">data</span></div>
+      <div><span class="k">Rent</span><span>2,471 × city × tier</span><span class="src d">data</span></div>
+      <div><span class="k">Living costs</span><span>city median + 1.6% of income; students −126</span><span class="src d">data</span></div>
+      <div><span class="k">Bills</span><span>37% in Feb and Aug, 4.5% otherwise; CHF 450–1,780</span><span class="src d">data</span></div>
+      <div><span class="k">Noise SD</span><span>CHF 200 + 5% of pay (self-employed 23%)</span><span class="src d">data</span></div>
+      <div><span class="k">Tuition</span><span>CHF 1,200–8,000 a year (scenario S001)</span><span class="src d">data</span></div>
+      <div><span class="k">Cost growth</span><span>1.0% a year (pay grows 1.4%)</span><span class="src d">data</span></div>
+      <div><span class="k">Inflation regime</span><span>costs grow 3.0% a year instead</span><span class="src a">assumed</span></div>
+      <div><span class="k">Returns a year</span><span>normal 6% ± 10, inflation 1% ± 12, recession −15% ± 25 (≈ 4% long run)</span><span class="src a">assumed</span></div>
+      <div><span class="k">Child · move</span><span>CHF 1,800 a month · CHF 2,000 once</span><span class="src a">assumed</span></div>
+      <div><span class="k">Loans</span><span>fixed 60-month repayment at the stated rate</span><span class="src a">assumed</span></div>
+      <div><span class="k">Credit</span><span>8% a year below 0, limit 3 × monthly pay</span><span class="src a">assumed</span></div>
+    </div>
+  </div>
+  <div class="tablewrap">
+    <table class="events stack">
+      <thead><tr><th>Random event</th><th>Per month</th><th>Effect</th></tr></thead>
+      <tbody>
+        <tr><td>Job loss</td><td>0.3%<span class="sub">1.0% in recession</span></td><td>E → N</td></tr>
+        <tr><td>Job found while looking</td><td>20%<span class="sub">10% in recession</span></td><td>N or S → E100</td></tr>
+        <tr><td>Studies end</td><td>1 in 24</td><td>S → N; pay level +1 with probability ½</td></tr>
+        <tr><td>Promotion</td><td>0.7%<span class="sub">0.3% in recession</span></td><td>k + 1 while employed</td></tr>
+        <tr><td>Partner moves in</td><td>0.4%<span class="sub">single, under 45</span></td><td>single → couple</td></tr>
+        <tr><td>Child</td><td>0.7%<span class="sub">couple, under 42</span></td><td>couple → family; 4 months at 80% pay</td></tr>
+        <tr><td>Separation</td><td>0.2%</td><td>couple → single</td></tr>
+        <tr><td>Windfall</td><td>0.05%</td><td>cash + CHF 5k–50k</td></tr>
+        <tr><td>Economy turns</td><td>0.5% each way</td><td>normal → inflation or recession; back to normal at 4% (inflation) or 6% (recession) a month, so about 10% and 7% of months</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">All event rates are assumptions. In the data, a month's surprise does not carry over to the next and bills do not depend on pay, so independent monthly draws are faithful to it.</p>
+</section>
+
+<section id="reward">
+  <div class="section-head">
+    <div class="eyebrow">Reward <span class="m">r(s, a)</span></div>
+    <h2>Everything in CHF-equivalents a month</h2>
+    <p>Money counts through net worth at the end; the monthly terms price what money misses. The preference values belong to the user (the twin should ask for them); the defaults only make the trade-offs real.</p>
+  </div>
+  <div class="formula">
+    <div class="eq">r<sub>t</sub> = lifestyle(L) + home(H, F) + free time(W) − 2,000·[C &lt; 0] − 300·[status or housing move] + goal bonus</div>
+    <div class="eq">r<sub>T</sub> = C + I − loans in Dec 2034 · breaching the credit limit ends the episode at −100,000 · γ = 0.997</div>
+  </div>
+  <div class="tablewrap">
+    <table class="pref stack">
+      <thead><tr><th>Term</th><th>Default value, CHF a month</th></tr></thead>
+      <tbody>
+        <tr><td>Lifestyle</td><td>lean −300 · standard 0 · comfortable +200</td></tr>
+        <tr><td>Home, single</td><td>shared −700 · small 0 · family flat +300</td></tr>
+        <tr><td>Home, couple</td><td>shared −1,500 · small −500 · family flat 0</td></tr>
+        <tr><td>Home, family</td><td>small −1,200 · family flat 0 (shared is masked)</td></tr>
+        <tr><td>Free time</td><td>E100 0 · E80 +1,000 · E60 +1,800 · N +2,000 · S 0</td></tr>
+        <tr><td>Goal bonus</td><td>high goal met in Dec 2029: its target amount · medium goal met in Dec 2032: half its target. Met means liquid wealth ≥ target (emergency savings: cash only).</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">This closes the loopholes found in the action screen: overdraft is not free, pay rises are not certain, cutting back is not costless, and nobody studies forever.</p>
+</section>
+
+<section id="decisions">
+  <div class="section-head">
+    <div class="eyebrow">Why it is not trivial</div>
+    <h2>Five trade-offs the policy has to learn</h2>
+  </div>
+  <ol class="notes">
+    <li><div><b>Study or start work.</b> Two years on CHF 1,200 plus tuition buy a 50% chance of the next pay level, which is 17–35% more pay for the rest of the horizon. <span class="ids">S001 · S011</span></div></li>
+    <li><div><b>Work less or retire early.</b> Free time against lost pay. The pension starts only at 65, so stopping earlier must be paid for from C and I. <span class="ids">S017 · S091</span></div></li>
+    <li><div><b>Housing against goals.</b> One tier is worth CHF 550–780 a month in Bern, and a child forces at least a small flat. <span class="ids">S031 · S032 · S082</span></div></li>
+    <li><div><b>Lifestyle against saving.</b> Upgrading costs little, but cutting back hurts, so an upgrade should wait for a safe buffer. <span class="ids">S041 · S046</span></div></li>
+    <li><div><b>Invest or hold cash.</b> A recession raises job-loss risk and cuts returns together, so the cash buffer matters most exactly when the portfolio is down. <span class="ids">S061 · S065 · S110</span></div></li>
+  </ol>
+</section>
+
+<section id="coverage">
+  <div class="section-head">
+    <div class="eyebrow">Scenario catalog</div>
+    <h2>Where each of the 120 scenarios lives</h2>
+    <p>51 play out inside one episode as agent moves, random events or built-in rules. 34 are what-if runs of the same MDP with one number changed. 35 need states left out on purpose.</p>
+  </div>
+  <figure>
+    <div class="legend" id="cov-legend"></div>
+    <div class="cov" id="cov"></div>
+    <figcaption>Each catalog category holds 10 scenarios. Hover over or tab to a segment to list its scenarios; the full list is below.</figcaption>
+  </figure>
+  <details class="all">
+    <summary>All 120 scenarios and their place in the MDP</summary>
+    <div class="tablewrap">
+      <table id="cat-table">
+        <thead><tr><th>ID</th><th>Scenario</th><th>Lives as</th><th>In the MDP</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<section id="left-out">
+  <div class="section-head">
+    <div class="eyebrow">Deliberately left out</div>
+    <h2>What each extra state would buy</h2>
+    <p>Every extension adds at least one variable. Going abroad and owning a home unlock the most scenarios; a separate debt state adds the least.</p>
+  </div>
+  <div class="tablewrap">
+    <table class="ext stack">
+      <thead><tr><th>Extension</th><th>Adds</th><th class="r">Unlocks</th><th>Scenarios</th><th>Why it waits</th></tr></thead>
+      <tbody>
+        <tr><td>Abroad and currency</td><td>country and currency state</td><td class="r">10</td><td class="mono">S023–S029, S070, S095, S105</td><td>the data is Swiss and in CHF only</td></tr>
+        <tr><td>Home ownership</td><td>tier 3, home value and mortgage</td><td class="r">7</td><td class="mono">S033–S036, S038, S039, S108</td><td>no property or mortgages in the data</td></tr>
+        <tr><td>Separate debt</td><td>loan balance, repay and refinance moves</td><td class="r">6</td><td class="mono">S073–S076, S078, S080</td><td>these moves changed at most 2% of outcomes in the action screen</td></tr>
+        <tr><td>Self-employment</td><td>a sixth status and business cash</td><td class="r">5</td><td class="mono">S113, S116, S117, S119, S120</td><td>outside the three work profiles</td></tr>
+        <tr><td>Pension pots</td><td>a locked pillar 2/3a balance</td><td class="r">4</td><td class="mono">S055, S093, S094, S099</td><td>not in the data</td></tr>
+        <tr><td>Other</td><td>equity pay, rebalancing, tax</td><td class="r">3</td><td class="mono">S018, S068, S107</td><td>incomes are net and the portfolio is one asset</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div>Scenario list from <code>Data/scenario-catalog.csv</code>. Calibrated values come from <code>analysis/action_importance/results/calibration.json</code> and <code>income_expense_correlation.json</code>.</div>
+  <div>Synthetic data only: numbers describe the challenge data, not real households, and nothing here is financial advice. Built 2026-11-21.</div>
+</footer>
+</div>
+
+<div class="tt" id="tt" role="tooltip" hidden></div>
+<script type="application/json" id="catalog">[
+{
+"id": "S001",
+"cat": "Education & skills",
+"name": "Full-time master’s",
+"cls": "action",
+"el": "status: study → S; one pay level up with probability ½ on finishing"
+},
+{
+"id": "S002",
+"cat": "Education & skills",
+"name": "Part-time master’s",
+"cls": "param",
+"el": "study variant: S at 60% pay, about 3 years"
+},
+{
+"id": "S003",
+"cat": "Education & skills",
+"name": "Scholarship award",
+"cls": "param",
+"el": "tuition = 0"
+},
+{
+"id": "S004",
+"cat": "Education & skills",
+"name": "Tuition increase",
+"cls": "param",
+"el": "tuition × 1.5"
+},
+{
+"id": "S005",
+"cat": "Education & skills",
+"name": "Internship year",
+"cls": "param",
+"el": "student pay raised for 12 months"
+},
+{
+"id": "S006",
+"cat": "Education & skills",
+"name": "Bootcamp reskilling",
+"cls": "param",
+"el": "study variant: 3 months, fee, level up with probability 0.3"
+},
+{
+"id": "S007",
+"cat": "Education & skills",
+"name": "Doctoral track",
+"cls": "param",
+"el": "study variant: funded (about CHF 4k a month), about 4 years"
+},
+{
+"id": "S008",
+"cat": "Education & skills",
+"name": "Study abroad",
+"cls": "param",
+"el": "higher living costs while in S"
+},
+{
+"id": "S009",
+"cat": "Education & skills",
+"name": "Student loan",
+"cls": "builtin",
+"el": "cash may go below 0 while studying (credit line, 8% a year)"
+},
+{
+"id": "S010",
+"cat": "Education & skills",
+"name": "Delayed graduation",
+"cls": "event",
+"el": "studies end at random (1 in 24 a month); a lower rate means a delay"
+},
+{
+"id": "S011",
+"cat": "Career & employment",
+"name": "Early job start",
+"cls": "action",
+"el": "status: +1 from S (look for a job)"
+},
+{
+"id": "S012",
+"cat": "Career & employment",
+"name": "Salary negotiation",
+"cls": "event",
+"el": "promotion k + 1, a chance event rather than a free lever"
+},
+{
+"id": "S013",
+"cat": "Career & employment",
+"name": "Promotion",
+"cls": "event",
+"el": "promotion k + 1 (0.7% a month)"
+},
+{
+"id": "S014",
+"cat": "Career & employment",
+"name": "Unemployment gap",
+"cls": "event",
+"el": "job loss E → N"
+},
+{
+"id": "S015",
+"cat": "Career & employment",
+"name": "Freelancing",
+"cls": "param",
+"el": "E with self-employed pay noise (23% of pay)"
+},
+{
+"id": "S016",
+"cat": "Career & employment",
+"name": "Career switch",
+"cls": "param",
+"el": "pay level − 1 now, higher promotion rate"
+},
+{
+"id": "S017",
+"cat": "Career & employment",
+"name": "Four-day week",
+"cls": "action",
+"el": "status: −1 (E100 → E80)"
+},
+{
+"id": "S018",
+"cat": "Career & employment",
+"name": "Equity compensation",
+"cls": "out",
+"el": "illiquid equity is not modelled"
+},
+{
+"id": "S019",
+"cat": "Career & employment",
+"name": "Contract work",
+"cls": "param",
+"el": "job-loss rate × 2"
+},
+{
+"id": "S020",
+"cat": "Career & employment",
+"name": "Second income",
+"cls": "param",
+"el": "pay +20% with less free time"
+},
+{
+"id": "S021",
+"cat": "Relocation & geography",
+"name": "Move to Zurich",
+"cls": "param",
+"el": "city = Zurich (rent × 1.14) plus a moving cost"
+},
+{
+"id": "S022",
+"cat": "Relocation & geography",
+"name": "Move to Geneva",
+"cls": "param",
+"el": "city = Geneva (rent × 1.16) plus a moving cost"
+},
+{
+"id": "S023",
+"cat": "Relocation & geography",
+"name": "Move to Berlin",
+"cls": "out",
+"el": "abroad: needs a currency, tax and cost model"
+},
+{
+"id": "S024",
+"cat": "Relocation & geography",
+"name": "Move to London",
+"cls": "out",
+"el": "abroad: needs a currency, tax and cost model"
+},
+{
+"id": "S025",
+"cat": "Relocation & geography",
+"name": "Move to Singapore",
+"cls": "out",
+"el": "abroad: needs a currency, tax and cost model"
+},
+{
+"id": "S026",
+"cat": "Relocation & geography",
+"name": "Remote work abroad",
+"cls": "out",
+"el": "abroad: needs a currency, tax and cost model"
+},
+{
+"id": "S027",
+"cat": "Relocation & geography",
+"name": "Return migration",
+"cls": "out",
+"el": "abroad: needs a currency, tax and cost model"
+},
+{
+"id": "S028",
+"cat": "Relocation & geography",
+"name": "Currency depreciation",
+"cls": "out",
+"el": "single currency (CHF)"
+},
+{
+"id": "S029",
+"cat": "Relocation & geography",
+"name": "Dual-currency income",
+"cls": "out",
+"el": "single currency (CHF)"
+},
+{
+"id": "S030",
+"cat": "Relocation & geography",
+"name": "High relocation cost",
+"cls": "param",
+"el": "higher moving cost"
+},
+{
+"id": "S031",
+"cat": "Housing & property",
+"name": "Rent alone",
+"cls": "action",
+"el": "housing: +1 (shared → small flat)"
+},
+{
+"id": "S032",
+"cat": "Housing & property",
+"name": "Move in with flatmates",
+"cls": "action",
+"el": "housing: −1 (→ shared flat)"
+},
+{
+"id": "S033",
+"cat": "Housing & property",
+"name": "Buy starter home",
+"cls": "out",
+"el": "needs an ownership tier and a mortgage"
+},
+{
+"id": "S034",
+"cat": "Housing & property",
+"name": "Higher down payment",
+"cls": "out",
+"el": "needs an ownership tier and a mortgage"
+},
+{
+"id": "S035",
+"cat": "Housing & property",
+"name": "Mortgage rate reset",
+"cls": "out",
+"el": "needs an ownership tier and a mortgage"
+},
+{
+"id": "S036",
+"cat": "Housing & property",
+"name": "Home renovation",
+"cls": "out",
+"el": "needs an ownership tier and a mortgage"
+},
+{
+"id": "S037",
+"cat": "Housing & property",
+"name": "Rent increase",
+"cls": "event",
+"el": "rents follow the cost index, faster in the inflation regime"
+},
+{
+"id": "S038",
+"cat": "Housing & property",
+"name": "Buy later",
+"cls": "out",
+"el": "needs an ownership tier and a mortgage"
+},
+{
+"id": "S039",
+"cat": "Housing & property",
+"name": "Property price decline",
+"cls": "out",
+"el": "needs an ownership tier and a mortgage"
+},
+{
+"id": "S040",
+"cat": "Housing & property",
+"name": "Unexpected maintenance",
+"cls": "event",
+"el": "one-off bill"
+},
+{
+"id": "S041",
+"cat": "Spending & lifestyle",
+"name": "Budget reduction",
+"cls": "action",
+"el": "spending: −1"
+},
+{
+"id": "S042",
+"cat": "Spending & lifestyle",
+"name": "Car purchase",
+"cls": "param",
+"el": "scripted: CHF 25k once plus CHF 400 a month"
+},
+{
+"id": "S043",
+"cat": "Spending & lifestyle",
+"name": "Public transport switch",
+"cls": "action",
+"el": "spending: −1"
+},
+{
+"id": "S044",
+"cat": "Spending & lifestyle",
+"name": "Travel sabbatical",
+"cls": "action",
+"el": "status: stop for 6 months, then +1"
+},
+{
+"id": "S045",
+"cat": "Spending & lifestyle",
+"name": "Subscription audit",
+"cls": "action",
+"el": "spending: −1"
+},
+{
+"id": "S046",
+"cat": "Spending & lifestyle",
+"name": "Lifestyle inflation",
+"cls": "action",
+"el": "spending: +1"
+},
+{
+"id": "S047",
+"cat": "Spending & lifestyle",
+"name": "Large purchase",
+"cls": "param",
+"el": "scripted one-off purchase"
+},
+{
+"id": "S048",
+"cat": "Spending & lifestyle",
+"name": "Emergency expense",
+"cls": "event",
+"el": "one-off bill (CHF 450–1,780; larger ones as a parameter)"
+},
+{
+"id": "S049",
+"cat": "Spending & lifestyle",
+"name": "Shared household",
+"cls": "action",
+"el": "housing: −1 (→ shared flat)"
+},
+{
+"id": "S050",
+"cat": "Spending & lifestyle",
+"name": "Energy cost spike",
+"cls": "event",
+"el": "economy: inflation regime"
+},
+{
+"id": "S051",
+"cat": "Savings & liquidity",
+"name": "Emergency fund target",
+"cls": "action",
+"el": "asset rule with a 6-month buffer"
+},
+{
+"id": "S052",
+"cat": "Savings & liquidity",
+"name": "Automated saving",
+"cls": "action",
+"el": "asset: +1 every month"
+},
+{
+"id": "S053",
+"cat": "Savings & liquidity",
+"name": "Savings rate increase",
+"cls": "action",
+"el": "spending −1 together with asset +1"
+},
+{
+"id": "S054",
+"cat": "Savings & liquidity",
+"name": "Short-term cash goal",
+"cls": "builtin",
+"el": "goal target and deadline in the reward"
+},
+{
+"id": "S055",
+"cat": "Savings & liquidity",
+"name": "Liquidity lockup",
+"cls": "out",
+"el": "only one liquid portfolio"
+},
+{
+"id": "S056",
+"cat": "Savings & liquidity",
+"name": "Interest on deposits",
+"cls": "param",
+"el": "interest on cash"
+},
+{
+"id": "S057",
+"cat": "Savings & liquidity",
+"name": "Unexpected windfall",
+"cls": "event",
+"el": "windfall (0.05% a month)"
+},
+{
+"id": "S058",
+"cat": "Savings & liquidity",
+"name": "Income interruption",
+"cls": "event",
+"el": "job loss E → N"
+},
+{
+"id": "S059",
+"cat": "Savings & liquidity",
+"name": "Buffer depletion",
+"cls": "event",
+"el": "a bill drains the buffer"
+},
+{
+"id": "S060",
+"cat": "Savings & liquidity",
+"name": "Multiple goals",
+"cls": "builtin",
+"el": "high and medium goals both in the reward"
+},
+{
+"id": "S061",
+"cat": "Investments & allocation",
+"name": "Start investing",
+"cls": "action",
+"el": "asset: +1"
+},
+{
+"id": "S062",
+"cat": "Investments & allocation",
+"name": "Higher equity share",
+"cls": "param",
+"el": "portfolio return and risk up"
+},
+{
+"id": "S063",
+"cat": "Investments & allocation",
+"name": "Bond allocation",
+"cls": "param",
+"el": "portfolio return and risk down"
+},
+{
+"id": "S064",
+"cat": "Investments & allocation",
+"name": "Fee reduction",
+"cls": "param",
+"el": "return plus the fee saving"
+},
+{
+"id": "S065",
+"cat": "Investments & allocation",
+"name": "Market drawdown",
+"cls": "event",
+"el": "economy: recession (−15% a year)"
+},
+{
+"id": "S066",
+"cat": "Investments & allocation",
+"name": "Recovery sequence",
+"cls": "event",
+"el": "recessions last (6% a month chance of recovery)"
+},
+{
+"id": "S067",
+"cat": "Investments & allocation",
+"name": "Contribution holiday",
+"cls": "action",
+"el": "asset: 0 (pause)"
+},
+{
+"id": "S068",
+"cat": "Investments & allocation",
+"name": "Rebalancing rule",
+"cls": "out",
+"el": "single-asset portfolio"
+},
+{
+"id": "S069",
+"cat": "Investments & allocation",
+"name": "Concentrated holding",
+"cls": "param",
+"el": "portfolio risk up"
+},
+{
+"id": "S070",
+"cat": "Investments & allocation",
+"name": "Currency exposure",
+"cls": "out",
+"el": "single currency (CHF)"
+},
+{
+"id": "S071",
+"cat": "Debt & credit",
+"name": "Student loan repayment",
+"cls": "builtin",
+"el": "loans repaid on a fixed schedule"
+},
+{
+"id": "S072",
+"cat": "Debt & credit",
+"name": "Credit-card balance",
+"cls": "builtin",
+"el": "cash below 0 is revolving credit (8% a year)"
+},
+{
+"id": "S073",
+"cat": "Debt & credit",
+"name": "Refinance loan",
+"cls": "out",
+"el": "dropped: refinancing changed 1 of 1,200 outcomes"
+},
+{
+"id": "S074",
+"cat": "Debt & credit",
+"name": "Early repayment",
+"cls": "out",
+"el": "dropped: early repayment changed 11 of 1,200 outcomes"
+},
+{
+"id": "S075",
+"cat": "Debt & credit",
+"name": "Interest rate shock",
+"cls": "out",
+"el": "dropped: a rate rise mattered for 0.25% of profiles"
+},
+{
+"id": "S076",
+"cat": "Debt & credit",
+"name": "Debt consolidation",
+"cls": "out",
+"el": "one loan per profile"
+},
+{
+"id": "S077",
+"cat": "Debt & credit",
+"name": "New personal loan",
+"cls": "builtin",
+"el": "credit line; new loans only made outcomes worse (23 profiles)"
+},
+{
+"id": "S078",
+"cat": "Debt & credit",
+"name": "Missed payment",
+"cls": "out",
+"el": "no payment-arrears model"
+},
+{
+"id": "S079",
+"cat": "Debt & credit",
+"name": "Borrowing cap",
+"cls": "builtin",
+"el": "credit limit: 3 × monthly pay"
+},
+{
+"id": "S080",
+"cat": "Debt & credit",
+"name": "Variable amortization",
+"cls": "out",
+"el": "fixed schedule only"
+},
+{
+"id": "S081",
+"cat": "Family & life events",
+"name": "Partner cohabitation",
+"cls": "event",
+"el": "household: single → couple"
+},
+{
+"id": "S082",
+"cat": "Family & life events",
+"name": "Childcare costs",
+"cls": "event",
+"el": "household: couple → family (+CHF 1,800 a month)"
+},
+{
+"id": "S083",
+"cat": "Family & life events",
+"name": "Parental leave",
+"cls": "event",
+"el": "child: 4 months at 80% pay"
+},
+{
+"id": "S084",
+"cat": "Family & life events",
+"name": "Family support",
+"cls": "param",
+"el": "recurring transfer"
+},
+{
+"id": "S085",
+"cat": "Family & life events",
+"name": "Marriage costs",
+"cls": "param",
+"el": "scripted one-off cost"
+},
+{
+"id": "S086",
+"cat": "Family & life events",
+"name": "Caregiving break",
+"cls": "action",
+"el": "status: −1 or stop"
+},
+{
+"id": "S087",
+"cat": "Family & life events",
+"name": "Divorce scenario",
+"cls": "event",
+"el": "household: couple → single"
+},
+{
+"id": "S088",
+"cat": "Family & life events",
+"name": "Dependent education",
+"cls": "param",
+"el": "extra cost while a family"
+},
+{
+"id": "S089",
+"cat": "Family & life events",
+"name": "Insurance claim",
+"cls": "event",
+"el": "one-off bill"
+},
+{
+"id": "S090",
+"cat": "Family & life events",
+"name": "Disability interruption",
+"cls": "event",
+"el": "job loss E → N"
+},
+{
+"id": "S091",
+"cat": "Retirement & pensions",
+"name": "Retire at 60",
+"cls": "action",
+"el": "status: stop at 60 (the pension starts at 65)"
+},
+{
+"id": "S092",
+"cat": "Retirement & pensions",
+"name": "Retire at 67",
+"cls": "action",
+"el": "status: 0 past 65"
+},
+{
+"id": "S093",
+"cat": "Retirement & pensions",
+"name": "Pension contribution increase",
+"cls": "out",
+"el": "no pension pot (pillar 2/3a)"
+},
+{
+"id": "S094",
+"cat": "Retirement & pensions",
+"name": "Career gap effect",
+"cls": "out",
+"el": "no pension pot (pillar 2/3a)"
+},
+{
+"id": "S095",
+"cat": "Retirement & pensions",
+"name": "Retirement relocation",
+"cls": "out",
+"el": "abroad"
+},
+{
+"id": "S096",
+"cat": "Retirement & pensions",
+"name": "Inflation in retirement",
+"cls": "event",
+"el": "economy: inflation regime"
+},
+{
+"id": "S097",
+"cat": "Retirement & pensions",
+"name": "Withdrawal strategy",
+"cls": "action",
+"el": "asset: −1 rule in retirement"
+},
+{
+"id": "S098",
+"cat": "Retirement & pensions",
+"name": "Longer lifespan",
+"cls": "param",
+"el": "longer horizon"
+},
+{
+"id": "S099",
+"cat": "Retirement & pensions",
+"name": "Pension lump sum",
+"cls": "out",
+"el": "no pension pot (pillar 2/3a)"
+},
+{
+"id": "S100",
+"cat": "Retirement & pensions",
+"name": "Healthcare costs later",
+"cls": "param",
+"el": "living costs rise with age"
+},
+{
+"id": "S101",
+"cat": "Macroeconomic & systemic shocks",
+"name": "High inflation",
+"cls": "event",
+"el": "economy: inflation regime"
+},
+{
+"id": "S102",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Deflation episode",
+"cls": "param",
+"el": "cost growth below 0"
+},
+{
+"id": "S103",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Rate hike",
+"cls": "param",
+"el": "credit rate +2 points"
+},
+{
+"id": "S104",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Recession",
+"cls": "event",
+"el": "economy: recession (job loss × 3)"
+},
+{
+"id": "S105",
+"cat": "Macroeconomic & systemic shocks",
+"name": "FX volatility",
+"cls": "out",
+"el": "single currency (CHF)"
+},
+{
+"id": "S106",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Energy shock",
+"cls": "event",
+"el": "economy: inflation regime"
+},
+{
+"id": "S107",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Tax policy change",
+"cls": "out",
+"el": "incomes are net of tax"
+},
+{
+"id": "S108",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Housing downturn",
+"cls": "out",
+"el": "no property"
+},
+{
+"id": "S109",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Market liquidity shock",
+"cls": "param",
+"el": "cost or delay when selling"
+},
+{
+"id": "S110",
+"cat": "Macroeconomic & systemic shocks",
+"name": "Compound crisis",
+"cls": "event",
+"el": "recession: job loss and market drop together"
+},
+{
+"id": "S111",
+"cat": "Entrepreneurship & innovation",
+"name": "Start a business",
+"cls": "param",
+"el": "E variant: 12 months of near-zero pay, then 23% pay noise"
+},
+{
+"id": "S112",
+"cat": "Entrepreneurship & innovation",
+"name": "Side project",
+"cls": "param",
+"el": "extra income stream"
+},
+{
+"id": "S113",
+"cat": "Entrepreneurship & innovation",
+"name": "Seed funding",
+"cls": "out",
+"el": "no business balance sheet"
+},
+{
+"id": "S114",
+"cat": "Entrepreneurship & innovation",
+"name": "Startup failure",
+"cls": "param",
+"el": "business variant ends in N"
+},
+{
+"id": "S115",
+"cat": "Entrepreneurship & innovation",
+"name": "Revenue delay",
+"cls": "param",
+"el": "longer zero-pay start"
+},
+{
+"id": "S116",
+"cat": "Entrepreneurship & innovation",
+"name": "Hire employee",
+"cls": "out",
+"el": "no business balance sheet"
+},
+{
+"id": "S117",
+"cat": "Entrepreneurship & innovation",
+"name": "Equity dilution",
+"cls": "out",
+"el": "no business balance sheet"
+},
+{
+"id": "S118",
+"cat": "Entrepreneurship & innovation",
+"name": "Founder salary",
+"cls": "param",
+"el": "lower pay level"
+},
+{
+"id": "S119",
+"cat": "Entrepreneurship & innovation",
+"name": "Business loan",
+"cls": "out",
+"el": "no business balance sheet"
+},
+{
+"id": "S120",
+"cat": "Entrepreneurship & innovation",
+"name": "Exit event",
+"cls": "out",
+"el": "no business balance sheet"
+}
+]</script>
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('catalog').textContent);
+  const CLS = [['action', 'Agent move'], ['event', 'Random event'], ['builtin', 'Built-in rule'],
+               ['param', 'Parameter setting'], ['out', 'Left out']];
+  const label = Object.fromEntries(CLS);
+  const cats = [...new Set(data.map(d => d.cat))];
+  const tt = document.getElementById('tt');
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function showTT(anchor, head, items, compact) {
+    tt.replaceChildren(el('div', 'h', head));
+    if (compact) {
+      tt.append(el('div', 'idl', items.map(d => d.id).join(' · ')));
+    } else {
+      for (const d of items) {
+        const r = el('div', 'item');
+        r.append(el('b', null, d.id + ' ' + d.name), el('span', null, d.el));
+        tt.append(r);
+      }
+    }
+    tt.hidden = false;
+    const a = anchor.getBoundingClientRect();
+    const w = tt.offsetWidth, h = tt.offsetHeight;
+    const x = Math.max(8, Math.min(a.left + a.width / 2 - w / 2, window.innerWidth - w - 8));
+    let y = a.top - h - 8;
+    if (y < 8) y = a.bottom + 8;
+    tt.style.left = x + 'px';
+    tt.style.top = y + 'px';
+  }
+  const hideTT = () => { tt.hidden = true; };
+  window.addEventListener('scroll', hideTT, { passive: true });
+
+  const leg = document.getElementById('cov-legend');
+  for (const [k, l] of CLS) {
+    const s = el('span');
+    s.append(el('i', 'sw ' + k), document.createTextNode(l));
+    leg.append(s);
+  }
+
+  const cov = document.getElementById('cov');
+  function row(name, items, total) {
+    const r = el('div', 'cov-row' + (total ? ' total' : ''));
+    r.append(el('div', 'lab', name));
+    const bar = el('div', 'cov-bar');
+    for (const [k, l] of CLS) {
+      const sub = items.filter(d => d.cls === k);
+      if (!sub.length) continue;
+      const s = el('div', 'seg ' + k, String(sub.length));
+      s.style.flex = sub.length + ' 1 0';
+      s.tabIndex = 0;
+      s.setAttribute('aria-label', name + ': ' + sub.length + ' ' + l.toLowerCase());
+      const show = () => showTT(s, name + ' · ' + l + ' (' + sub.length + ')', sub, total);
+      s.addEventListener('mouseenter', show);
+      s.addEventListener('focus', show);
+      s.addEventListener('mouseleave', hideTT);
+      s.addEventListener('blur', hideTT);
+      bar.append(s);
+    }
+    r.append(bar);
+    cov.append(r);
+  }
+  row('All 120 scenarios', data, true);
+  for (const c of cats) row(c, data.filter(d => d.cat === c), false);
+
+  const tb = document.querySelector('#cat-table tbody');
+  for (const c of cats) {
+    const g = el('tr', 'grp');
+    const th = el('th', null, c);
+    th.colSpan = 4;
+    g.append(th);
+    tb.append(g);
+    for (const d of data.filter(x => x.cat === c)) {
+      const tr = el('tr');
+      const cl = el('td', 'cls');
+      cl.append(el('i', 'sw ' + d.cls), document.createTextNode(label[d.cls]));
+      tr.append(el('td', null, d.id), el('td', null, d.name), cl, el('td', null, d.el));
+      tb.append(tr);
+    }
+  }
+})();
+</script>
+</body>
+</html>
