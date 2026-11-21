@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>MDP Action Shortlist</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column, answer first (the shortlist), evidence after; every chart is a full-column figure. */
+:root {
+  --bg: #f9f9f7;
+  --surface: #fcfcfb;
+  --fg: #0b0b0b;
+  --fg2: #52514e;
+  --muted: #6f6d68;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --line: rgba(11, 11, 11, 0.10);
+  --hover: rgba(11, 11, 11, 0.04);
+  --accent: #1c5cab;
+  --better: #2a78d6;
+  --worse: #e34948;
+  --mid: #f0efec;
+  --track: #cde2fb;
+  --tint: #eef4fc;
+  --font-display: "Instrument Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #9b9a93;
+    --grid: #2c2c2a; --axis: #4a4a46; --line: rgba(255, 255, 255, 0.10); --hover: rgba(255, 255, 255, 0.05);
+    --accent: #86b6ef; --better: #3987e5; --worse: #e66767; --mid: #383835; --track: #0d366b; --tint: #14243a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #9b9a93;
+  --grid: #2c2c2a; --axis: #4a4a46; --line: rgba(255, 255, 255, 0.10); --hover: rgba(255, 255, 255, 0.05);
+  --accent: #86b6ef; --better: #3987e5; --worse: #e66767; --mid: #383835; --track: #0d366b; --tint: #14243a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 15px/1.6 var(--font-body); }
+.page {
+  max-width: 940px; margin: 0 auto;
+  padding-block: 44px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 0;
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-weight: 700; font-size: clamp(2.1rem, 6vw, 3rem); line-height: 1.05; letter-spacing: -0.025em; }
+h2 { font-weight: 600; font-size: 1.55rem; line-height: 1.2; letter-spacing: -0.012em; }
+h3 { font-weight: 600; font-size: 1.06rem; line-height: 1.3; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+.eyebrow { font: 500 0.72rem/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: 0.09em; color: var(--fg2); }
+.small { font-size: 0.85rem; color: var(--fg2); }
+.num { font-variant-numeric: tabular-nums; }
+
+header.top { display: grid; gap: 18px; padding-bottom: 36px; }
+.lede { font-size: 1.12rem; line-height: 1.55; max-width: 64ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 400 0.78rem/1.4 var(--font-mono); color: var(--fg2); }
+
+section { display: grid; gap: 18px; padding-block: 40px; border-top: 1px solid var(--line); min-width: 0; }
+section > * { min-width: 0; }
+.section-head { display: grid; gap: 8px; }
+
+/* Shortlist */
+.levers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.lever { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 18px 16px; display: grid; gap: 10px; align-content: start; }
+.lever-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.lever .tag { font: 500 0.7rem/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg2); white-space: nowrap; }
+.lever ul { margin: 0; padding-left: 1.1em; display: grid; gap: 2px; font-size: 0.92rem; }
+.lever .evidence { font-size: 0.88rem; color: var(--fg2); border-top: 1px solid var(--line); padding-top: 10px; }
+.lever .evidence b { color: var(--fg); font-weight: 600; }
+.rows { display: grid; gap: 14px; }
+.chiprow { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: 12px; align-items: start; }
+.chiprow .k { display: grid; gap: 2px; }
+.chiprow .k b { font: 600 0.95rem/1.3 var(--font-display); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 0.86rem; line-height: 1.35; }
+.chip .n { font: 500 0.74rem/1 var(--font-mono); color: var(--fg2); }
+.chip.out { color: var(--fg2); text-decoration: line-through; text-decoration-color: var(--axis); }
+
+/* Generator card */
+.formula { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; display: grid; gap: 14px; }
+.eq { font: 500 0.92rem/1.7 var(--font-mono); overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
+.eq .t { color: var(--fg2); }
+.params { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 28px; font-size: 0.88rem; }
+.params div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-block: 5px; }
+.params span:last-child { font-variant-numeric: tabular-nums; text-align: right; }
+.params .src { font: 400 0.7rem/1 var(--font-mono); color: var(--muted); margin-left: 6px; }
+.months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+.month { background: var(--bg); border-radius: 4px; padding: 8px 6px; display: grid; gap: 3px; align-content: start; min-height: 92px; }
+.month.hot { background: var(--tint); }
+.month .m { font: 500 0.72rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg2); }
+.month .e { font-size: 0.74rem; line-height: 1.25; }
+.month .e.q { color: var(--muted); }
+
+/* Meter lists */
+.meters { display: grid; gap: 8px; }
+.meter { display: grid; grid-template-columns: 11rem minmax(0, 1fr) 3.4rem; gap: 12px; align-items: center; font-size: 0.9rem; }
+.meter .track { height: 8px; border-radius: 999px; background: var(--track); overflow: hidden; }
+.meter .fill { height: 100%; border-radius: 999px; background: var(--better); }
+.meter .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--fg2); }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.pair > div { display: grid; gap: 10px; align-content: start; min-width: 0; }
+
+/* Figures */
+figure { margin: 0; display: grid; gap: 12px; min-width: 0; }
+.fig-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 18px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.84rem; color: var(--fg2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.sw.better { background: var(--better); }
+.sw.worse { background: var(--worse); }
+button.toggle {
+  font: 500 0.82rem/1 var(--font-body); color: var(--accent); background: transparent;
+  border: 1px solid var(--line); border-radius: 6px; padding: 7px 11px; cursor: pointer;
+}
+button.toggle:hover { background: var(--hover); }
+button.toggle:focus-visible, .dv-row:focus-visible, td.cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+figcaption { font-size: 0.84rem; color: var(--fg2); max-width: 72ch; }
+
+/* Diverging bar chart */
+.dv { display: grid; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px 12px; }
+.dv-head, .dv-row { display: grid; grid-template-columns: minmax(0, 14.5rem) minmax(0, 1fr); column-gap: 14px; align-items: center; }
+.dv-head { padding-block: 4px 6px; border-bottom: 1px solid var(--grid); }
+.dv-head .side { display: grid; grid-template-columns: 1fr 1fr; font: 500 0.72rem/1.2 var(--font-mono); color: var(--fg2); text-transform: uppercase; letter-spacing: 0.05em; }
+.dv-head .side span:first-child { text-align: right; padding-right: 10px; }
+.dv-head .side span:last-child { padding-left: 10px; }
+.dv-ticks { display: grid; grid-template-columns: 1fr 1px 1fr; height: 16px; margin-top: 4px; }
+.dv-ticks .h { position: relative; }
+.dv-ticks i { position: absolute; top: 0; transform: translateX(-50%); font: 400 0.68rem/1 var(--font-body); font-style: normal; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dv-group { grid-column: 1 / -1; display: flex; gap: 10px; align-items: baseline; padding: 16px 0 6px; border-bottom: 1px solid var(--grid); }
+.dv-group b { font: 600 0.82rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.05em; }
+.dv-group span { font-size: 0.8rem; color: var(--fg2); }
+.dv-row { min-height: 30px; border-radius: 4px; cursor: default; }
+.dv-row:hover { background: var(--hover); }
+.dv-label { display: flex; gap: 8px; align-items: baseline; font-size: 0.88rem; line-height: 1.25; padding: 4px 0 4px 4px; min-width: 0; }
+.dv-label .tier { font: 500 0.66rem/1 var(--font-mono); color: var(--fg2); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; white-space: nowrap; }
+.dv-plot { display: grid; grid-template-columns: 1fr 1px 1fr; height: 30px; }
+.dv-half { position: relative; background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px); background-size: 25% 100%; }
+.dv-half.r { box-shadow: inset -1px 0 0 var(--grid); }
+.dv-axis { background: var(--axis); }
+.dv-bar { position: absolute; top: 9px; height: 12px; width: var(--w); }
+.dv-half.l .dv-bar { right: 2px; background: var(--worse); border-radius: 4px 0 0 4px; }
+.dv-half.r .dv-bar { left: 2px; background: var(--better); border-radius: 0 4px 4px 0; }
+.dv-val { position: absolute; top: 50%; transform: translateY(-50%); font: 500 0.72rem/1 var(--font-body); color: var(--fg2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dv-half.l .dv-val { right: calc(var(--w) + 7px); }
+.dv-half.r .dv-val { left: calc(var(--w) + 7px); }
+
+/* Tables */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--grid); }
+thead th { font: 600 0.74rem/1.3 var(--font-body); color: var(--fg2); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.spec td:first-child { font-weight: 600; white-space: nowrap; }
+.spec td { min-width: 9rem; }
+
+/* Heat table */
+.heat { border-collapse: separate; border-spacing: 2px; font-size: 0.84rem; }
+.heat th, .heat td { border: 0; }
+.heat thead th { text-align: center; vertical-align: bottom; text-transform: none; letter-spacing: 0; font-size: 0.78rem; }
+.heat thead th .sub { display: block; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.heat th.rowh { font-weight: 500; white-space: nowrap; padding-right: 14px; color: var(--fg); font-size: 0.85rem; }
+.heat td.cell { text-align: center; border-radius: 4px; font-variant-numeric: tabular-nums; min-width: 4.4rem; padding: 7px 6px; }
+.heat td.na { color: var(--muted); }
+.heat tr.grp th { padding-top: 14px; font: 600 0.74rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg2); text-align: left; }
+.scale { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--fg2); font-variant-numeric: tabular-nums; }
+.scale .bar { width: 180px; max-width: 40vw; height: 10px; border-radius: 3px; background: linear-gradient(to right, var(--better), var(--mid), var(--worse)); }
+
+/* Stat tiles */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 6px; align-content: start; }
+.tile .v { font: 600 1.9rem/1.1 var(--font-body); letter-spacing: -0.01em; }
+.tile .l { font-size: 0.86rem; color: var(--fg2); }
+
+/* Notes list */
+.notes { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; counter-reset: n; }
+.notes li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 8px; }
+.notes li::before { counter-increment: n; content: counter(n); font: 500 0.78rem/1.9 var(--font-mono); color: var(--fg2); }
+.notes b { font-weight: 600; }
+
+pre.code { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 400 0.82rem/1.6 var(--font-mono); }
+.files { display: grid; gap: 6px; font-size: 0.9rem; }
+.files div { display: grid; grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: 12px; border-bottom: 1px solid var(--line); padding-block: 6px; }
+.files code { overflow-wrap: anywhere; }
+footer { border-top: 1px solid var(--line); padding-top: 22px; font-size: 0.82rem; color: var(--fg2); }
+
+/* Tooltip */
+.tt { position: fixed; z-index: 20; max-width: 300px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.14); font-size: 0.8rem; line-height: 1.35; pointer-events: none; display: grid; gap: 4px; }
+.tt .h { font: 600 0.86rem/1.3 var(--font-display); margin-bottom: 2px; }
+.tt .row { display: flex; gap: 8px; align-items: baseline; }
+.tt .row b { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 4.2rem; }
+.tt .row span { color: var(--fg2); }
+.tt .key { width: 12px; height: 2px; border-radius: 1px; display: inline-block; align-self: center; flex: none; }
+.tt .foot { color: var(--muted); font-size: 0.74rem; margin-top: 2px; }
+
+@media (max-width: 720px) {
+  .levers, .pair, .params { grid-template-columns: minmax(0, 1fr); }
+  .chiprow { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .months { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .dv-head, .dv-row { grid-template-columns: minmax(0, 1fr); }
+  .dv-head > div:first-child { display: none; }
+  .dv-label { padding-top: 6px; }
+  .dv-ticks i.minor { display: none; }
+  .meter { grid-template-columns: 8.5rem minmax(0, 1fr) 3rem; }
+  .files div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div class="eyebrow">LauzHack 2026 · AI Financial Twin · MDP design</div>
+    <h1>MDP Action Shortlist</h1>
+    <p class="lede">We simulated 29 decisions and shocks on all 1,200 synthetic profiles over ten years and counted whose outcome each one changes. Four levers carry nearly all of the controllable effect: <b>work</b>, <b>housing cost</b>, the <b>cash buffer</b> and the <b>spending level</b>. Debt actions barely matter in this data. The largest swings come from life choices (starting a business, cutting to 80% hours, buying a car, a master's), and those only belong in the policy's choice set if the reward has an explicit preference term.</p>
+    <div class="meta">
+      <span>1,200 profiles × 200 paths × 120 months</span>
+      <span>Jan 2025 → Dec 2034</span>
+      <span>Calibrated on the 2025–26 ledger</span>
+      <span>Synthetic data · not advice</span>
+    </div>
+  </header>
+
+  <section id="shortlist" aria-labelledby="h-shortlist">
+    <div class="section-head">
+      <div class="eyebrow">The answer</div>
+      <h2 id="h-shortlist">What goes into the MDP</h2>
+      <p>The policy chooses among four levers. The user fixes a life-choice branch, the environment draws shocks, and a few catalogue items can be dropped or folded into a lever. Each card gives the strongest piece of evidence for including it.</p>
+    </div>
+    <div class="levers">
+      <article class="lever">
+        <div class="lever-top"><h3>Work</h3><span class="tag">Agent lever</span></div>
+        <ul>
+          <li>Take a full-time job (student, unemployed)</li>
+          <li>Part-time → full-time</li>
+          <li>Search takes months; success is a chance event</li>
+        </ul>
+        <p class="evidence">Income accounts for <b>77–94%</b> of how outcomes differ between profiles. A job fixes <b>72 of 76</b> student and unemployed shortfalls; full-time work helps <b>all 120</b> part-timers.</p>
+      </article>
+      <article class="lever">
+        <div class="lever-top"><h3>Housing cost</h3><span class="tag">Agent lever</span></div>
+        <ul>
+          <li>Flat 20% cheaper</li>
+          <li>Shared flat (single households)</li>
+          <li>Cheapest-rent city (St Gallen here)</li>
+        </ul>
+        <p class="evidence">The best financial lever for <b>671 of 1,200</b> profiles, and it fixes <b>38</b> shortfalls. Rent is the only large cost that varies between profiles.</p>
+      </article>
+      <article class="lever">
+        <div class="lever-top"><h3>Cash buffer</h3><span class="tag">Agent lever</span></div>
+        <ul>
+          <li>Target buffer: 1, 3 or 6 months of outgoings</li>
+          <li>Invest above it; sell investments below 1 month</li>
+          <li>Applied every month, so it acts as a rule</li>
+        </ul>
+        <p class="evidence">Investing excess cash once leaves <b>150 better off and 149 worse off</b>. With the sell-when-low rule: <b>233 better, 28 worse</b>, and 33 shortfalls fixed.</p>
+      </article>
+      <article class="lever">
+        <div class="lever-top"><h3>Spending level</h3><span class="tag">Agent lever</span></div>
+        <ul>
+          <li>Non-rent costs −10%, unchanged or +10%</li>
+          <li>About CHF 150 a month either way</li>
+          <li>Needs a preference cost, or −10% always wins</li>
+        </ul>
+        <p class="evidence">Small but universal: it materially changes <b>21%</b> of profiles and never hurts, so on cash alone the policy would always pick −10%.</p>
+      </article>
+    </div>
+    <div class="rows">
+      <div class="chiprow">
+        <div class="k"><b>Branches the user picks</b><span class="small">Chosen once; the policy optimises inside each</span></div>
+        <div class="chips" id="chips-life"></div>
+      </div>
+      <div class="chiprow">
+        <div class="k"><b>Shocks the environment draws</b><span class="small">Share of profiles materially changed</span></div>
+        <div class="chips" id="chips-shock"></div>
+      </div>
+      <div class="chiprow">
+        <div class="k"><b>Drop or fold in</b><span class="small">Under 2% of profiles, or never helps</span></div>
+        <div class="chips">
+          <span class="chip out">Repay loan early <span class="n">0.9%</span></span>
+          <span class="chip out">Refinance −2 pts <span class="n">0.1%</span></span>
+          <span class="chip out">Borrow CHF 20k <span class="n">helps no one</span></span>
+          <span class="chip out">Loan rate +2 pts <span class="n">0.3%</span></span>
+          <span class="chip">Pay rise → chance event</span>
+          <span class="chip">Lifestyle +10% → spending lever</span>
+          <span class="chip">Rent alone → housing lever</span>
+        </div>
+      </div>
+    </div>
+    <p class="small">How the tiers were set: an intervention is Tier 1 if it changes the outcome for at least 20% of all profiles, or fixes at least a quarter of the 150 baseline shortfalls; Tier 2 if it changes at least 5% of all profiles or 40% of its eligible group. "Changes the outcome" means a shift of 10 points or more in shortfall risk or goal odds, or of 10% in 2034 net worth.</p>
+  </section>
+
+  <section id="drivers" aria-labelledby="h-drivers">
+    <div class="section-head">
+      <div class="eyebrow">Evidence · the data</div>
+      <h2 id="h-drivers">What drives cash flow in the data</h2>
+      <p>The synthetic ledger was generated by a simple rule, and it can be decoded. Once the rule is known, the transition model calibrates itself. Income dominates. Living costs are almost the same for everyone (about CHF 1,480 a month, whatever the household size), so rent is the only cost lever with real spread.</p>
+    </div>
+    <div class="formula">
+      <div class="eyebrow">Monthly net cash flow, as decoded</div>
+      <div class="eq">net<sub>t</sub> = Y<sub>t</sub> − R<sub>t</sub> − O<sub>t</sub> − fees<sub>t</sub> − shock<sub>t</sub> + bonus<sub>t</sub> + ε<sub>t</sub> − debt<sub>t</sub> <span class="t">&nbsp;&nbsp;Y: pay · R: rent · O: living costs</span></div>
+      <div class="params" id="params"></div>
+      <div class="months" id="months" aria-label="Calendar effects in the generator"></div>
+    </div>
+    <div class="pair">
+      <div>
+        <h3>Share of between-profile differences explained</h3>
+        <p class="small">R² of each component alone against each profile's typical monthly net flow.</p>
+        <div class="meters" id="meters-r2"></div>
+      </div>
+      <div>
+        <h3>Rent multipliers</h3>
+        <p class="small">Fitted log-rent model, R² 0.66. Pay does not vary by city in this data.</p>
+        <div class="eyebrow">Household, relative to a couple</div>
+        <div class="meters" id="meters-rent-hh"></div>
+        <div class="eyebrow">City, relative to Bern</div>
+        <div class="meters" id="meters-rent-city"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="impact" aria-labelledby="h-impact">
+    <div class="section-head">
+      <div class="eyebrow">Evidence · simulation</div>
+      <h2 id="h-impact">Which interventions change outcomes</h2>
+      <p>Each intervention is applied in January 2025 to every eligible profile, and compared with continuing as-is under the same random shocks. Bars show the share of all 1,200 profiles that end up materially better or worse off, so levers that apply to small groups (a job for the 76 students and unemployed) look short here; the next section splits them by group. Hover or focus a row for counts.</p>
+    </div>
+    <figure>
+      <div class="fig-tools">
+        <div class="legend"><span><i class="sw better"></i>Better off</span><span><i class="sw worse"></i>Worse off</span></div>
+        <button class="toggle" type="button" id="tbl-impact-btn" aria-expanded="false" aria-controls="tbl-impact">Show as table</button>
+      </div>
+      <div class="dv" id="dv-impact" role="list"></div>
+      <div class="tablewrap" id="tbl-impact" hidden></div>
+      <figcaption>Better or worse means a change of at least 10 points in shortfall risk (cash below zero in any month to 2034), in the odds of the high-priority goal (Dec 2029) or the medium goal (Dec 2032), or of 10% in median 2034 net worth. A profile can count on both sides.</figcaption>
+    </figure>
+  </section>
+
+  <section id="segments" aria-labelledby="h-segments">
+    <div class="section-head">
+      <div class="eyebrow">Evidence · who it helps</div>
+      <h2 id="h-segments">Each lever works for a different group</h2>
+      <p>Employed people almost never run short, so their decisions are about wealth. Part-timers and retirees carry real risk that housing and liquidity moves reduce. Students and unemployed people run short whatever else they do, unless they start working.</p>
+    </div>
+    <figure>
+      <div class="fig-tools">
+        <div class="scale"><span>Lower risk</span><span class="bar" aria-hidden="true"></span><span>Higher risk</span></div>
+        <span class="small">Mean change in 10-year shortfall risk, points</span>
+      </div>
+      <div class="tablewrap"><table class="heat" id="heat"></table></div>
+      <figcaption>Colour saturates at ±30 points. A dash means the intervention does not apply to that group. Students and unemployed profiles start at 100% risk, so only a job moves them.</figcaption>
+    </figure>
+    <h3>Best financial lever per profile</h3>
+    <p class="small">For each profile, the lever that most lowers shortfall risk, then raises goal odds, then raises 2034 net worth. A certain pay rise is excluded because its outcome is not the person's to choose.</p>
+    <div class="tablewrap"><table id="best"></table></div>
+  </section>
+
+  <section id="closed-loop" aria-labelledby="h-loop">
+    <div class="section-head">
+      <div class="eyebrow">Evidence · why an MDP</div>
+      <h2 id="h-loop">The liquidity action has to be a rule</h2>
+      <p>Moving spare cash into investments once looks attractive on net worth, but it raises shortfall risk for anyone whose cash later runs down, retirees most of all (+16 points). Add one state-dependent rule, selling investments when cash drops below a month of outgoings, and the same move becomes safe. This is the clearest case in the data where a closed-loop policy beats any one-shot scenario.</p>
+    </div>
+    <figure>
+      <div class="legend"><span><i class="sw better"></i>Better off</span><span><i class="sw worse"></i>Worse off</span></div>
+      <div class="dv" id="dv-loop" role="list"></div>
+      <figcaption>Same scale and definitions as the chart above. Negative cash costs 8% a year in these runs. With free overdraft, holding investments while overdrawn wins and the sell rule looks worse than it is.</figcaption>
+    </figure>
+  </section>
+
+  <section id="state" aria-labelledby="h-state">
+    <div class="section-head">
+      <div class="eyebrow">Evidence · state</div>
+      <h2 id="h-state">Which state variables matter</h2>
+      <p>A random forest predicted each profile's baseline outcome from its starting state, and each variable was then shuffled to see how much accuracy it carries. Income dominates every outcome. Rent comes next; investments matter for goals, and cash matters for timing. Age, household, city and debt add almost nothing beyond eligibility, so they can stay out of the transition state.</p>
+    </div>
+    <div class="pair">
+      <div><h3>Shortfall risk</h3><p class="small" id="r2-breach"></p><div class="meters" id="meters-breach"></div></div>
+      <div><h3>High-priority goal (Dec 2029)</h3><p class="small" id="r2-goal"></p><div class="meters" id="meters-goal"></div></div>
+    </div>
+  </section>
+
+  <section id="trust" aria-labelledby="h-trust">
+    <div class="section-head">
+      <div class="eyebrow">Evidence · validation</div>
+      <h2 id="h-trust">Can the simulator be trusted?</h2>
+      <p>The transition model was calibrated on 2025 only and asked to predict 2026, starting from each profile's recorded December 2025 cash. It reproduces which profiles run short, and its uncertainty bands have the right width.</p>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="tablewrap"><table id="bt-status"></table></div>
+    <h3>Does the shortlist survive other assumptions?</h3>
+    <p class="small" id="sens-intro"></p>
+    <div class="tablewrap"><table id="sens"></table></div>
+  </section>
+
+  <section id="spec" aria-labelledby="h-spec">
+    <div class="section-head">
+      <div class="eyebrow">Specification</div>
+      <h2 id="h-spec">The MDP, written out</h2>
+      <p>A monthly finite-horizon MDP, 2025-01 to 2034-12, one shared environment for all profiles. It keeps the accounting contract in <code>analysis/mdp_design.json</code> and takes its parameters from <code>results/calibration.json</code>.</p>
+    </div>
+    <h3>State</h3>
+    <div class="tablewrap">
+      <table class="spec">
+        <thead><tr><th>Variable</th><th>Why it is in</th><th>Encoding</th></tr></thead>
+        <tbody>
+          <tr><td>Monthly pay</td><td>77–94% of outcome importance</td><td>CHF, 2025 prices × pay drift</td></tr>
+          <tr><td>Employment status + timer</td><td>Sets pay, December bonus, student fees and noise; job search, study and start-up take months</td><td>6 statuses + countdown</td></tr>
+          <tr><td>Rent, living costs</td><td>Rent 4–12% of importance; the housing and spending levers act here</td><td>CHF</td></tr>
+          <tr><td>Cash</td><td>A shortfall is cash below zero; runway sets timing</td><td>CHF, or months of outgoings: &lt;0, 0–1, 1–3, 3–6, 6–12, 12+</td></tr>
+          <tr><td>Investments</td><td>12% of goal-odds importance; source for top-ups</td><td>CHF, or months of outgoings</td></tr>
+          <tr><td>Calendar month</td><td>February and August bills, September fees, December bonus all hit timing</td><td>1–12</td></tr>
+          <tr><td>Goals</td><td>Targets, deadlines and paid-once flags drive the reward</td><td>High: Dec 2029 · Medium: Dec 2032</td></tr>
+          <tr><td>Loan</td><td>Accounting correctness only; under 1% of importance</td><td>Balance, rate, months left</td></tr>
+          <tr><td>Household, city, age</td><td>Eligibility and rent multipliers only</td><td>Context, not dynamics</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Actions and masks</h3>
+    <div class="tablewrap">
+      <table class="spec">
+        <thead><tr><th>Action</th><th>Options</th><th>Mask</th></tr></thead>
+        <tbody>
+          <tr><td>continue</td><td>Keep everything as is</td><td>Always available</td></tr>
+          <tr><td>work</td><td>Search for a full-time job; part-time → full-time</td><td>Status-dependent; one change per 12 months; success is stochastic</td></tr>
+          <tr><td>housing</td><td>20% cheaper flat; shared flat; cheapest-rent city. A one-off moving cost of CHF 2–3k</td><td>Shared flat for singles only; at most one move per 24 months</td></tr>
+          <tr><td>buffer</td><td>Target of 1, 3 or 6 months of outgoings; invest above, sell below 1 month</td><td>Any month; executes automatically</td></tr>
+          <tr><td>spending</td><td>Non-rent costs −10%, 0 or +10%</td><td>Any month; preference cost on −10%</td></tr>
+          <tr><td>branch</td><td>Master's (age ≤ 35), business (≤ 60), 80% workload, early retirement (≥ 58), child, car</td><td>Chosen at t = 0 by the user, or by the agent only with a preference term</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Transitions</h3>
+    <p>Fitted from the ledger: pay drift +1.42% a year, cost inflation +1.01%, noise, one-off bills, December bonus and student fees (all in the card above). Assumed and labelled: investment returns of 4% a year with 10% volatility, 60-month loan annuities, 8% a year on negative cash, and job-search delays. The shocks need assumed rates: costs outpacing pay, rent rises, spells out of work, market drawdowns and emergency bills.</p>
+    <h3>Reward</h3>
+    <pre class="code">r_t = − λ_short · 1[cash_t &lt; 0]  − λ_gap · max(0, −cash_t) / 10k
+      + B_high · 1[high goal met, Dec 2029, paid once]  + B_med · 1[medium goal met, Dec 2032, paid once]
+      + λ_wealth · Δnet_worth_t / 100k  − κ · 1[a_t ≠ continue]  + u_branch
+
+starting values to tune and show the user:
+  λ_short = 1   λ_gap = 0.5   B_high = 10   B_med = 5   λ_wealth = 1   κ = 0.05   u_branch = user-set</pre>
+    <h3>Loopholes this run found</h3>
+    <ol class="notes">
+      <li><span><b>Free overdraft.</b> The ledger lets cash go negative at no cost, so holding investments while overdrawn beats selling. Charge interest (8% a year here) or forbid it.</span></li>
+      <li><span><b>Free improvements.</b> A certain 10% pay rise and a costless spending cut help every profile, so an agent always takes them. Make raises a chance event and give spending cuts a preference cost.</span></li>
+      <li><span><b>Life choices never pay in cash.</b> Without a preference term the agent never studies, starts a business, retires early or has a child. Fix the branch first, then optimise the levers inside it.</span></li>
+      <li><span><b>Students study forever.</b> Their do-nothing path is ten more years on a student budget. Add a graduation event or force a work decision.</span></li>
+      <li><span><b>Structure the data lacks.</b> There is no household-size effect on spending, no pay rise with age and no city effect on pay. Child costs, career progression and relocation pay are assumptions and should be labelled as such.</span></li>
+    </ol>
+  </section>
+
+  <section id="files" aria-labelledby="h-files">
+    <div class="section-head">
+      <div class="eyebrow">Reproduce</div>
+      <h2 id="h-files">Files and how to rerun</h2>
+      <p>Everything comes from one script. It builds on the replay study in <code>analysis/analyze_mdp.py</code>, which it leaves untouched. Change the assumptions in the dict <code>A</code> at the top and rerun; it takes about two and a half minutes.</p>
+    </div>
+    <pre class="code">python analysis/action_importance/action_importance.py</pre>
+    <div class="files">
+      <div><code>results/calibration.json</code><span>Transition parameters for the environment, plus every assumption used</span></div>
+      <div><code>results/action_ranking.csv</code><span>One row per intervention: counts, deltas, tier, character</span></div>
+      <div><code>results/action_by_status.csv</code><span>The same effects, split by employment status</span></div>
+      <div><code>results/action_effects_by_profile.csv</code><span>Per-profile deltas for every intervention</span></div>
+      <div><code>results/baseline_by_profile.csv</code><span>Shortfall risk, goal odds and net worth if nothing changes</span></div>
+      <div><code>results/backtest.json</code><span>2025 → 2026 out-of-sample check</span></div>
+      <div><code>results/state_importance.csv</code><span>Permutation importance of starting-state variables</span></div>
+      <div><code>results/sensitivity_tiers.csv</code><span>Tiers under pessimistic, reference and optimistic assumptions</span></div>
+    </div>
+  </section>
+
+  <footer>Synthetic data only. These results describe this simulator under the stated assumptions. They are not forecasts, causal estimates or financial advice.</footer>
+</div>
+
+<div class="tt" id="tt" role="tooltip" hidden></div>
+
+<script type="application/json" id="report-data">{"actions":[{"id":"negotiate_raise","label":"Pay rise +10% (certain)","role":"financial_lever","tier":1,"character":"dominant (no downside)","catalogue":"S012, S013","basis":"assumed +10%, certain","description":"Pay rise of 10% from month 0.","eligible":908,"better":908,"worse":0,"material":908,"fixed":14,"created":0,"gained":23,"lost":0,"dbreach":-1.63,"dgoal":2.62,"dnw":93230.0},{"id":"move_to_cheaper_flat","label":"Flat 20% cheaper","role":"financial_lever","tier":1,"character":"trade-off","catalogue":"S039","basis":"assumed rent -20% and moving cost","description":"Any household moves to a flat 20% cheaper.","eligible":1200,"better":619,"worse":2,"material":619,"fixed":38,"created":0,"gained":52,"lost":0,"dbreach":-3.35,"dgoal":3.92,"dnw":48285.0},{"id":"relocate_to_cheapest_city","label":"Move to cheapest-rent city","role":"financial_lever","tier":1,"character":"trade-off","catalogue":"S021, S022, S088","basis":"data: city rent and living-cost effects; income unaffected by city","description":"Move to the city with the lowest modelled rent (St Gallen in this data).","eligible":1089,"better":521,"worse":3,"material":522,"fixed":37,"created":2,"gained":47,"lost":0,"dbreach":-3.34,"dgoal":3.97,"dnw":45543.0},{"id":"move_to_shared_flat","label":"Single → shared flat","role":"financial_lever","tier":1,"character":"dominant (no downside)","catalogue":"S032, S049","basis":"data: household rent multipliers; assumed moving cost","description":"Single household moves into shared housing.","eligible":472,"better":312,"worse":0,"material":312,"fixed":17,"created":0,"gained":26,"lost":0,"dbreach":-3.87,"dgoal":4.71,"dnw":66967.0},{"id":"invest_excess_with_top_up","label":"Invest excess + sell when low","role":"financial_lever","tier":1,"character":"trade-off","catalogue":"S056, S061, S068","basis":"invest_excess_cash plus the top-up rule","description":"Invest cash above six months of outgoings, then sell back whenever cash drops below one month.","eligible":1007,"better":233,"worse":28,"material":258,"fixed":33,"created":0,"gained":15,"lost":16,"dbreach":-3.5,"dgoal":-0.5,"dnw":18211.0},{"id":"cut_spending_10pct","label":"Living costs −10%","role":"financial_lever","tier":1,"character":"dominant (no downside)","catalogue":"S045, S047, S050","basis":"assumed -10% of non-rent living costs","description":"Cut non-rent living costs by 10% (about CHF 150 a month here).","eligible":1200,"better":256,"worse":0,"material":256,"fixed":9,"created":0,"gained":22,"lost":0,"dbreach":-1.13,"dgoal":1.45,"dnw":19013.0},{"id":"liquidate_investments","label":"Sell all investments now","role":"financial_lever","tier":1,"character":"trade-off","catalogue":"S060, S068","basis":"no fees, immediate access","description":"Sell the whole portfolio into cash at month 0.","eligible":1199,"better":85,"worse":228,"material":256,"fixed":33,"created":0,"gained":10,"lost":10,"dbreach":-3.13,"dgoal":-0.51,"dnw":-12676.0},{"id":"invest_excess_cash","label":"Invest excess cash, one-shot","role":"financial_lever","tier":1,"character":"trade-off","catalogue":"S056, S061","basis":"assumed 4% return, 10% volatility; 6-month buffer","description":"Move cash above six months of outgoings into the portfolio.","eligible":1007,"better":150,"worse":149,"material":246,"fixed":0,"created":48,"gained":14,"lost":16,"dbreach":4.84,"dgoal":-0.49,"dnw":14594.0},{"id":"sell_investments_when_cash_low","label":"Sell investments when low","role":"financial_lever","tier":1,"character":"dominant (no downside)","catalogue":"S060, S068","basis":"rule: sell below 1 month of outgoings, refill to 3","description":"Closed-loop rule: whenever cash drops below one month of outgoings, sell investments to restore three.","eligible":1199,"better":97,"worse":0,"material":97,"fixed":40,"created":0,"gained":1,"lost":0,"dbreach":-3.62,"dgoal":0.08,"dnw":0.0},{"id":"take_full_time_job","label":"Take a full-time job","role":"financial_lever","tier":1,"character":"dominant (no downside)","catalogue":"S011, S014 exit","basis":"data: entry pay = employed p25; assumed 3-month search","description":"Student or unemployed person starts a full-time job.","eligible":76,"better":76,"worse":0,"material":76,"fixed":72,"created":0,"gained":74,"lost":0,"dbreach":-94.34,"dgoal":97.62,"dnw":742188.0},{"id":"part_time_to_full_time","label":"Part-time → full-time","role":"financial_lever","tier":2,"character":"dominant (no downside)","catalogue":"S020","basis":"data: employed/part-time median income ratio","description":"Part-time worker moves to full-time.","eligible":120,"better":120,"worse":0,"material":120,"fixed":21,"created":0,"gained":43,"lost":0,"dbreach":-17.53,"dgoal":35.28,"dnw":470001.0},{"id":"invest_half_of_surplus","label":"Invest half of each surplus","role":"financial_lever","tier":3,"character":"trade-off","catalogue":"S052, S062","basis":"assumed share and buffer","description":"Each month, invest half of any positive net flow while cash exceeds a 3-month buffer.","eligible":1200,"better":11,"worse":34,"material":44,"fixed":0,"created":2,"gained":2,"lost":20,"dbreach":0.13,"dgoal":-1.62,"dnw":25117.0},{"id":"take_personal_loan_20k","label":"Borrow CHF 20k","role":"financial_lever","tier":3,"character":"no financial upside","catalogue":"S076, S079, S009","basis":"assumed CHF 20k at 6.5% over 60 months","description":"Borrow CHF 20k now and repay it over five years.","eligible":1200,"better":0,"worse":23,"material":23,"fixed":0,"created":4,"gained":0,"lost":2,"dbreach":0.26,"dgoal":-0.55,"dnw":-3479.0},{"id":"repay_debt_from_cash","label":"Repay loan from spare cash","role":"financial_lever","tier":3,"character":"dominant (no downside)","catalogue":"S040, S072, S080","basis":"assumed 3-month buffer kept","description":"Repay as much loan principal as cash above a 3-month buffer allows.","eligible":267,"better":11,"worse":0,"material":11,"fixed":0,"created":0,"gained":3,"lost":0,"dbreach":-0.41,"dgoal":0.76,"dnw":3246.0},{"id":"refinance_minus_2pts","label":"Refinance loan −2 pts","role":"financial_lever","tier":3,"character":"dominant (no downside)","catalogue":"S074, S077","basis":"assumed -2 points, no fees","description":"Refinance the loan two percentage points cheaper.","eligible":283,"better":1,"worse":0,"material":1,"fixed":0,"created":0,"gained":2,"lost":0,"dbreach":-0.26,"dgoal":0.35,"dnw":2041.0},{"id":"buy_car_cash","label":"Buy a CHF 25k car","role":"life_choice","tier":1,"character":"no financial upside","catalogue":"S042, S047","basis":"assumed price and running cost","description":"Buy a CHF 25k car from cash and run it for CHF 400 a month.","eligible":1200,"better":0,"worse":909,"material":909,"fixed":0,"created":232,"gained":0,"lost":114,"dbreach":19.06,"dgoal":-9.88,"dnw":-75478.0},{"id":"reduce_workload_80pct","label":"Cut workload to 80%","role":"life_choice","tier":1,"character":"no financial upside","catalogue":"S017, S087, S096","basis":"assumed income x0.8","description":"Employed or self-employed person cuts workload to 80%.","eligible":788,"better":0,"worse":788,"material":788,"fixed":0,"created":43,"gained":0,"lost":69,"dbreach":5.18,"dgoal":-8.81,"dnw":-204420.0},{"id":"start_business","label":"Start a business","role":"life_choice","tier":1,"character":"no financial upside","catalogue":"S111, S115","basis":"data: SE/employed income ratio, SE volatility; assumed cost and delay","description":"Leave work, 12 months without revenue, CHF 15k set-up, then self-employed income.","eligible":702,"better":0,"worse":702,"material":702,"fixed":0,"created":405,"gained":0,"lost":138,"dbreach":57.55,"dgoal":-18.93,"dnw":-159451.0},{"id":"full_time_masters","label":"Full-time master's","role":"life_choice","tier":1,"character":"trade-off","catalogue":"S001","basis":"data: S001 tuition, student income; assumed +10% premium","description":"Two-year master's on a student budget, then a job paying 10% more.","eligible":308,"better":101,"worse":261,"material":308,"fixed":1,"created":250,"gained":32,"lost":30,"dbreach":80.59,"dgoal":0.37,"dnw":-81271.0},{"id":"lifestyle_inflation_10pct","label":"Living costs +10%","role":"life_choice","tier":1,"character":"no financial upside","catalogue":"S043, S044","basis":"assumed +10% of non-rent living costs","description":"Raise non-rent living costs by 10%.","eligible":1200,"better":0,"worse":269,"material":269,"fixed":0,"created":21,"gained":0,"lost":11,"dbreach":1.49,"dgoal":-1.53,"dnw":-19045.0},{"id":"have_child","label":"Have a child","role":"life_choice","tier":2,"character":"no financial upside","catalogue":"S082, S083","basis":"assumed child cost and leave; data has no household-size cost effect","description":"Couple or family aged 25-45 adds CHF 1,800 a month of costs and 4 months on 80% pay.","eligible":213,"better":0,"worse":213,"material":213,"fixed":0,"created":56,"gained":0,"lost":52,"dbreach":25.88,"dgoal":-25.23,"dnw":-235228.0},{"id":"retire_early","label":"Retire early (58+)","role":"life_choice","tier":2,"character":"no financial upside","catalogue":"S091","basis":"data: retired median income","description":"Worker aged 58+ retires now on the typical retired income.","eligible":172,"better":0,"worse":155,"material":155,"fixed":0,"created":19,"gained":0,"lost":36,"dbreach":11.85,"dgoal":-22.7,"dnw":-417916.0},{"id":"rent_alone","label":"Shared flat → rent alone","role":"life_choice","tier":2,"character":"no financial upside","catalogue":"S031","basis":"data: household rent multipliers","description":"Shared-housing household moves to a flat of its own.","eligible":139,"better":0,"worse":93,"material":93,"fixed":0,"created":4,"gained":0,"lost":4,"dbreach":3.39,"dgoal":-3.45,"dnw":-73015.0},{"id":"inflation_2pct_no_raise","label":"Costs +2%/yr over pay","role":"exogenous_shock","tier":1,"character":"no financial upside","catalogue":"S101, S106, S108","basis":"assumed +2%/yr on rent and living costs, flat pay","description":"Rent and living costs grow 2% a year faster than pay.","eligible":1200,"better":0,"worse":628,"material":628,"fixed":0,"created":53,"gained":0,"lost":19,"dbreach":4.01,"dgoal":-1.96,"dnw":-47352.0},{"id":"rent_increase_15pct","label":"Rent +15%","role":"exogenous_shock","tier":1,"character":"no financial upside","catalogue":"S038, S109","basis":"assumed +15%","description":"Landlord raises rent by 15%.","eligible":1200,"better":0,"worse":519,"material":519,"fixed":0,"created":47,"gained":0,"lost":46,"dbreach":3.61,"dgoal":-3.57,"dnw":-37831.0},{"id":"job_loss_6m","label":"6 months out of work","role":"exogenous_shock","tier":1,"character":"no financial upside","catalogue":"S014, S104","basis":"data: unemployed median income","description":"Six months on the typical unemployed income, then back to the old job.","eligible":908,"better":0,"worse":301,"material":301,"fixed":0,"created":142,"gained":0,"lost":30,"dbreach":15.51,"dgoal":-3.5,"dnw":-39658.0},{"id":"market_crash_30pct","label":"Portfolio −30%","role":"exogenous_shock","tier":1,"character":"no financial upside","catalogue":"S065, S105","basis":"assumed -30%","description":"Portfolio loses 30% at month 0.","eligible":1199,"better":0,"worse":264,"material":264,"fixed":0,"created":0,"gained":0,"lost":30,"dbreach":0.0,"dgoal":-2.3,"dnw":-13654.0},{"id":"emergency_expense_10k","label":"CHF 10k emergency bill","role":"exogenous_shock","tier":2,"character":"no financial upside","catalogue":"S048, S055","basis":"assumed CHF 10k","description":"Unplanned CHF 10k bill in month 0.","eligible":1200,"better":0,"worse":222,"material":222,"fixed":0,"created":45,"gained":0,"lost":12,"dbreach":3.56,"dgoal":-1.71,"dnw":-10000.0},{"id":"rate_hike_2pts","label":"Loan rate +2 pts","role":"exogenous_shock","tier":3,"character":"no financial upside","catalogue":"S073, S102","basis":"assumed +2 points on a variable rate","description":"Loan rate rises two percentage points.","eligible":283,"better":0,"worse":3,"material":3,"fixed":0,"created":0,"gained":0,"lost":0,"dbreach":0.3,"dgoal":-0.39,"dnw":-2112.0}],"heat":{"take_full_time_job":{"student":{"d":-92.1,"n":39,"better":1.0},"unemployed":{"d":-96.7,"n":37,"better":1.0}},"part_time_to_full_time":{"part_time":{"d":-17.5,"n":120,"better":1.0}},"negotiate_raise":{"employed":{"d":-0.5,"n":682,"better":1.0},"part_time":{"d":-6.6,"n":120,"better":1.0},"self_employed":{"d":-3.1,"n":106,"better":1.0}},"reduce_workload_80pct":{"employed":{"d":3.7,"n":682,"better":0.0},"self_employed":{"d":14.6,"n":106,"better":0.0}},"start_business":{"employed":{"d":58.4,"n":600,"better":0.0},"part_time":{"d":52.7,"n":102,"better":0.0}},"full_time_masters":{"employed":{"d":94.1,"n":236,"better":0.157},"part_time":{"d":69.8,"n":39,"better":0.795},"student":{"d":-3.0,"n":33,"better":1.0}},"retire_early":{"employed":{"d":14.4,"n":129,"better":0.0},"part_time":{"d":3.9,"n":24,"better":0.0},"self_employed":{"d":4.7,"n":19,"better":0.0}},"job_loss_6m":{"employed":{"d":15.4,"n":682,"better":0.0},"part_time":{"d":14.8,"n":120,"better":0.0},"self_employed":{"d":17.0,"n":106,"better":0.0}},"move_to_shared_flat":{"employed":{"d":0.0,"n":264,"better":0.496},"part_time":{"d":-14.6,"n":42,"better":1.0},"retired":{"d":-9.1,"n":94,"better":0.957},"self_employed":{"d":-8.9,"n":41,"better":0.439},"student":{"d":0.0,"n":15,"better":1.0},"unemployed":{"d":0.0,"n":16,"better":1.0}},"move_to_cheaper_flat":{"employed":{"d":-0.5,"n":682,"better":0.331},"part_time":{"d":-8.8,"n":120,"better":0.858},"retired":{"d":-10.7,"n":216,"better":0.801},"self_employed":{"d":-3.2,"n":106,"better":0.396},"student":{"d":0.0,"n":39,"better":1.0},"unemployed":{"d":0.0,"n":37,"better":0.973}},"relocate_to_cheapest_city":{"employed":{"d":-0.2,"n":615,"better":0.34},"part_time":{"d":-9.0,"n":109,"better":0.734},"retired":{"d":-11.5,"n":197,"better":0.726},"self_employed":{"d":-2.5,"n":98,"better":0.378},"student":{"d":0.0,"n":36,"better":0.806},"unemployed":{"d":0.0,"n":34,"better":0.676}},"rent_alone":{"employed":{"d":0.0,"n":75,"better":0.0},"part_time":{"d":7.2,"n":13,"better":0.0},"retired":{"d":11.7,"n":25,"better":0.0},"self_employed":{"d":5.4,"n":16,"better":0.0},"student":{"d":0.0,"n":3,"better":0.0},"unemployed":{"d":0.0,"n":7,"better":0.0}},"rent_increase_15pct":{"employed":{"d":0.6,"n":682,"better":0.0},"part_time":{"d":11.2,"n":120,"better":0.0},"retired":{"d":10.1,"n":216,"better":0.0},"self_employed":{"d":4.1,"n":106,"better":0.0},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"cut_spending_10pct":{"employed":{"d":-0.2,"n":682,"better":0.062},"part_time":{"d":-2.5,"n":120,"better":0.483},"retired":{"d":-3.5,"n":216,"better":0.505},"self_employed":{"d":-1.5,"n":106,"better":0.226},"student":{"d":0.0,"n":39,"better":0.231},"unemployed":{"d":0.0,"n":37,"better":0.378}},"lifestyle_inflation_10pct":{"employed":{"d":0.1,"n":682,"better":0.0},"part_time":{"d":4.6,"n":120,"better":0.0},"retired":{"d":4.6,"n":216,"better":0.0},"self_employed":{"d":1.5,"n":106,"better":0.0},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"buy_car_cash":{"employed":{"d":17.6,"n":682,"better":0.0},"part_time":{"d":27.9,"n":120,"better":0.0},"retired":{"d":22.0,"n":216,"better":0.0},"self_employed":{"d":25.8,"n":106,"better":0.0},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"emergency_expense_10k":{"employed":{"d":3.4,"n":682,"better":0.0},"part_time":{"d":7.4,"n":120,"better":0.0},"retired":{"d":3.2,"n":216,"better":0.0},"self_employed":{"d":3.8,"n":106,"better":0.0},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"invest_excess_cash":{"employed":{"d":0.4,"n":563,"better":0.057},"part_time":{"d":9.4,"n":100,"better":0.38},"retired":{"d":15.9,"n":202,"better":0.361},"self_employed":{"d":5.8,"n":86,"better":0.081},"student":{"d":0.0,"n":24,"better":0.0},"unemployed":{"d":0.0,"n":32,"better":0.0}},"invest_half_of_surplus":{"employed":{"d":0.0,"n":682,"better":0.006},"part_time":{"d":0.2,"n":120,"better":0.033},"retired":{"d":0.2,"n":216,"better":0.005},"self_employed":{"d":0.7,"n":106,"better":0.019},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"liquidate_investments":{"employed":{"d":-0.4,"n":682,"better":0.013},"part_time":{"d":-6.9,"n":120,"better":0.15},"retired":{"d":-11.5,"n":216,"better":0.213},"self_employed":{"d":-1.3,"n":106,"better":0.066},"student":{"d":0.0,"n":38,"better":0.026},"unemployed":{"d":0.0,"n":37,"better":0.108}},"sell_investments_when_cash_low":{"employed":{"d":-0.4,"n":682,"better":0.006},"part_time":{"d":-7.6,"n":120,"better":0.125},"retired":{"d":-13.6,"n":216,"better":0.245},"self_employed":{"d":-1.4,"n":106,"better":0.057},"student":{"d":-0.0,"n":38,"better":0.079},"unemployed":{"d":-0.7,"n":37,"better":0.432}},"invest_excess_with_top_up":{"employed":{"d":-0.4,"n":563,"better":0.064},"part_time":{"d":-6.5,"n":100,"better":0.49},"retired":{"d":-12.3,"n":202,"better":0.579},"self_employed":{"d":-1.1,"n":86,"better":0.128},"student":{"d":-0.6,"n":24,"better":0.083},"unemployed":{"d":-2.0,"n":32,"better":0.562}},"market_crash_30pct":{"employed":{"d":0.0,"n":682,"better":0.0},"part_time":{"d":0.0,"n":120,"better":0.0},"retired":{"d":0.0,"n":216,"better":0.0},"self_employed":{"d":0.0,"n":106,"better":0.0},"student":{"d":0.0,"n":38,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"repay_debt_from_cash":{"employed":{"d":-0.2,"n":152,"better":0.026},"part_time":{"d":-0.7,"n":28,"better":0.036},"retired":{"d":-1.1,"n":54,"better":0.111},"self_employed":{"d":-0.2,"n":20,"better":0.0},"student":{"d":0.0,"n":8,"better":0.0},"unemployed":{"d":0.0,"n":5,"better":0.0}},"refinance_minus_2pts":{"employed":{"d":-0.1,"n":162,"better":0.006},"part_time":{"d":-0.6,"n":31,"better":0.0},"retired":{"d":-0.6,"n":55,"better":0.0},"self_employed":{"d":-0.3,"n":21,"better":0.0},"student":{"d":0.0,"n":9,"better":0.0},"unemployed":{"d":0.0,"n":5,"better":0.0}},"rate_hike_2pts":{"employed":{"d":0.1,"n":162,"better":0.0},"part_time":{"d":0.9,"n":31,"better":0.0},"retired":{"d":0.7,"n":55,"better":0.0},"self_employed":{"d":0.5,"n":21,"better":0.0},"student":{"d":0.0,"n":9,"better":0.0},"unemployed":{"d":0.0,"n":5,"better":0.0}},"take_personal_loan_20k":{"employed":{"d":0.0,"n":682,"better":0.0},"part_time":{"d":0.8,"n":120,"better":0.0},"retired":{"d":0.8,"n":216,"better":0.0},"self_employed":{"d":0.3,"n":106,"better":0.0},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}},"have_child":{"employed":{"d":16.1,"n":146,"better":0.0},"part_time":{"d":57.8,"n":32,"better":0.0},"self_employed":{"d":59.5,"n":22,"better":0.0},"student":{"d":0.0,"n":8,"better":0.0},"unemployed":{"d":0.0,"n":5,"better":0.0}},"inflation_2pct_no_raise":{"employed":{"d":0.5,"n":682,"better":0.0},"part_time":{"d":11.5,"n":120,"better":0.0},"retired":{"d":12.1,"n":216,"better":0.0},"self_employed":{"d":4.2,"n":106,"better":0.0},"student":{"d":0.0,"n":39,"better":0.0},"unemployed":{"d":0.0,"n":37,"better":0.0}}},"importance":{"nw_median":{"r2":0.982,"items":[{"f":"income","s":0.9437},{"f":"rent","s":0.0377},{"f":"investments","s":0.01},{"f":"cash","s":0.007},{"f":"age","s":0.0008},{"f":"other_living","s":0.0005},{"f":"debt","s":0.0001},{"f":"loan_rate","s":0.0001},{"f":"household_type","s":0.0001},{"f":"has_medium_goal","s":0.0},{"f":"goal_is_emergency","s":0.0},{"f":"employment_status","s":0.0},{"f":"city","s":0.0}]},"p_breach":{"r2":0.841,"items":[{"f":"income","s":0.8361},{"f":"rent","s":0.1226},{"f":"cash","s":0.033},{"f":"age","s":0.0054},{"f":"debt","s":0.0011},{"f":"employment_status","s":0.0006},{"f":"loan_rate","s":0.0005},{"f":"investments","s":0.0003},{"f":"city","s":0.0002},{"f":"goal_is_emergency","s":0.0001},{"f":"has_medium_goal","s":0.0001},{"f":"other_living","s":0.0},{"f":"household_type","s":0.0}]},"p_high_goal":{"r2":0.805,"items":[{"f":"income","s":0.7661},{"f":"investments","s":0.1173},{"f":"rent","s":0.0731},{"f":"cash","s":0.0257},{"f":"debt","s":0.0085},{"f":"age","s":0.0025},{"f":"other_living","s":0.0021},{"f":"loan_rate","s":0.0021},{"f":"employment_status","s":0.002},{"f":"household_type","s":0.0005},{"f":"goal_is_emergency","s":0.0001},{"f":"city","s":0.0001},{"f":"has_medium_goal","s":0.0}]},"p_med_goal":{"r2":0.743,"items":[{"f":"income","s":0.852},{"f":"rent","s":0.0636},{"f":"investments","s":0.0544},{"f":"cash","s":0.0135},{"f":"other_living","s":0.013},{"f":"employment_status","s":0.0012},{"f":"city","s":0.001},{"f":"loan_rate","s":0.0006},{"f":"debt","s":0.0003},{"f":"age","s":0.0002},{"f":"goal_is_emergency","s":0.0002},{"f":"has_medium_goal","s":0.0},{"f":"household_type","s":0.0}]}},"sensitivity":[{"id":"buy_car_cash","label":"Buy a CHF 25k car","role":"life_choice","ref":1,"pes":1,"opt":1,"mref":0.758,"mpes":0.769,"mopt":0.752},{"id":"cut_spending_10pct","label":"Living costs −10%","role":"financial_lever","ref":1,"pes":1,"opt":1,"mref":0.213,"mpes":0.224,"mopt":0.203},{"id":"emergency_expense_10k","label":"CHF 10k emergency bill","role":"exogenous_shock","ref":2,"pes":2,"opt":2,"mref":0.185,"mpes":0.182,"mopt":0.181},{"id":"full_time_masters","label":"Full-time master's","role":"life_choice","ref":1,"pes":1,"opt":1,"mref":0.257,"mpes":0.257,"mopt":0.252},{"id":"have_child","label":"Have a child","role":"life_choice","ref":2,"pes":2,"opt":2,"mref":0.178,"mpes":0.178,"mopt":0.178},{"id":"inflation_2pct_no_raise","label":"Costs +2%/yr over pay","role":"exogenous_shock","ref":1,"pes":1,"opt":1,"mref":0.523,"mpes":0.532,"mopt":0.502},{"id":"invest_excess_cash","label":"Invest excess cash, one-shot","role":"financial_lever","ref":1,"pes":2,"opt":1,"mref":0.205,"mpes":0.192,"mopt":0.276},{"id":"invest_excess_with_top_up","label":"Invest excess + sell when low","role":"financial_lever","ref":1,"pes":2,"opt":1,"mref":0.215,"mpes":0.167,"mopt":0.309},{"id":"invest_half_of_surplus","label":"Invest half of each surplus","role":"financial_lever","ref":3,"pes":3,"opt":1,"mref":0.037,"mpes":0.032,"mopt":0.548},{"id":"job_loss_6m","label":"6 months out of work","role":"exogenous_shock","ref":1,"pes":1,"opt":1,"mref":0.251,"mpes":0.262,"mopt":0.242},{"id":"lifestyle_inflation_10pct","label":"Living costs +10%","role":"life_choice","ref":1,"pes":1,"opt":1,"mref":0.224,"mpes":0.232,"mopt":0.211},{"id":"liquidate_investments","label":"Sell all investments now","role":"financial_lever","ref":1,"pes":2,"opt":1,"mref":0.213,"mpes":0.12,"mopt":0.314},{"id":"market_crash_30pct","label":"Portfolio −30%","role":"exogenous_shock","ref":1,"pes":2,"opt":1,"mref":0.22,"mpes":0.189,"mopt":0.252},{"id":"move_to_cheaper_flat","label":"Flat 20% cheaper","role":"financial_lever","ref":1,"pes":1,"opt":1,"mref":0.516,"mpes":0.254,"mopt":0.693},{"id":"move_to_shared_flat","label":"Single → shared flat","role":"financial_lever","ref":1,"pes":1,"opt":1,"mref":0.26,"mpes":0.258,"mopt":0.261},{"id":"negotiate_raise","label":"Pay rise +10% (certain)","role":"financial_lever","ref":1,"pes":1,"opt":1,"mref":0.757,"mpes":0.757,"mopt":0.756},{"id":"part_time_to_full_time","label":"Part-time → full-time","role":"financial_lever","ref":2,"pes":2,"opt":2,"mref":0.1,"mpes":0.1,"mopt":0.1},{"id":"rate_hike_2pts","label":"Loan rate +2 pts","role":"exogenous_shock","ref":3,"pes":3,"opt":3,"mref":0.002,"mpes":0.002,"mopt":0.002},{"id":"reduce_workload_80pct","label":"Cut workload to 80%","role":"life_choice","ref":1,"pes":1,"opt":1,"mref":0.657,"mpes":0.657,"mopt":0.657},{"id":"refinance_minus_2pts","label":"Refinance loan −2 pts","role":"financial_lever","ref":3,"pes":3,"opt":3,"mref":0.001,"mpes":0.0,"mopt":0.0},{"id":"relocate_to_cheapest_city","label":"Move to cheapest-rent city","role":"financial_lever","ref":1,"pes":1,"opt":1,"mref":0.435,"mpes":0.428,"mopt":0.435},{"id":"rent_alone","label":"Shared flat → rent alone","role":"life_choice","ref":2,"pes":2,"opt":2,"mref":0.078,"mpes":0.08,"mopt":0.073},{"id":"rent_increase_15pct","label":"Rent +15%","role":"exogenous_shock","ref":1,"pes":1,"opt":1,"mref":0.432,"mpes":0.448,"mopt":0.411},{"id":"repay_debt_from_cash","label":"Repay loan from spare cash","role":"financial_lever","ref":3,"pes":3,"opt":3,"mref":0.009,"mpes":0.007,"mopt":0.009},{"id":"retire_early","label":"Retire early (58+)","role":"life_choice","ref":2,"pes":2,"opt":2,"mref":0.129,"mpes":0.129,"mopt":0.128},{"id":"sell_investments_when_cash_low","label":"Sell investments when low","role":"financial_lever","ref":1,"pes":2,"opt":1,"mref":0.081,"mpes":0.085,"mopt":0.072},{"id":"start_business","label":"Start a business","role":"life_choice","ref":1,"pes":1,"opt":1,"mref":0.585,"mpes":0.585,"mopt":0.585},{"id":"take_full_time_job","label":"Take a full-time job","role":"financial_lever","ref":1,"pes":1,"opt":1,"mref":0.063,"mpes":0.063,"mopt":0.063},{"id":"take_personal_loan_20k","label":"Borrow CHF 20k","role":"financial_lever","ref":3,"pes":3,"opt":3,"mref":0.019,"mpes":0.022,"mopt":0.018}],"best":[{"id":"cut_spending_10pct","label":"Living costs −10%","employed":1,"part_time":0,"retired":0,"self_employed":0,"student":0,"unemployed":0,"all":1},{"id":"invest_excess_cash","label":"Invest excess cash, one-shot","employed":8,"part_time":0,"retired":8,"self_employed":2,"student":0,"unemployed":0,"all":18},{"id":"invest_excess_with_top_up","label":"Invest excess + sell when low","employed":1,"part_time":0,"retired":22,"self_employed":2,"student":0,"unemployed":0,"all":25},{"id":"invest_half_of_surplus","label":"Invest half of each surplus","employed":235,"part_time":0,"retired":2,"self_employed":40,"student":0,"unemployed":0,"all":277},{"id":"liquidate_investments","label":"Sell all investments now","employed":1,"part_time":0,"retired":4,"self_employed":1,"student":0,"unemployed":0,"all":6},{"id":"move_to_cheaper_flat","label":"Flat 20% cheaper","employed":125,"part_time":0,"retired":40,"self_employed":18,"student":0,"unemployed":0,"all":183},{"id":"move_to_shared_flat","label":"Single → shared flat","employed":143,"part_time":0,"retired":68,"self_employed":24,"student":0,"unemployed":0,"all":235},{"id":"part_time_to_full_time","label":"Part-time → full-time","employed":0,"part_time":120,"retired":0,"self_employed":0,"student":0,"unemployed":0,"all":120},{"id":"relocate_to_cheapest_city","label":"Move to cheapest-rent city","employed":167,"part_time":0,"retired":68,"self_employed":18,"student":0,"unemployed":0,"all":253},{"id":"sell_investments_when_cash_low","label":"Sell investments when low","employed":1,"part_time":0,"retired":4,"self_employed":1,"student":0,"unemployed":0,"all":6},{"id":"take_full_time_job","label":"Take a full-time job","employed":0,"part_time":0,"retired":0,"self_employed":0,"student":39,"unemployed":37,"all":76}],"backtest":{"design":"calibrate on 2025-01..2025-12, simulate 2026-01..2026-12 from recorded 2025-12 cash (no debt service, as in the ledger)","profiles_breaching_2026_observed":61,"profiles_breaching_2026_expected":61.2,"profiles_breaching_2026_90pct_interval":[60.0,63.0],"breach_auc":1.0,"breach_brier":0.0011,"final_cash_coverage_50pct":0.5075,"final_cash_coverage_90pct":0.8925,"final_cash_pit_deciles":[95,100,110,114,107,140,135,132,126,141],"breach_by_status_observed_vs_expected":{"employed":{"obs":1,"exp":0.2},"part_time":{"obs":3,"exp":2.9},"retired":{"obs":4,"exp":4.8},"self_employed":{"obs":1,"exp":1.0},"student":{"obs":32,"exp":32.0},"unemployed":{"obs":20,"exp":20.4}}},"calibration":{"calibration_window":"2025-01..2026-12","net_flow_model":"net_t = income_t - rent_t - other_living_t - fees_t(student; Feb, Sep) - shock_t + bonus_t(Dec; employed, self-employed) + noise_t + offset_i - debt_service_t; income grows at pay_growth, rent/living costs/fees/shocks at cost_inflation","drift":{"pay_growth_per_year":0.0142,"cost_inflation_per_year":0.0101,"note":"fitted on per-profile trends of regular-month net flow; approximate"},"base_flow_r2_explained_by":{"income":0.9411,"rent":0.0278,"other_living":0.0074},"base_flow_standard_error_chf":{"median":131.9618},"other_living_chf":{"median":1479.9612,"p10":1270.9457,"p90":1749.0819,"corr_with_income":0.2286},"other_living_city_median_chf":{"Basel":1506.6331,"Bern":1489.8904,"Biel":1399.9105,"Fribourg":1337.5886,"Geneva":1609.7839,"Lausanne":1542.2503,"Lucerne":1476.6147,"Lugano":1441.6137,"Neuchatel":1410.0716,"St Gallen":1392.5238,"Winterthur":1511.0811,"Zurich":1647.2492},"noise_sd_chf":{"employed":421.1659,"part_time":288.6993,"retired":424.5129,"student":229.9068,"unemployed":247.7425},"noise_sd_self_employed_share_of_income":0.2385,"shock":{"p_regular_month":0.0448,"p_feb_aug":0.3694,"size_uniform_chf":[453.1267,1779.8919]},"student_fee_chf":{"feb":1050.9815,"sep":846.2255},"december_bonus":{"p":0.5594,"size_share_of_income_uniform":[0.2302,1.0147]},"income_median_by_status_chf":{"employed":7738.465,"part_time":4313.225,"retired":3834.75,"self_employed":7269.765,"student":1200.0,"unemployed":533.09},"entry_salary_chf":5715.0525,"full_time_over_part_time_income":1.7941,"self_employed_over_employed_income":0.9394,"rent_model":{"form":"rent = 2,100-ish x household_mult x city_mult x noise","r2_log":0.6603,"household_mult":{"couple":1.0,"family":0.9967,"shared_housing":0.4637,"single":0.6847},"city_mult":{"Bern":1.0,"Basel":1.0212,"Biel":0.9131,"Fribourg":0.864,"Geneva":1.1592,"Lausanne":0.9902,"Lucerne":1.0429,"Lugano":0.9437,"Neuchatel":0.907,"St Gallen":0.838,"Winterthur":0.9817,"Zurich":1.1354}},"assumptions":{"invest_return":0.04,"invest_vol":0.1,"loan_term":60,"rate_floor":0.01,"overdraft_rate":0.08,"job_search_months":3,"entry_salary_quantile":0.25,"masters_months":24,"masters_premium":0.1,"business_delay":12,"business_cost":15000,"moving_cost":2000,"relocation_cost":3000,"car_price":25000,"car_running":400,"emergency_expense":10000,"new_loan":20000,"new_loan_rate":0.065,"child_cost":1800,"leave_months":4,"leave_income":0.8,"invest_buffer_months":6,"repay_buffer_months":3,"surplus_share":0.5,"surplus_buffer_months":3,"topup_floor_months":1,"topup_target_months":3,"job_loss_months":6,"crash":0.3,"rate_step":0.02,"inflation_extra":0.02,"rent_increase":0.15,"raise_":0.1,"workload_cut":0.2,"spending_change":0.1,"cheaper_flat":0.2,"material":0.1}},"summary":{"horizon":"2025-01..2034-12 (120 months), 200 paths per profile, seed 20261121","baseline_definition":"continue current situation; data-fitted pay growth and cost inflation; loans amortised over 60 months and a 4%/10% portfolio (assumptions)","baseline":{"profiles_with_breach_prob_over_50pct":150,"by_status":{"employed":{"p_breach":0.006,"p_breach_5y":0.004,"p_high_goal":0.97,"p_med_goal":0.952,"nw_median":667704.244},"part_time":{"p_breach":0.175,"p_breach_5y":0.117,"p_high_goal":0.641,"p_med_goal":0.545,"nw_median":194745.599},"retired":{"p_breach":0.219,"p_breach_5y":0.123,"p_high_goal":0.707,"p_med_goal":0.53,"nw_median":219867.721},"self_employed":{"p_breach":0.045,"p_breach_5y":0.028,"p_high_goal":0.856,"p_med_goal":0.868,"nw_median":605214.564},"student":{"p_breach":1.0,"p_breach_5y":0.976,"p_high_goal":0.0,"p_med_goal":0.0,"nw_median":-378317.855},"unemployed":{"p_breach":1.0,"p_breach_5y":0.973,"p_high_goal":0.007,"p_med_goal":0.0,"nw_median":-326547.875}},"mean_p_high_goal":0.8187,"mean_p_med_goal":0.7646},"tier_changes_under_sensitivity":6,"runtime_seconds":147.2}}</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("report-data").textContent);
+  const N = 1200;
+  const MINUS = "−";
+  const A = Object.fromEntries(D.actions.map(a => [a.id, a]));
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const pctOfAll = n => { if (!n) return "0"; const p = 100 * n / N; return p >= 10 ? Math.round(p) + "%" : p.toFixed(1) + "%"; };
+  const signed = (v, d = 1) => { const s = v > 0 ? "+" : v < 0 ? MINUS : ""; return s + Math.abs(v).toFixed(d); };
+  const chf = v => { const s = v > 0 ? "+" : v < 0 ? MINUS : ""; const a = Math.abs(v); const body = a >= 1e6 ? (a / 1e6).toFixed(1) + "M" : a >= 1000 ? Math.round(a / 1000) + "k" : String(Math.round(a)); return s + "CHF " + body; };
+  const int = n => n.toLocaleString("en-US");
+  const STATUS = [
+    ["employed", "Employed"], ["self_employed", "Self-employed"], ["part_time", "Part-time"],
+    ["retired", "Retired"], ["unemployed", "Unemployed"], ["student", "Student"]];
+  const base = D.summary.baseline.by_status;
+  const counts = { employed: 682, self_employed: 106, part_time: 120, retired: 216, unemployed: 37, student: 39 };
+
+  /* ---------- tooltip ---------- */
+  const tt = document.getElementById("tt");
+  function fillTip(a) {
+    tt.replaceChildren();
+    tt.append(el("div", "h", a.label));
+    const row = (val, label, key) => { const r = el("div", "row"); if (key) { const k = el("i", "key"); k.style.background = `var(--${key})`; r.append(k); } r.append(el("b", null, val), el("span", null, label)); tt.append(r); };
+    row(int(a.better), "better off", "better");
+    row(int(a.worse), "worse off", "worse");
+    row(int(a.eligible), "eligible of 1,200");
+    row(`${int(a.fixed)} / ${int(a.created)}`, "shortfalls fixed / created");
+    row(`${int(a.gained)} / ${int(a.lost)}`, "high goals gained / lost");
+    row(signed(a.dbreach) + " pts", "mean change in shortfall risk");
+    row(signed(a.dgoal) + " pts", "mean change in goal odds");
+    row(chf(a.dnw), "median change in 2034 net worth");
+    tt.append(el("div", "foot", `Tier ${a.tier} · ${a.character} · ${a.catalogue} · ${a.basis}`));
+  }
+  function place(x, y) {
+    tt.hidden = false;
+    const w = tt.offsetWidth, h = tt.offsetHeight, pad = 12;
+    let left = x + 16, top = y + 16;
+    if (left + w > innerWidth - pad) left = Math.max(pad, x - w - 16);
+    if (top + h > innerHeight - pad) top = Math.max(pad, y - h - 16);
+    tt.style.left = left + "px"; tt.style.top = top + "px";
+  }
+  function bindTip(node, fill) {
+    node.addEventListener("pointermove", e => { fill(); place(e.clientX, e.clientY); });
+    node.addEventListener("pointerleave", () => { tt.hidden = true; });
+    node.addEventListener("focus", () => { fill(); const r = node.getBoundingClientRect(); place(r.left + Math.min(r.width, 320) / 2, r.bottom - 8); });
+    node.addEventListener("blur", () => { tt.hidden = true; });
+  }
+
+  /* ---------- diverging bars ---------- */
+  function ticks() {
+    const t = el("div", "dv-ticks");
+    const L = el("div", "h"), R = el("div", "h");
+    [[0, "100%"], [25, "75%"], [50, "50%"], [75, "25%"]].forEach(([x, s], i) => { const k = el("i", i % 2 ? "minor" : "", s); k.style.left = x + "%"; L.append(k); });
+    [[25, "25%"], [50, "50%"], [75, "75%"], [100, "100%"]].forEach(([x, s], i) => { const k = el("i", i % 2 ? "" : "minor", s); k.style.left = x + "%"; R.append(k); });
+    const zero = el("div"); zero.style.position = "relative"; const z = el("i", "", "0"); z.style.left = "0"; zero.append(z);
+    t.append(L, zero, R);
+    return t;
+  }
+  function header() {
+    const h = el("div", "dv-head");
+    const right = el("div");
+    const side = el("div", "side"); side.append(el("span", null, "← Worse off"), el("span", null, "Better off →"));
+    right.append(side, ticks());
+    h.append(el("div"), right);
+    return h;
+  }
+  function half(cls, n) {
+    const hf = el("div", "dv-half " + cls);
+    const w = (100 * n / N).toFixed(2) + "%";
+    hf.style.setProperty("--w", w);
+    if (n > 0) hf.append(el("div", "dv-bar"));
+    hf.append(el("span", "dv-val", pctOfAll(n)));
+    return hf;
+  }
+  function barRow(a) {
+    const r = el("div", "dv-row");
+    r.tabIndex = 0; r.setAttribute("role", "listitem");
+    r.setAttribute("aria-label", `${a.label}: ${pctOfAll(a.better)} better off, ${pctOfAll(a.worse)} worse off, ${a.fixed} shortfalls fixed, tier ${a.tier}`);
+    const lab = el("div", "dv-label"); lab.append(el("span", null, a.label), el("span", "tier", "T" + a.tier));
+    const plot = el("div", "dv-plot"); plot.append(half("l", a.worse), el("div", "dv-axis"), half("r", a.better));
+    r.append(lab, plot);
+    bindTip(r, () => fillTip(a));
+    return r;
+  }
+  const GROUPS = [
+    ["financial_lever", "Financial levers", "the agent chooses", (x, y) => y.better - x.better],
+    ["life_choice", "Life choices", "the user chooses", (x, y) => y.worse - x.worse],
+    ["exogenous_shock", "Shocks", "the environment draws", (x, y) => y.worse - x.worse]];
+  const impact = document.getElementById("dv-impact");
+  impact.append(header());
+  for (const [role, title, note, sort] of GROUPS) {
+    const g = el("div", "dv-group"); g.append(el("b", null, title), el("span", null, note));
+    impact.append(g);
+    D.actions.filter(a => a.role === role).sort(sort).forEach(a => impact.append(barRow(a)));
+  }
+  const loop = document.getElementById("dv-loop");
+  loop.append(header());
+  ["invest_excess_cash", "invest_excess_with_top_up", "sell_investments_when_cash_low", "liquidate_investments"].forEach(id => loop.append(barRow(A[id])));
+
+  /* table view for the impact chart */
+  const tbl = document.getElementById("tbl-impact");
+  (() => {
+    const t = el("table"); const th = el("thead"); const hr = el("tr");
+    ["Intervention", "Role", "Tier", "Eligible", "Better", "Worse", "Fixed", "Goals +", "Goals −", "Risk pts", "Net worth"].forEach((h, i) => hr.append(el("th", i > 2 ? "r" : "", h)));
+    th.append(hr); t.append(th);
+    const tb = el("tbody");
+    for (const [role, title, , sort] of GROUPS) {
+      D.actions.filter(a => a.role === role).sort(sort).forEach(a => {
+        const tr = el("tr");
+        tr.append(el("td", null, a.label), el("td", null, title), el("td", null, String(a.tier)));
+        [int(a.eligible), int(a.better), int(a.worse), int(a.fixed), int(a.gained), int(a.lost), signed(a.dbreach), chf(a.dnw)].forEach(v => tr.append(el("td", "r", v)));
+        tb.append(tr);
+      });
+    }
+    t.append(tb); tbl.append(t);
+  })();
+  const btn = document.getElementById("tbl-impact-btn");
+  btn.addEventListener("click", () => { const open = tbl.hidden; tbl.hidden = !open; btn.setAttribute("aria-expanded", String(open)); btn.textContent = open ? "Hide table" : "Show as table"; });
+
+  /* ---------- chips ---------- */
+  const chipsFor = (role, id) => {
+    const box = document.getElementById(id);
+    D.actions.filter(a => a.role === role && a.id !== "rent_alone" && a.id !== "lifestyle_inflation_10pct" && a.id !== "rate_hike_2pts")
+      .sort((x, y) => y.material - x.material)
+      .forEach(a => { const c = el("span", "chip", a.label); c.append(el("span", "n", pctOfAll(a.material))); box.append(c); });
+  };
+  chipsFor("life_choice", "chips-life");
+  chipsFor("exogenous_shock", "chips-shock");
+
+  /* ---------- generator card ---------- */
+  const C = D.calibration;
+  const P = [
+    ["Pay growth", `+${(100 * C.drift.pay_growth_per_year).toFixed(2)}% / yr`, "fitted"],
+    ["Cost inflation", `+${(100 * C.drift.cost_inflation_per_year).toFixed(2)}% / yr`, "fitted"],
+    ["Living costs O", `CHF ${int(Math.round(C.other_living_chf.median))} median`, "fitted"],
+    ["Noise ε, employed", `σ CHF ${Math.round(C.noise_sd_chf.employed)}`, "fitted"],
+    ["Noise ε, self-employed", `σ ${Math.round(100 * C.noise_sd_self_employed_share_of_income)}% of pay`, "fitted"],
+    ["One-off bill", `CHF ${int(Math.round(C.shock.size_uniform_chf[0]))}–${int(Math.round(C.shock.size_uniform_chf[1]))}`, "fitted"],
+    ["December bonus", `${Math.round(100 * C.december_bonus.size_share_of_income_uniform[0])}–${Math.round(100 * C.december_bonus.size_share_of_income_uniform[1])}% of pay`, "fitted"],
+    ["New job pay", `CHF ${int(Math.round(C.entry_salary_chf))}`, "employed p25"],
+  ];
+  const params = document.getElementById("params");
+  P.forEach(([k, v, s]) => { const d = el("div"); const a = el("span", null, k); a.append(el("span", "src", s)); d.append(a, el("span", null, v)); params.append(d); });
+  const reg = (100 * C.shock.p_regular_month).toFixed(1) + "%";
+  const sea = Math.round(100 * C.shock.p_feb_aug) + "%";
+  const bon = Math.round(100 * C.december_bonus.p) + "%";
+  const M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = document.getElementById("months");
+  M.forEach((m, i) => {
+    const hot = [1, 7, 8, 11].includes(i);
+    const c = el("div", "month" + (hot ? " hot" : ""));
+    c.append(el("span", "m", m));
+    if (i === 1 || i === 7) c.append(el("span", "e", `Bill odds ${sea}`)); else c.append(el("span", "e q", `Bill odds ${reg}`));
+    if (i === 1) c.append(el("span", "e", `Student fee CHF ${int(Math.round(C.student_fee_chf.feb))}`));
+    if (i === 8) c.append(el("span", "e", `Student fee CHF ${int(Math.round(C.student_fee_chf.sep))}`));
+    if (i === 11) c.append(el("span", "e", `Bonus odds ${bon}`));
+    months.append(c);
+  });
+
+  /* ---------- meters ---------- */
+  function meters(id, items, maxv) {
+    const box = document.getElementById(id);
+    items.forEach(([name, v, label]) => {
+      const r = el("div", "meter");
+      const tr = el("div", "track"); const f = el("div", "fill"); f.style.width = (100 * v / maxv).toFixed(1) + "%"; tr.append(f);
+      r.append(el("span", null, name), tr, el("span", "v", label));
+      box.append(r);
+    });
+  }
+  const r2 = C.base_flow_r2_explained_by;
+  meters("meters-r2", [["Pay", r2.income, Math.round(100 * r2.income) + "%"], ["Rent", r2.rent, (100 * r2.rent).toFixed(1) + "%"], ["Living costs", r2.other_living, (100 * r2.other_living).toFixed(1) + "%"]], 1);
+  const hm = C.rent_model.household_mult, cm = C.rent_model.city_mult;
+  meters("meters-rent-hh", [["Couple", hm.couple, "1.00"], ["Family", hm.family, hm.family.toFixed(2)],
+    ["Single", hm.single, hm.single.toFixed(2)], ["Shared flat", hm.shared_housing, hm.shared_housing.toFixed(2)]], 1.2);
+  meters("meters-rent-city", Object.entries(cm).sort((x, y) => y[1] - x[1]).filter((_, i, arr) => i < 2 || i >= arr.length - 2 || _[0] === "Bern")
+    .map(([c, v]) => [c, v, v.toFixed(2)]), 1.2);
+  const FEAT = { income: "Monthly pay", rent: "Rent", cash: "Cash", investments: "Investments", debt: "Loan balance", age: "Age", employment_status: "Status, beyond pay", household_type: "Household", city: "City", other_living: "Living costs", loan_rate: "Loan rate", has_medium_goal: "Has a medium goal", goal_is_emergency: "Goal type" };
+  function importance(outcome, id, r2id) {
+    const o = D.importance[outcome];
+    const top = o.items.slice(0, 4).map(x => [FEAT[x.f] || x.f, x.s, (100 * x.s).toFixed(1) + "%"]);
+    const rest = o.items.slice(4).reduce((s, x) => s + x.s, 0);
+    top.push(["Everything else", rest, (100 * rest).toFixed(1) + "%"]);
+    meters(id, top, 1);
+    document.getElementById(r2id).textContent = `Share of importance · model fit R² ${o.r2.toFixed(2)} (5-fold)`;
+  }
+  importance("p_breach", "meters-breach", "r2-breach");
+  importance("p_high_goal", "meters-goal", "r2-goal");
+
+  /* ---------- heat table ---------- */
+  const heat = document.getElementById("heat");
+  (() => {
+    const th = el("thead"); const hr = el("tr"); hr.append(el("th"));
+    STATUS.forEach(([k, name]) => { const c = el("th", null, name); c.append(el("span", "sub", `${counts[k]} · ${(100 * base[k].p_breach).toFixed(base[k].p_breach < 0.1 ? 1 : 0)}% risk`)); hr.append(c); });
+    th.append(hr); heat.append(th);
+    const tb = el("tbody");
+    const groups = [["Financial levers", D.actions.filter(a => a.role === "financial_lever").sort((x, y) => y.better - x.better)],
+                    ["Shocks", D.actions.filter(a => a.role === "exogenous_shock").sort((x, y) => y.worse - x.worse)]];
+    for (const [title, list] of groups) {
+      const g = el("tr", "grp"); const gh = el("th", null, title); gh.colSpan = STATUS.length + 1; g.append(gh); tb.append(g);
+      list.forEach(a => {
+        const tr = el("tr"); tr.append(el("th", "rowh", a.label));
+        STATUS.forEach(([k, name]) => {
+          const cell = D.heat[a.id] && D.heat[a.id][k];
+          if (!cell) { tr.append(el("td", "cell na", "–")); return; }
+          const v = cell.d;
+          const td = el("td", "cell", Math.abs(v) < 0.5 ? "0" : signed(v, 0));
+          const t = Math.min(1, Math.abs(v) / 30) * 60;  /* capped so cell text keeps 4.5:1 in both themes */
+          td.style.background = `color-mix(in oklab, var(${v < 0 ? "--better" : "--worse"}) ${t.toFixed(0)}%, var(--mid))`;
+          td.tabIndex = 0;
+          td.setAttribute("aria-label", `${a.label}, ${name}: ${signed(v)} points, ${cell.n} eligible`);
+          bindTip(td, () => {
+            tt.replaceChildren(el("div", "h", `${a.label} · ${name}`));
+            const add = (b, s) => { const r = el("div", "row"); r.append(el("b", null, b), el("span", null, s)); tt.append(r); };
+            add(signed(v) + " pts", "mean change in shortfall risk");
+            add(int(cell.n), "eligible profiles");
+            add(Math.round(100 * cell.better) + "%", "of them materially better off");
+          });
+          tr.append(td);
+        });
+        tb.append(tr);
+      });
+    }
+    heat.append(tb);
+  })();
+
+  /* ---------- best lever table ---------- */
+  (() => {
+    const t = document.getElementById("best");
+    const th = el("thead"); const hr = el("tr"); hr.append(el("th", null, "Best lever"));
+    STATUS.forEach(([, name]) => hr.append(el("th", "r", name))); hr.append(el("th", "r", "All"));
+    th.append(hr); t.append(th);
+    const tb = el("tbody");
+    D.best.slice().sort((x, y) => y.all - x.all).forEach(b => {
+      const tr = el("tr"); tr.append(el("td", null, b.label));
+      STATUS.forEach(([k]) => tr.append(el("td", "r", b[k] ? int(b[k]) : "–")));
+      tr.append(el("td", "r", int(b.all)));
+      tb.append(tr);
+    });
+    t.append(tb);
+  })();
+
+  /* ---------- backtest ---------- */
+  const B = D.backtest;
+  const tiles = document.getElementById("tiles");
+  [[`${B.profiles_breaching_2026_observed} vs ${B.profiles_breaching_2026_expected.toFixed(1)}`, "profiles short of cash in 2026, recorded vs predicted (90% range " + B.profiles_breaching_2026_90pct_interval.map(Math.round).join("–") + ")"],
+   [Math.round(100 * B.final_cash_coverage_50pct) + "%", "of recorded Dec 2026 balances inside the predicted 50% band (target 50%)"],
+   [Math.round(100 * B.final_cash_coverage_90pct) + "%", "inside the predicted 90% band (target 90%)"]].forEach(([v, l]) => {
+    const t = el("div", "tile"); t.append(el("div", "v", v), el("div", "l", l)); tiles.append(t);
+  });
+  (() => {
+    const t = document.getElementById("bt-status");
+    const th = el("thead"); const hr = el("tr"); hr.append(el("th", null, "Short of cash in 2026"));
+    STATUS.forEach(([, name]) => hr.append(el("th", "r", name))); th.append(hr); t.append(th);
+    const tb = el("tbody");
+    [["Recorded", "obs", 0], ["Predicted", "exp", 1]].forEach(([lab, key, d]) => {
+      const tr = el("tr"); tr.append(el("td", null, lab));
+      STATUS.forEach(([k]) => tr.append(el("td", "r", B.breach_by_status_observed_vs_expected[k][key].toFixed(d))));
+      tb.append(tr);
+    });
+    t.append(tb);
+  })();
+
+  /* ---------- sensitivity ---------- */
+  (() => {
+    const changed = D.sensitivity.filter(s => !(s.ref === s.pes && s.ref === s.opt));
+    document.getElementById("sens-intro").textContent =
+      `The whole analysis was rerun under a pessimistic set (2% returns, 15% volatility, new-job pay at p10, no master's premium, 10% rent saving, higher moving and set-up costs) and an optimistic set (6% returns, p50 pay, 20% premium, 30% rent saving). ${D.sensitivity.length - changed.length} of ${D.sensitivity.length} interventions keep their tier in all three. The ${changed.length} that move all depend on the investment-return assumption.`;
+    const t = document.getElementById("sens");
+    const th = el("thead"); const hr = el("tr");
+    ["Intervention", "Pessimistic", "Reference", "Optimistic"].forEach((h, i) => hr.append(el("th", i ? "r" : "", h)));
+    th.append(hr); t.append(th);
+    const tb = el("tbody");
+    changed.forEach(s => {
+      const tr = el("tr"); tr.append(el("td", null, s.label));
+      [[s.pes, s.mpes], [s.ref, s.mref], [s.opt, s.mopt]].forEach(([tier, m]) => tr.append(el("td", "r", `Tier ${tier} · ${Math.round(100 * m)}%`)));
+      tb.append(tr);
+    });
+    t.append(tb);
+  })();
+})();
+</script>
+
+</body>
+</html>

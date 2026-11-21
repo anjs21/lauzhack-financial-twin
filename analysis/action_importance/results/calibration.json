@@ -1,0 +1,138 @@
+{
+  "calibration_window": "2025-01..2026-12",
+  "net_flow_model": "net_t = income_t - rent_t - other_living_t - fees_t(student; Feb, Sep) - shock_t + bonus_t(Dec; employed, self-employed) + noise_t + offset_i - debt_service_t; income grows at pay_growth, rent/living costs/fees/shocks at cost_inflation",
+  "drift": {
+    "pay_growth_per_year": 0.0142,
+    "cost_inflation_per_year": 0.0101,
+    "note": "fitted on per-profile trends of regular-month net flow; approximate"
+  },
+  "base_flow_r2_explained_by": {
+    "income": 0.9411,
+    "rent": 0.0278,
+    "other_living": 0.0074
+  },
+  "base_flow_standard_error_chf": {
+    "median": 131.9618
+  },
+  "other_living_chf": {
+    "median": 1479.9612,
+    "p10": 1270.9457,
+    "p90": 1749.0819,
+    "corr_with_income": 0.2286
+  },
+  "other_living_city_median_chf": {
+    "Basel": 1506.6331,
+    "Bern": 1489.8904,
+    "Biel": 1399.9105,
+    "Fribourg": 1337.5886,
+    "Geneva": 1609.7839,
+    "Lausanne": 1542.2503,
+    "Lucerne": 1476.6147,
+    "Lugano": 1441.6137,
+    "Neuchatel": 1410.0716,
+    "St Gallen": 1392.5238,
+    "Winterthur": 1511.0811,
+    "Zurich": 1647.2492
+  },
+  "noise_sd_chf": {
+    "employed": 421.1659,
+    "part_time": 288.6993,
+    "retired": 424.5129,
+    "student": 229.9068,
+    "unemployed": 247.7425
+  },
+  "noise_sd_self_employed_share_of_income": 0.2385,
+  "shock": {
+    "p_regular_month": 0.0448,
+    "p_feb_aug": 0.3694,
+    "size_uniform_chf": [
+      453.1267,
+      1779.8919
+    ]
+  },
+  "student_fee_chf": {
+    "feb": 1050.9815,
+    "sep": 846.2255
+  },
+  "december_bonus": {
+    "p": 0.5594,
+    "size_share_of_income_uniform": [
+      0.2302,
+      1.0147
+    ]
+  },
+  "income_median_by_status_chf": {
+    "employed": 7738.465,
+    "part_time": 4313.225,
+    "retired": 3834.75,
+    "self_employed": 7269.765,
+    "student": 1200.0,
+    "unemployed": 533.09
+  },
+  "entry_salary_chf": 5715.0525,
+  "full_time_over_part_time_income": 1.7941,
+  "self_employed_over_employed_income": 0.9394,
+  "rent_model": {
+    "form": "rent = 2,100-ish x household_mult x city_mult x noise",
+    "r2_log": 0.6603,
+    "household_mult": {
+      "couple": 1.0,
+      "family": 0.9967,
+      "shared_housing": 0.4637,
+      "single": 0.6847
+    },
+    "city_mult": {
+      "Bern": 1.0,
+      "Basel": 1.0212,
+      "Biel": 0.9131,
+      "Fribourg": 0.864,
+      "Geneva": 1.1592,
+      "Lausanne": 0.9902,
+      "Lucerne": 1.0429,
+      "Lugano": 0.9437,
+      "Neuchatel": 0.907,
+      "St Gallen": 0.838,
+      "Winterthur": 0.9817,
+      "Zurich": 1.1354
+    }
+  },
+  "assumptions": {
+    "invest_return": 0.04,
+    "invest_vol": 0.1,
+    "loan_term": 60,
+    "rate_floor": 0.01,
+    "overdraft_rate": 0.08,
+    "job_search_months": 3,
+    "entry_salary_quantile": 0.25,
+    "masters_months": 24,
+    "masters_premium": 0.1,
+    "business_delay": 12,
+    "business_cost": 15000,
+    "moving_cost": 2000,
+    "relocation_cost": 3000,
+    "car_price": 25000,
+    "car_running": 400,
+    "emergency_expense": 10000,
+    "new_loan": 20000,
+    "new_loan_rate": 0.065,
+    "child_cost": 1800,
+    "leave_months": 4,
+    "leave_income": 0.8,
+    "invest_buffer_months": 6,
+    "repay_buffer_months": 3,
+    "surplus_share": 0.5,
+    "surplus_buffer_months": 3,
+    "topup_floor_months": 1,
+    "topup_target_months": 3,
+    "job_loss_months": 6,
+    "crash": 0.3,
+    "rate_step": 0.02,
+    "inflation_extra": 0.02,
+    "rent_increase": 0.15,
+    "raise_": 0.1,
+    "workload_cut": 0.2,
+    "spending_change": 0.1,
+    "cheaper_flat": 0.2,
+    "material": 0.1
+  }
+}

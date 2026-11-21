@@ -1,0 +1,13 @@
+best,employed,part_time,retired,self_employed,student,unemployed,all
+cut_spending_10pct,1,0,0,0,0,0,1
+invest_excess_cash,8,0,8,2,0,0,18
+invest_excess_with_top_up,1,0,22,2,0,0,25
+invest_half_of_surplus,235,0,2,40,0,0,277
+liquidate_investments,1,0,4,1,0,0,6
+move_to_cheaper_flat,125,0,40,18,0,0,183
+move_to_shared_flat,143,0,68,24,0,0,235
+part_time_to_full_time,0,120,0,0,0,0,120
+relocate_to_cheapest_city,167,0,68,18,0,0,253
+sell_investments_when_cash_low,1,0,4,1,0,0,6
+take_full_time_job,0,0,0,0,39,37,76
+all,682,120,216,106,39,37,1200

@@ -1,0 +1,51 @@
+{
+  "design": "calibrate on 2025-01..2025-12, simulate 2026-01..2026-12 from recorded 2025-12 cash (no debt service, as in the ledger)",
+  "profiles_breaching_2026_observed": 61,
+  "profiles_breaching_2026_expected": 61.2,
+  "profiles_breaching_2026_90pct_interval": [
+    60.0,
+    63.0
+  ],
+  "breach_auc": 1.0,
+  "breach_brier": 0.0011,
+  "final_cash_coverage_50pct": 0.5075,
+  "final_cash_coverage_90pct": 0.8925,
+  "final_cash_pit_deciles": [
+    95,
+    100,
+    110,
+    114,
+    107,
+    140,
+    135,
+    132,
+    126,
+    141
+  ],
+  "breach_by_status_observed_vs_expected": {
+    "employed": {
+      "obs": 1,
+      "exp": 0.2
+    },
+    "part_time": {
+      "obs": 3,
+      "exp": 2.9
+    },
+    "retired": {
+      "obs": 4,
+      "exp": 4.8
+    },
+    "self_employed": {
+      "obs": 1,
+      "exp": 1.0
+    },
+    "student": {
+      "obs": 32,
+      "exp": 32.0
+    },
+    "unemployed": {
+      "obs": 20,
+      "exp": 20.4
+    }
+  }
+}

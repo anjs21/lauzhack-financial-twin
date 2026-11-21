@@ -1,0 +1,55 @@
+{
+  "horizon": "2025-01..2034-12 (120 months), 200 paths per profile, seed 20261121",
+  "baseline_definition": "continue current situation; data-fitted pay growth and cost inflation; loans amortised over 60 months and a 4%/10% portfolio (assumptions)",
+  "baseline": {
+    "profiles_with_breach_prob_over_50pct": 150,
+    "by_status": {
+      "employed": {
+        "p_breach": 0.006,
+        "p_breach_5y": 0.004,
+        "p_high_goal": 0.97,
+        "p_med_goal": 0.952,
+        "nw_median": 667704.244
+      },
+      "part_time": {
+        "p_breach": 0.175,
+        "p_breach_5y": 0.117,
+        "p_high_goal": 0.641,
+        "p_med_goal": 0.545,
+        "nw_median": 194745.599
+      },
+      "retired": {
+        "p_breach": 0.219,
+        "p_breach_5y": 0.123,
+        "p_high_goal": 0.707,
+        "p_med_goal": 0.53,
+        "nw_median": 219867.721
+      },
+      "self_employed": {
+        "p_breach": 0.045,
+        "p_breach_5y": 0.028,
+        "p_high_goal": 0.856,
+        "p_med_goal": 0.868,
+        "nw_median": 605214.564
+      },
+      "student": {
+        "p_breach": 1.0,
+        "p_breach_5y": 0.976,
+        "p_high_goal": 0.0,
+        "p_med_goal": 0.0,
+        "nw_median": -378317.855
+      },
+      "unemployed": {
+        "p_breach": 1.0,
+        "p_breach_5y": 0.973,
+        "p_high_goal": 0.007,
+        "p_med_goal": 0.0,
+        "nw_median": -326547.875
+      }
+    },
+    "mean_p_high_goal": 0.8187,
+    "mean_p_med_goal": 0.7646
+  },
+  "tier_changes_under_sensitivity": 6,
+  "runtime_seconds": 147.2
+}
