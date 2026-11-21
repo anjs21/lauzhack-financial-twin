@@ -1,0 +1,55 @@
+{
+  "note": "Official Swiss statistics the simulated world is calibrated to or checked against. 'use' says how.",
+  "targets": {
+    "unemployment_rate": {
+      "value": 0.028, "band": [0.025, 0.045], "use": "calibrate job openings",
+      "definition": "searching non-workers under 65 / (workers + searchers). SECO counts registered unemployed only, so the ILO rate is higher; the band spans both.",
+      "source": "SECO, registered unemployment, 2025 annual average 2.8%",
+      "url": "https://www.secoalv.admin.ch/dam/secoalv/de/dokumente/publikationen/amstat/2025/2025-11_die_lage_auf_dem_arbeitsmarkt.pdf.download.pdf/2025-11_Die_Lage_auf_dem_Arbeitsmarkt_DE.pdf"
+    },
+    "median_unemployment_months": {
+      "value": 6.5, "band": [5.0, 8.0], "use": "calibrate job openings",
+      "definition": "median spell of searching before an accepted job; 199 days = 6.5 months",
+      "source": "BFS labour force survey (SAKE), median duration of unemployment 199 days, Q4 2025",
+      "url": "https://www.srf.ch/news/wirtschaft/2-8-prozent-arbeitslosigkeit-wir-liegen-im-langjaehrigen-durchschnitt-der-arbeitslosenquote"
+    },
+    "bachelor_to_master_within_24m": {
+      "value": 0.87, "band": [0.80, 0.92], "use": "calibrate the preference for a master's",
+      "definition": "share of university bachelor graduates who start a master's within two years",
+      "source": "BFS data cited by Avenir Suisse (2024): about 87%; BFS Bologna barometer: 88% average since 2004",
+      "url": "https://files.avenir-suisse.ch/production/uploads/2024/02/2024-02_analyse_bachelor-bologna_de.pdf"
+    },
+    "master_to_phd_within_24m": {
+      "value": 0.15, "band": [0.10, 0.20], "use": "calibrate PhD positions",
+      "definition": "share of master graduates who start a PhD within two years",
+      "source": "ASSUMPTION: no verified BFS figure found; replace with the BFS transitions table when available",
+      "url": "https://edudoc.ch/record/119835/files/1578_1500.pdf"
+    },
+    "moving_rate_per_year": {
+      "value": 0.093, "band": [0.07, 0.11], "use": "calibrate flat vacancies",
+      "definition": "share of people who move home in a year",
+      "source": "BFS, Umzugsquote 2024: 9.3%",
+      "url": "https://www.bfs.admin.ch/asset/en/21004197"
+    },
+    "graduate_unemployment_1y_master": {
+      "value": 0.064, "band": [0.03, 0.10], "use": "check only",
+      "source": "BFS graduate survey, UH master graduates one year after their degree (ILO), 2025: 6.4%",
+      "url": "https://www.kmu.admin.ch/de/erwerbslosigkeit-unter-hochschulabsolventen-steigt"
+    },
+    "graduate_unemployment_1y_bachelor": {
+      "value": 0.049, "band": [0.02, 0.10], "use": "check only",
+      "source": "BFS graduate survey, FH bachelor graduates one year after their degree (ILO), 2025: 4.9%",
+      "url": "https://www.kmu.admin.ch/de/erwerbslosigkeit-unter-hochschulabsolventen-steigt"
+    },
+    "vacancy_rate_dwellings": {
+      "value": 0.0100, "use": "context: explains why flat applications often fail",
+      "source": "BFS vacant-dwelling count, 1 June 2025: 1.00% (0.93% in 2026)",
+      "url": "https://www.bwo.admin.ch/dam/de/sd-web/RDoGMBsSgkIu/Leerwohnungsziffer_prozent_Kt_2025.pdf"
+    },
+    "phd_salary_chf_per_year": {
+      "value": 47040, "use": "PhD student pay",
+      "source": "SNSF minimum doctoral salary 2025 (CHF 50,000 from 2026)",
+      "url": "https://snf.ch/en/kHunysxdKHpyUL8s/news/salary-increase-for-doctoral-students"
+    }
+  }
+}
