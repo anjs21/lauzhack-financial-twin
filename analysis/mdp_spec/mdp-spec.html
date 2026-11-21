@@ -59,6 +59,8 @@ code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
 
 header.top { display: grid; gap: 18px; padding-bottom: 34px; }
 .lede { font-size: 1.1rem; line-height: 1.55; max-width: 66ch; }
+.small { font-size: 0.9rem; color: var(--fg2); }
+a { color: var(--accent); text-underline-offset: 2px; }
 .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 6px; }
 .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
 .tile .v { font: 600 1.8rem/1.1 var(--font-body); letter-spacing: -0.01em; }
@@ -226,45 +228,53 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 
 <header class="top">
   <div class="eyebrow">LauzHack 2026 · UBS AI Financial Twin · MDP specification</div>
-  <h1>A life in eight states and four moves</h1>
-  <p class="lede">One step is one month, from January 2025 to December 2034. The agent chooses work, housing, spending and investing. Jobs, family, bills and the economy move at random. 85 of the 120 catalog scenarios run in this MDP; the other 35 need states left out on purpose.</p>
+  <h1>A life in nine states and four choices</h1>
+  <p class="lede">One step is one month, from January 2025 to December 2034. A persona agent chooses work, housing, spending and investing the way this person tends to, with randomness. A world model learned from the ledger samples what happens next. 85 of the 120 catalog scenarios run in this MDP; the other 35 need states left out on purpose.</p>
+  <p class="small">How the world model and the persona are built and tested: <a href="learning-plan.html">learning plan</a>.</p>
   <div class="tiles">
-    <div class="tile"><div class="v num">8 + t</div><div class="l">state variables: six categories, two CHF balances, plus the month</div></div>
+    <div class="tile"><div class="v num">9 + 2</div><div class="l">state variables: five categories and four CHF amounts, plus two clocks</div></div>
     <div class="tile"><div class="v num">135</div><div class="l">joint actions (5 × 3 × 3 × 3), fewer after masks</div></div>
-    <div class="tile"><div class="v num">48,600</div><div class="l">states per month once cash and investments are put in bins</div></div>
-    <div class="tile"><div class="v num">85 / 120</div><div class="l">catalog scenarios covered: 51 inside an episode, 34 as parameter settings</div></div>
+    <div class="tile"><div class="v num">28,800</div><div class="l">profile-months the world model learns from</div></div>
+    <div class="tile"><div class="v num">85 / 120</div><div class="l">catalog scenarios covered: 51 inside a sampled life, 34 as parameter settings</div></div>
   </div>
 </header>
 
 <section id="state">
   <div class="section-head">
     <div class="eyebrow">State <span class="m">s<sub>t</sub></span></div>
-    <h2>Eight variables carry a life</h2>
-    <p>Six small categories describe the situation, two CHF balances hold the money, and the economy is one regime shared by everyone. All else about a person stays fixed as context.</p>
+    <h2>Nine variables and two clocks carry a life</h2>
+    <p>Five small categories describe the situation, four CHF amounts hold the money, and two clocks keep time. The economy is one regime shared by everyone. All else about a person stays fixed as context.</p>
   </div>
   <div class="tablewrap">
     <table class="state stack">
       <thead><tr><th>Variable</th><th>Values</th><th>Changed by</th><th>Catalog</th></tr></thead>
       <tbody>
         <tr>
-          <td><span class="sym">W</span>Work status</td>
-          <td><div class="vals"><span class="v"><b>S</b> student</span><span class="v"><b>E60</b><b>E80</b><b>E100</b> employed, % of full time</span><span class="v"><b>N</b> not working</span></div>
-              <div class="note">N before 65 is unemployed or on a break (CHF 530 a month); from 65 it is retired (pension).</div></td>
-          <td>status move · job loss · job found · graduation</td>
+          <td><span class="sym">W</span>Work mode</td>
+          <td><div class="vals"><span class="v">student</span><span class="v">part-time</span><span class="v">full-time</span><span class="v">not working</span></div>
+              <div class="note">Not working before 65 means unemployed or on a break; from 65 it means retired. Self-employed people count as full-time and keep a flag for their larger pay swings.</div></td>
+          <td>status action · job loss · job offer · end of the master's</td>
           <td>Education, Career, Retirement</td>
         </tr>
         <tr>
-          <td><span class="sym">k</span>Pay level</td>
-          <td><div class="vals"><span class="v"><b>1</b> 4.5k</span><span class="arr">›</span><span class="v"><b>2</b> 6.1k</span><span class="arr">›</span><span class="v"><b>3</b> 7.8k</span><span class="arr">›</span><span class="v"><b>4</b> 9.3k</span><span class="arr">›</span><span class="v"><b>5</b> 10.8k</span></div>
-              <div class="note">Full-time CHF a month: the five employee pay quintiles in the data. E60 and E80 earn 60% and 80%; the pension is 50%.</div></td>
-          <td>promotion (random) · degree (random, on graduating)</td>
-          <td>Career, Education</td>
+          <td><span class="sym">Y</span>net_income</td>
+          <td><div class="vals"><span class="v">≥ 0 CHF a month</span></div>
+              <div class="note">Current take-home income, including student income or a pension. Two people in the same work mode can earn different amounts: full-time pay in the data runs from CHF 4.4k to 10.7k (10th to 90th percentile).</div></td>
+          <td>pay drift · promotion · redrawn on a work-mode change, keeping the person's pay rank</td>
+          <td>Career, Education, Retirement</td>
         </tr>
         <tr>
           <td><span class="sym">H</span>Housing tier</td>
           <td><div class="vals"><span class="v"><b>0</b> shared flat</span><span class="arr">›</span><span class="v"><b>1</b> small flat</span><span class="arr">›</span><span class="v"><b>2</b> family flat</span></div>
-              <div class="note">Rent = CHF 2,471 × city × 0.46 / 0.68 / 1.00 (fitted on the data, R² 0.66).</div></td>
-          <td>housing move (forced up when a child arrives in a shared flat)</td>
+              <div class="note">Typical rent is CHF 2,471 × city × 0.46 / 0.68 / 1.00 (fitted on the data, R² 0.66). The tier also decides which households fit.</div></td>
+          <td>housing action (forced up when a child arrives in a shared flat)</td>
+          <td>Housing, Relocation</td>
+        </tr>
+        <tr>
+          <td><span class="sym">R</span>Rent</td>
+          <td><div class="vals"><span class="v">≥ 0 CHF a month</span></div>
+              <div class="note">What the person actually pays; two people in the same tier pay different rents. Kept for the same reason as net_income.</div></td>
+          <td>redrawn on a move, keeping the person's rank · cost growth</td>
           <td>Housing, Relocation</td>
         </tr>
         <tr>
@@ -278,7 +288,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
           <td><span class="sym">L</span>Lifestyle</td>
           <td><div class="vals"><span class="v"><b>0</b> lean</span><span class="arr">›</span><span class="v"><b>1</b> standard</span><span class="arr">›</span><span class="v"><b>2</b> comfortable</span></div>
               <div class="note">Non-rent living costs × 0.9 / 1.0 / 1.1.</div></td>
-          <td>spending move</td>
+          <td>spending action</td>
           <td>Spending</td>
         </tr>
         <tr>
@@ -291,15 +301,15 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
         <tr>
           <td><span class="sym">C</span>Cash</td>
           <td><div class="vals"><span class="v">CHF, may go below 0</span></div>
-              <div class="note">Below 0 is a credit line at 8% a year, limit 3 × monthly pay. Bins: &lt;0 · 0–1 · 1–3 · 3–6 · 6–12 · 12+ months of outgoings.</div></td>
-          <td>monthly cash flow · asset move</td>
+              <div class="note">Below 0 is a credit line at 8% a year, limit 3 × monthly pay.</div></td>
+          <td>learned monthly cash flow · asset action</td>
           <td>Savings, Debt</td>
         </tr>
         <tr>
           <td><span class="sym">I</span>Investments</td>
           <td><div class="vals"><span class="v">CHF ≥ 0</span></div>
-              <div class="note">Bins: 0 · &lt;1 · 1–3 · 3+ years of outgoings.</div></td>
-          <td>market returns · asset move</td>
+              <div class="note">One portfolio; its returns depend on the economy.</div></td>
+          <td>market returns · asset action</td>
           <td>Investments</td>
         </tr>
         <tr>
@@ -308,6 +318,13 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
               <div class="note">Gives age, the December bonus, February and August bills, and the goal deadlines.</div></td>
           <td>clock</td>
           <td>Retirement</td>
+        </tr>
+        <tr>
+          <td><span class="sym">τ</span>Months in mode</td>
+          <td><div class="vals"><span class="v">0, 1, 2, …</span></div>
+              <div class="note">Ends the master's after 24 months (scenario S001) and lets choices depend on how long someone has been in a mode.</div></td>
+          <td>clock, reset on a mode change</td>
+          <td>Education, Career</td>
         </tr>
       </tbody>
     </table>
@@ -326,11 +343,11 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
     <div class="card">
       <h3>Start state from the data</h3>
       <dl class="kv">
-        <dt>W</dt><dd>employed and self-employed (788) → E100 · part-time (120) → E60 · students (39) → S · unemployed (37) and retired (216) → N</dd>
-        <dt>k</dt><dd>level nearest full-time pay (part-time ÷ 0.6, pension ÷ 0.5); students 1, unemployed 2</dd>
+        <dt>W</dt><dd>employed and self-employed (788) → full-time · part-time (120) → part-time · students (39) → student · unemployed (37) and retired (216) → not working</dd>
+        <dt>Y, R</dt><dd>the profile's reference income and rent</dd>
         <dt>H, F</dt><dd>single → H1 · couple, family → H2 · shared housing → single in H0</dd>
         <dt>C, I</dt><dd>opening cash and portfolio (medians CHF 53k and 32k)</dd>
-        <dt>L, M</dt><dd>standard, normal</dd>
+        <dt>L, M, τ</dt><dd>standard, normal; τ is unknown, so students start at a random month of their 24</dd>
       </dl>
     </div>
   </div>
@@ -339,30 +356,30 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 <section id="actions">
   <div class="section-head">
     <div class="eyebrow">Action <span class="m">a<sub>t</sub></span> = (status, housing, spending, assets)</div>
-    <h2>Four moves, a handful of options each</h2>
-    <p>All four are chosen every month. Masks remove options that make no sense in the current state, and status and housing moves cost money and utility, so the policy has no reason to flip-flop.</p>
+    <h2>Four choices, a handful of options each</h2>
+    <p>Spending and assets are chosen every month; status and housing at a yearly review or right after an event (job loss, child, end of the master's, a big bill). Masks remove options that make no sense in the current state. A persona policy samples each choice; nothing is optimised.</p>
   </div>
   <div class="acts">
     <article class="act">
-      <div class="act-top"><h3>Status move</h3><span class="tag">5 options</span></div>
+      <div class="act-top"><h3>Status change</h3><span class="tag">5 options</span></div>
       <dl class="opts">
-        <dt><span>stop</span></dt><dd>leave work or study for N: quit, sabbatical, care break, early retirement (the pension still starts at 65)</dd>
-        <dt><span>−1</span></dt><dd>fewer hours: E100 → E80 → E60</dd>
-        <dt><span>0</span></dt><dd>stay</dd>
-        <dt><span>+1</span></dt><dd>more hours: E60 → E80 → E100. From N or S, look for a full-time job: found with 20% a month, 10% in a recession</dd>
-        <dt><span>study</span></dt><dd>full-time master's in S: tuition CHF 1,200–8,000 a year and CHF 1,200 pay; ends at random after about two years in N, half the time one pay level up</dd>
+        <dt><span>0</span></dt><dd>continue in the current work mode</dd>
+        <dt><span>1</span></dt><dd>start a master's: student for 24 months, tuition CHF 1,200–8,000 a year, student income; afterwards not working and looking, with a higher pay rank (degree premium)</dd>
+        <dt><span>2</span></dt><dd>accept part-time work: from full-time at once; from student or not working once an offer comes (20% a month, 10% in a recession). net_income is redrawn at the same rank among part-time pay</dd>
+        <dt><span>3</span></dt><dd>accept full-time work: the same, toward full-time pay</dd>
+        <dt><span>4</span></dt><dd>leave paid work: quit, sabbatical, care break or retirement. net_income becomes benefits before 65 (median CHF 530) or a pension from 65 (about half of pay, same rank)</dd>
       </dl>
-      <p class="mask">Masks: −1 only from E80 or E100 · stop not from N · study only up to age 45 and not from S</p>
+      <p class="mask">Masks: 1 not while studying and only up to age 45 · 2 not from part-time · 3 not from full-time · 4 only from part-time or full-time</p>
       <p class="ids">S001 · S011 · S017 · S044 · S086 · S091 · S092</p>
     </article>
     <article class="act">
-      <div class="act-top"><h3>Housing move</h3><span class="tag">3 options</span></div>
+      <div class="act-top"><h3>Housing change</h3><span class="tag">3 options</span></div>
       <dl class="opts">
-        <dt><span>−1</span></dt><dd>one tier cheaper: family flat → small flat saves CHF 780 a month, small → shared saves CHF 550 (Bern prices)</dd>
+        <dt><span>−1</span></dt><dd>one tier cheaper: family flat → small flat saves about CHF 780 a month, small → shared about CHF 550 (typical Bern rents)</dd>
         <dt><span>0</span></dt><dd>stay</dd>
         <dt><span>+1</span></dt><dd>one tier bigger</dd>
       </dl>
-      <p class="mask">CHF 2,000 per move · a family needs at least a small flat, so a child born in a shared flat forces +1</p>
+      <p class="mask">CHF 2,000 per move · the new rent is drawn for the new tier at the person's usual rank · a family needs at least a small flat, so a child born in a shared flat forces +1</p>
       <p class="ids">S031 · S032 · S049</p>
     </article>
     <article class="act">
@@ -388,72 +405,70 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
   </div>
 
   <figure>
-    <div class="diagram" role="img" aria-label="Work status transitions. Agent moves: plus one to search for a job from not working or from studying, stop from employed to not working, study from not working or employed, minus one and plus one between 60, 80 and 100 percent hours. Random events: job loss from employed to not working, graduation from student to not working.">
+    <div class="diagram" role="img" aria-label="Work mode transitions. Agent actions: 1 start a master's from not working or employed; 2 or 3 accept part-time or full-time work from not working or studying, or switch between them while employed; 4 leave paid work. Random events: job loss from employed to not working, and the end of the master's after 24 months.">
       <svg viewBox="0 0 680 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
           <marker id="ah-mv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ah-mv" d="M0,0 L10,5 L0,10 z"/></marker>
           <marker id="ah-rnd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ah-rnd" d="M0,0 L10,5 L0,10 z"/></marker>
         </defs>
         <rect class="box" x="250" y="14" width="180" height="54" rx="8"/>
-        <text class="t1" x="340" y="37" text-anchor="middle">S · Student</text>
-        <text class="t2" x="340" y="56" text-anchor="middle">tuition · CHF 1,200 pay</text>
+        <text class="t1" x="340" y="37" text-anchor="middle">Student</text>
+        <text class="t2" x="340" y="56" text-anchor="middle">24 months · tuition</text>
 
         <rect class="box" x="16" y="196" width="196" height="64" rx="8"/>
-        <text class="t1" x="114" y="221" text-anchor="middle">N · Not working</text>
-        <text class="t2" x="114" y="241" text-anchor="middle">CHF 530 · pension from 65</text>
+        <text class="t1" x="114" y="221" text-anchor="middle">Not working</text>
+        <text class="t2" x="114" y="241" text-anchor="middle">benefits · pension from 65</text>
 
         <rect class="box" x="448" y="180" width="216" height="96" rx="8"/>
-        <text class="t1" x="556" y="201" text-anchor="middle">E · Employed</text>
-        <rect class="pill" x="462" y="212" width="52" height="28" rx="6"/>
-        <rect class="pill" x="532" y="212" width="52" height="28" rx="6"/>
-        <rect class="pill" x="602" y="212" width="52" height="28" rx="6"/>
-        <text class="t3" x="488" y="230" text-anchor="middle">60%</text>
-        <text class="t3" x="558" y="230" text-anchor="middle">80%</text>
-        <text class="t3" x="628" y="230" text-anchor="middle">100%</text>
-        <text class="t2" x="523" y="230" text-anchor="middle">⇄</text>
-        <text class="t2" x="593" y="230" text-anchor="middle">⇄</text>
-        <text class="t2" x="556" y="262" text-anchor="middle">−1 / +1 change hours</text>
+        <text class="t1" x="556" y="201" text-anchor="middle">Employed</text>
+        <rect class="pill" x="460" y="212" width="88" height="28" rx="6"/>
+        <rect class="pill" x="568" y="212" width="84" height="28" rx="6"/>
+        <text class="t3" x="504" y="230" text-anchor="middle">part-time</text>
+        <text class="t3" x="610" y="230" text-anchor="middle">full-time</text>
+        <text class="t2" x="558" y="230" text-anchor="middle">⇄</text>
+        <text class="t2" x="556" y="262" text-anchor="middle">2 / 3 switch at once</text>
 
         <path class="mv" d="M212 206 L446 206"/>
-        <text class="lbl" x="329" y="198" text-anchor="middle">+1 · look for a job, found 20%/mo</text>
+        <text class="lbl" x="329" y="198" text-anchor="middle">2 / 3 · accept work, offer 20%/mo</text>
         <path class="mv" d="M448 230 L214 230"/>
-        <text class="lbl" x="329" y="224" text-anchor="middle">stop</text>
+        <text class="lbl" x="329" y="224" text-anchor="middle">4 · leave paid work</text>
         <path class="rnd" d="M448 254 L214 254"/>
         <text class="lbl" x="329" y="272" text-anchor="middle">job loss · 0.3%/mo</text>
 
         <path class="mv" d="M90 195 C90 110, 150 41, 248 41"/>
-        <text class="lbl" x="118" y="86" text-anchor="end">study</text>
+        <text class="lbl" x="118" y="86" text-anchor="end">1 · master's</text>
         <path class="rnd" d="M300 69 C300 130, 190 130, 172 194"/>
-        <text class="lbl" x="222" y="157">graduates · about 2 years</text>
+        <text class="lbl" x="222" y="157">ends after 24 months</text>
         <path class="mv" d="M390 69 C390 130, 520 120, 520 178"/>
-        <text class="lbl" x="468" y="104">+1 · look for a job</text>
+        <text class="lbl" x="468" y="104">2 / 3 · accept work</text>
         <path class="mv" d="M630 179 C630 100, 560 41, 432 41"/>
-        <text class="lbl" x="600" y="76">study</text>
+        <text class="lbl" x="596" y="76">1 · master's</text>
       </svg>
     </div>
     <div class="keys">
-      <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--accent)" stroke-width="2"/></svg>agent move</span>
+      <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--accent)" stroke-width="2"/></svg>agent action</span>
       <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--fg2)" stroke-width="1.6" stroke-dasharray="5 4"/></svg>random event</span>
     </div>
-    <figcaption>Work status. Looking for a job is the agent's choice, but finding one is random, and so is when studies end.</figcaption>
+    <figcaption>Work mode. Accepting work from not working or studying needs an offer, which arrives at random. The master's ends after 24 months.</figcaption>
   </figure>
 </section>
 
 <section id="dynamics">
   <div class="section-head">
     <div class="eyebrow">Transition <span class="m">P(s′ | s, a)</span></div>
-    <h2>One month of money, plus a few random events</h2>
-    <p><span class="src d">data</span> marks values calibrated on the 2025–2026 ledger; <span class="src a">assumed</span> marks placeholders to tune.</p>
+    <h2>A world model learned from the ledger</h2>
+    <p>Not hand-written: a network learns from 28,800 profile-months how a month unfolds for a given state. Nobody changes mode, flat or spending in the data, so an action works by moving the person into a state other people are already in. What the data cannot show stays an explicit prior. Build and tests: <a href="learning-plan.html">learning plan</a>.</p>
   </div>
   <div class="formula">
-    <div class="eq">C′ = C + income − rent − living − bills − tuition − loan − moving − invest + noise + 8%/12 · min(C, 0)</div>
-    <div class="eq">I′ = (I + invest) · (1 + return<sub>M</sub>)</div>
+    <div class="eq">flow ~ learned network(work mode, net_income, rent, household, tier, city, age, calendar month)</div>
+    <div class="eq">C′ = C + flow − invest − moving + 8%/12 · min(C, 0)   ·   I′ = (I + invest) · (1 + return<sub>M</sub>)</div>
+    <p class="note">Below is the hand-calibrated baseline the network has to match. <span class="src d">data</span> values come from the 2025–2026 ledger; <span class="src a">assumed</span> values are placeholders to tune.</p>
     <div class="params">
-      <div><span class="k">Pay, E</span><span>hours × level pay, +1.4% a year</span><span class="src d">data</span></div>
-      <div><span class="k">December bonus</span><span>E: 56% of years, 0.23–1.01 × monthly pay</span><span class="src d">data</span></div>
-      <div><span class="k">Pay, S · N &lt; 65</span><span>CHF 1,200 · CHF 530</span><span class="src d">data</span></div>
-      <div><span class="k">Pension, N ≥ 65</span><span>50% of level pay</span><span class="src d">data</span></div>
-      <div><span class="k">Rent</span><span>2,471 × city × tier</span><span class="src d">data</span></div>
+      <div><span class="k">Pay</span><span>net_income, +1.4% a year</span><span class="src d">data</span></div>
+      <div><span class="k">December bonus</span><span>employed: 56% of years, 0.23–1.01 × monthly pay</span><span class="src d">data</span></div>
+      <div><span class="k">Student · not working</span><span>median CHF 1,200 · CHF 530 (before 65)</span><span class="src d">data</span></div>
+      <div><span class="k">Pension from 65</span><span>about half of pay, same rank</span><span class="src d">data</span></div>
+      <div><span class="k">Rent</span><span>R; typical 2,471 × city × tier</span><span class="src d">data</span></div>
       <div><span class="k">Living costs</span><span>city median + 1.6% of income; students −126</span><span class="src d">data</span></div>
       <div><span class="k">Bills</span><span>37% in Feb and Aug, 4.5% otherwise; CHF 450–1,780</span><span class="src d">data</span></div>
       <div><span class="k">Noise SD</span><span>CHF 200 + 5% of pay (self-employed 23%)</span><span class="src d">data</span></div>
@@ -470,10 +485,10 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
     <table class="events stack">
       <thead><tr><th>Random event</th><th>Per month</th><th>Effect</th></tr></thead>
       <tbody>
-        <tr><td>Job loss</td><td>0.3%<span class="sub">1.0% in recession</span></td><td>E → N</td></tr>
-        <tr><td>Job found while looking</td><td>20%<span class="sub">10% in recession</span></td><td>N or S → E100</td></tr>
-        <tr><td>Studies end</td><td>1 in 24</td><td>S → N; pay level +1 with probability ½</td></tr>
-        <tr><td>Promotion</td><td>0.7%<span class="sub">0.3% in recession</span></td><td>k + 1 while employed</td></tr>
+        <tr><td>Job loss</td><td>0.3%<span class="sub">1.0% in recession</span></td><td>employed → not working; net_income becomes benefits</td></tr>
+        <tr><td>Offer after choosing 2 or 3</td><td>20%<span class="sub">10% in recession</span></td><td>student or not working → part-time or full-time</td></tr>
+        <tr><td>Master's ends</td><td>after 24 months</td><td>student → not working; pay rank +20 percentiles (degree premium)</td></tr>
+        <tr><td>Promotion</td><td>0.7%<span class="sub">0.3% in recession</span></td><td>net_income +10% while employed</td></tr>
         <tr><td>Partner moves in</td><td>0.4%<span class="sub">single, under 45</span></td><td>single → couple</td></tr>
         <tr><td>Child</td><td>0.7%<span class="sub">couple, under 42</span></td><td>couple → family; 4 months at 80% pay</td></tr>
         <tr><td>Separation</td><td>0.2%</td><td>couple → single</td></tr>
@@ -482,18 +497,18 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
       </tbody>
     </table>
   </div>
-  <p class="note">All event rates are assumptions. In the data, a month's surprise does not carry over to the next and bills do not depend on pay, so independent monthly draws are faithful to it.</p>
+  <p class="note">Event rates are assumptions, except the 24-month master's (scenario S001). In the data, a month's surprise does not carry over to the next and bills do not depend on pay, so independent monthly draws are faithful to it.</p>
 </section>
 
 <section id="reward">
   <div class="section-head">
-    <div class="eyebrow">Reward <span class="m">r(s, a)</span></div>
-    <h2>Everything in CHF-equivalents a month</h2>
-    <p>Money counts through net worth at the end; the monthly terms price what money misses. The preference values belong to the user (the twin should ask for them); the defaults only make the trade-offs real.</p>
+    <div class="eyebrow">Preferences <span class="m">u(s, a)</span></div>
+    <h2>What a persona values, in CHF a month</h2>
+    <p>The twin does not optimise. These values describe a persona: its policy leans toward options it values, with randomness set by its temperature, and every sampled life is scored with them. The defaults are placeholders; each person sets their own.</p>
   </div>
   <div class="formula">
-    <div class="eq">r<sub>t</sub> = lifestyle(L) + home(H, F) + free time(W) − 2,000·[C &lt; 0] − 300·[status or housing move] + goal bonus</div>
-    <div class="eq">r<sub>T</sub> = C + I − loans in Dec 2034 · breaching the credit limit ends the episode at −100,000 · γ = 0.997</div>
+    <div class="eq">u<sub>t</sub> = lifestyle(L) + home(H, F) + free time(W) − 2,000·[C &lt; 0] − 300·[status or housing change] + goal value</div>
+    <div class="eq">end of path: + C + I − loans in Dec 2034 · a breached credit limit ends the path at −100,000</div>
   </div>
   <div class="tablewrap">
     <table class="pref stack">
@@ -503,8 +518,8 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
         <tr><td>Home, single</td><td>shared −700 · small 0 · family flat +300</td></tr>
         <tr><td>Home, couple</td><td>shared −1,500 · small −500 · family flat 0</td></tr>
         <tr><td>Home, family</td><td>small −1,200 · family flat 0 (shared is masked)</td></tr>
-        <tr><td>Free time</td><td>E100 0 · E80 +1,000 · E60 +1,800 · N +2,000 · S 0</td></tr>
-        <tr><td>Goal bonus</td><td>high goal met in Dec 2029: its target amount · medium goal met in Dec 2032: half its target. Met means liquid wealth ≥ target (emergency savings: cash only).</td></tr>
+        <tr><td>Free time</td><td>full-time 0 · part-time +1,500 · not working +2,000 · student 0</td></tr>
+        <tr><td>Goal value</td><td>high goal met in Dec 2029: its target amount · medium goal met in Dec 2032: half its target. Met means liquid wealth ≥ target (emergency savings: cash only).</td></tr>
       </tbody>
     </table>
   </div>
@@ -514,11 +529,12 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 <section id="decisions">
   <div class="section-head">
     <div class="eyebrow">Why it is not trivial</div>
-    <h2>Five trade-offs the policy has to learn</h2>
+    <h2>Five decisions where personas part ways</h2>
+    <p>Each is a real trade-off, so two people with the same money but different traits or histories choose differently here, and the same person can choose differently on two sampled paths.</p>
   </div>
   <ol class="notes">
-    <li><div><b>Study or start work.</b> Two years on CHF 1,200 plus tuition buy a 50% chance of the next pay level, which is 17–35% more pay for the rest of the horizon. <span class="ids">S001 · S011</span></div></li>
-    <li><div><b>Work less or retire early.</b> Free time against lost pay. The pension starts only at 65, so stopping earlier must be paid for from C and I. <span class="ids">S017 · S091</span></div></li>
+    <li><div><b>Study or start work.</b> 24 months of student income plus tuition buy a higher pay rank for the rest of the horizon. <span class="ids">S001 · S011</span></div></li>
+    <li><div><b>Work less or stop.</b> Free time against lost pay (actions 2 and 4). The pension starts only at 65, so stopping earlier must be paid for from C and I. <span class="ids">S017 · S091</span></div></li>
     <li><div><b>Housing against goals.</b> One tier is worth CHF 550–780 a month in Bern, and a child forces at least a small flat. <span class="ids">S031 · S032 · S082</span></div></li>
     <li><div><b>Lifestyle against saving.</b> Upgrading costs little, but cutting back hurts, so an upgrade should wait for a safe buffer. <span class="ids">S041 · S046</span></div></li>
     <li><div><b>Invest or hold cash.</b> A recession raises job-loss risk and cuts returns together, so the cash buffer matters most exactly when the portfolio is down. <span class="ids">S061 · S065 · S110</span></div></li>
@@ -529,7 +545,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
   <div class="section-head">
     <div class="eyebrow">Scenario catalog</div>
     <h2>Where each of the 120 scenarios lives</h2>
-    <p>51 play out inside one episode as agent moves, random events or built-in rules. 34 are what-if runs of the same MDP with one number changed. 35 need states left out on purpose.</p>
+    <p>51 play out inside one sampled life as agent actions, random events or built-in rules. 34 are what-if runs of the same MDP with one number changed. 35 need states left out on purpose.</p>
   </div>
   <figure>
     <div class="legend" id="cov-legend"></div>
@@ -560,7 +576,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
         <tr><td>Abroad and currency</td><td>country and currency state</td><td class="r">10</td><td class="mono">S023–S029, S070, S095, S105</td><td>the data is Swiss and in CHF only</td></tr>
         <tr><td>Home ownership</td><td>tier 3, home value and mortgage</td><td class="r">7</td><td class="mono">S033–S036, S038, S039, S108</td><td>no property or mortgages in the data</td></tr>
         <tr><td>Separate debt</td><td>loan balance, repay and refinance moves</td><td class="r">6</td><td class="mono">S073–S076, S078, S080</td><td>these moves changed at most 2% of outcomes in the action screen</td></tr>
-        <tr><td>Self-employment</td><td>a sixth status and business cash</td><td class="r">5</td><td class="mono">S113, S116, S117, S119, S120</td><td>outside the three work profiles</td></tr>
+        <tr><td>Self-employment</td><td>a fifth work mode and business cash</td><td class="r">5</td><td class="mono">S113, S116, S117, S119, S120</td><td>outside the three work profiles</td></tr>
         <tr><td>Pension pots</td><td>a locked pillar 2/3a balance</td><td class="r">4</td><td class="mono">S055, S093, S094, S099</td><td>not in the data</td></tr>
         <tr><td>Other</td><td>equity pay, rebalancing, tax</td><td class="r">3</td><td class="mono">S018, S068, S107</td><td>incomes are net and the portfolio is one asset</td></tr>
       </tbody>
@@ -569,6 +585,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 </section>
 
 <footer>
+  <div>How the world model and the persona policy are learned: <a href="learning-plan.html">learning plan</a>.</div>
   <div>Scenario list from <code>Data/scenario-catalog.csv</code>. Calibrated values come from <code>analysis/action_importance/results/calibration.json</code> and <code>income_expense_correlation.json</code>.</div>
   <div>Synthetic data only: numbers describe the challenge data, not real households, and nothing here is financial advice. Built 2026-11-21.</div>
 </footer>
@@ -581,14 +598,14 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Education & skills",
 "name": "Full-time master’s",
 "cls": "action",
-"el": "status: study → S; one pay level up with probability ½ on finishing"
+"el": "status 1: start a master's (24 months); higher pay rank afterwards"
 },
 {
 "id": "S002",
 "cat": "Education & skills",
 "name": "Part-time master’s",
 "cls": "param",
-"el": "study variant: S at 60% pay, about 3 years"
+"el": "study variant: student with part-time pay, about 3 years"
 },
 {
 "id": "S003",
@@ -609,14 +626,14 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Education & skills",
 "name": "Internship year",
 "cls": "param",
-"el": "student pay raised for 12 months"
+"el": "student net_income raised for 12 months"
 },
 {
 "id": "S006",
 "cat": "Education & skills",
 "name": "Bootcamp reskilling",
 "cls": "param",
-"el": "study variant: 3 months, fee, level up with probability 0.3"
+"el": "study variant: 3 months, fee, higher pay rank with probability 0.3"
 },
 {
 "id": "S007",
@@ -630,7 +647,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Education & skills",
 "name": "Study abroad",
 "cls": "param",
-"el": "higher living costs while in S"
+"el": "higher living costs while studying"
 },
 {
 "id": "S009",
@@ -644,56 +661,56 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Education & skills",
 "name": "Delayed graduation",
 "cls": "event",
-"el": "studies end at random (1 in 24 a month); a lower rate means a delay"
+"el": "the master's can run late (delay chance)"
 },
 {
 "id": "S011",
 "cat": "Career & employment",
 "name": "Early job start",
 "cls": "action",
-"el": "status: +1 from S (look for a job)"
+"el": "status 3 from student: accept full-time work"
 },
 {
 "id": "S012",
 "cat": "Career & employment",
 "name": "Salary negotiation",
 "cls": "event",
-"el": "promotion k + 1, a chance event rather than a free lever"
+"el": "promotion: net_income +10%, a chance event rather than a free lever"
 },
 {
 "id": "S013",
 "cat": "Career & employment",
 "name": "Promotion",
 "cls": "event",
-"el": "promotion k + 1 (0.7% a month)"
+"el": "promotion: net_income +10% (0.7% a month)"
 },
 {
 "id": "S014",
 "cat": "Career & employment",
 "name": "Unemployment gap",
 "cls": "event",
-"el": "job loss E → N"
+"el": "job loss: employed → not working"
 },
 {
 "id": "S015",
 "cat": "Career & employment",
 "name": "Freelancing",
 "cls": "param",
-"el": "E with self-employed pay noise (23% of pay)"
+"el": "full-time with self-employed pay swings (23% of pay)"
 },
 {
 "id": "S016",
 "cat": "Career & employment",
 "name": "Career switch",
 "cls": "param",
-"el": "pay level − 1 now, higher promotion rate"
+"el": "net_income −15% now, higher promotion rate"
 },
 {
 "id": "S017",
 "cat": "Career & employment",
 "name": "Four-day week",
 "cls": "action",
-"el": "status: −1 (E100 → E80)"
+"el": "status 2: accept part-time work (an 80% variant sets the pay share)"
 },
 {
 "id": "S018",
@@ -791,14 +808,14 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Housing & property",
 "name": "Rent alone",
 "cls": "action",
-"el": "housing: +1 (shared → small flat)"
+"el": "housing +1 (shared → small flat); rent redrawn"
 },
 {
 "id": "S032",
 "cat": "Housing & property",
 "name": "Move in with flatmates",
 "cls": "action",
-"el": "housing: −1 (→ shared flat)"
+"el": "housing −1 (→ shared flat); rent redrawn"
 },
 {
 "id": "S033",
@@ -882,7 +899,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Spending & lifestyle",
 "name": "Travel sabbatical",
 "cls": "action",
-"el": "status: stop for 6 months, then +1"
+"el": "status 4 for 6 months, then 3"
 },
 {
 "id": "S045",
@@ -917,7 +934,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Spending & lifestyle",
 "name": "Shared household",
 "cls": "action",
-"el": "housing: −1 (→ shared flat)"
+"el": "housing −1 (→ shared flat); rent redrawn"
 },
 {
 "id": "S050",
@@ -980,7 +997,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Savings & liquidity",
 "name": "Income interruption",
 "cls": "event",
-"el": "job loss E → N"
+"el": "job loss: employed → not working"
 },
 {
 "id": "S059",
@@ -1176,7 +1193,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Family & life events",
 "name": "Caregiving break",
 "cls": "action",
-"el": "status: −1 or stop"
+"el": "status 2 or 4"
 },
 {
 "id": "S087",
@@ -1204,21 +1221,21 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Family & life events",
 "name": "Disability interruption",
 "cls": "event",
-"el": "job loss E → N"
+"el": "job loss: employed → not working"
 },
 {
 "id": "S091",
 "cat": "Retirement & pensions",
 "name": "Retire at 60",
 "cls": "action",
-"el": "status: stop at 60 (the pension starts at 65)"
+"el": "status 4 at 60 (the pension starts at 65)"
 },
 {
 "id": "S092",
 "cat": "Retirement & pensions",
 "name": "Retire at 67",
 "cls": "action",
-"el": "status: 0 past 65"
+"el": "status 0 past 65"
 },
 {
 "id": "S093",
@@ -1351,7 +1368,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Entrepreneurship & innovation",
 "name": "Start a business",
 "cls": "param",
-"el": "E variant: 12 months of near-zero pay, then 23% pay noise"
+"el": "full-time variant: 12 months of near-zero net_income, then 23% pay swings"
 },
 {
 "id": "S112",
@@ -1372,7 +1389,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Entrepreneurship & innovation",
 "name": "Startup failure",
 "cls": "param",
-"el": "business variant ends in N"
+"el": "business variant ends in not working"
 },
 {
 "id": "S115",
@@ -1400,7 +1417,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 "cat": "Entrepreneurship & innovation",
 "name": "Founder salary",
 "cls": "param",
-"el": "lower pay level"
+"el": "lower net_income"
 },
 {
 "id": "S119",
@@ -1420,7 +1437,7 @@ footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem
 <script>
 (() => {
   const data = JSON.parse(document.getElementById('catalog').textContent);
-  const CLS = [['action', 'Agent move'], ['event', 'Random event'], ['builtin', 'Built-in rule'],
+  const CLS = [['action', 'Agent action'], ['event', 'Random event'], ['builtin', 'Built-in rule'],
                ['param', 'Parameter setting'], ['out', 'Left out']];
   const label = Object.fromEntries(CLS);
   const cats = [...new Set(data.map(d => d.cat))];

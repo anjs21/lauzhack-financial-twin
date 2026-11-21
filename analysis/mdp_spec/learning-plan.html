@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Twin Learning Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --fg: #0b0b0b; --fg2: #52514e; --muted: #6f6d68;
+  --grid: #e1e0d9; --axis: #c3c2b7; --line: rgba(11, 11, 11, 0.10); --hover: rgba(11, 11, 11, 0.04);
+  --accent: #1c5cab; --tint: #eef4fc;
+  /* ordinal ramp for "how far inside the MDP": agent move > random event > built-in > parameter; gray = left out */
+  --c-action: #184f95; --c-event: #2a78d6; --c-builtin: #5598e7; --c-param: #86b6ef; --c-out: #dcdbd5;
+  --on-action: #ffffff; --on-event: #ffffff; --on-builtin: #0b0b0b; --on-param: #0b0b0b; --on-out: #52514e;
+  --font-display: "Instrument Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #9b9a93;
+    --grid: #2c2c2a; --axis: #4a4a46; --line: rgba(255, 255, 255, 0.10); --hover: rgba(255, 255, 255, 0.05);
+    --accent: #86b6ef; --tint: #14243a;
+    --c-action: #9ec5f4; --c-event: #6da7ec; --c-builtin: #2a78d6; --c-param: #184f95; --c-out: #383835;
+    --on-action: #0b0b0b; --on-event: #0b0b0b; --on-builtin: #ffffff; --on-param: #f0efec; --on-out: #c3c2b7;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --fg: #f0efec; --fg2: #c3c2b7; --muted: #9b9a93;
+  --grid: #2c2c2a; --axis: #4a4a46; --line: rgba(255, 255, 255, 0.10); --hover: rgba(255, 255, 255, 0.05);
+  --accent: #86b6ef; --tint: #14243a;
+  --c-action: #9ec5f4; --c-event: #6da7ec; --c-builtin: #2a78d6; --c-param: #184f95; --c-out: #383835;
+  --on-action: #0b0b0b; --on-event: #0b0b0b; --on-builtin: #ffffff; --on-param: #f0efec; --on-out: #c3c2b7;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 15px/1.6 var(--font-body); }
+.page {
+  max-width: 980px; margin: 0 auto; padding-block: 44px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-weight: 700; font-size: clamp(2rem, 6vw, 2.9rem); line-height: 1.06; letter-spacing: -0.025em; }
+h2 { font-weight: 600; font-size: 1.5rem; line-height: 1.2; letter-spacing: -0.012em; }
+h3 { font-weight: 600; font-size: 1.05rem; line-height: 1.3; }
+p { margin: 0; max-width: 70ch; }
+sub { font-size: 0.7em; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+.eyebrow { font: 500 0.72rem/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: 0.09em; color: var(--fg2); }
+.num { font-variant-numeric: tabular-nums; }
+
+header.top { display: grid; gap: 18px; padding-bottom: 34px; }
+.lede { font-size: 1.1rem; line-height: 1.55; max-width: 66ch; }
+.small { font-size: 0.9rem; color: var(--fg2); }
+a { color: var(--accent); text-underline-offset: 2px; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 6px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.tile .v { font: 600 1.8rem/1.1 var(--font-body); letter-spacing: -0.01em; }
+.tile .l { font-size: 0.84rem; line-height: 1.4; color: var(--fg2); }
+
+section { display: grid; gap: 18px; padding-block: 36px; border-top: 1px solid var(--line); min-width: 0; }
+section > * { min-width: 0; }
+.section-head { display: grid; gap: 8px; }
+
+/* Tables */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { padding: 9px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--grid); }
+thead th { font: 600 0.72rem/1.3 var(--font-body); color: var(--fg2); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+tbody tr:last-child td, tbody tr:last-child th { border-bottom: 0; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+.state { min-width: 760px; }
+.state td:first-child { white-space: nowrap; font-weight: 600; }
+.state td:nth-child(3), .state td:nth-child(4) { color: var(--fg2); font-size: 0.84rem; }
+.sym { display: inline-block; min-width: 1.7em; font: 600 0.9rem/1 var(--font-mono); color: var(--accent); }
+.vals { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.vals .v { display: inline-flex; align-items: baseline; gap: 5px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); font-size: 0.82rem; line-height: 1.45; white-space: nowrap; }
+.vals .v b { font: 600 0.78rem/1 var(--font-mono); }
+.eyebrow .m { text-transform: none; letter-spacing: 0.02em; }
+.events td:nth-child(2) { white-space: nowrap; }
+td .sub { display: block; font-size: 0.78rem; color: var(--fg2); }
+.pref td:first-child { white-space: nowrap; }
+.ext td:nth-child(4) { white-space: nowrap; }
+.arr { color: var(--muted); font-size: 0.8rem; }
+.note { font-size: 0.8rem; color: var(--fg2); margin-top: 5px; line-height: 1.45; }
+
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+.kv { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 0.86rem; line-height: 1.45; }
+.kv dt { color: var(--fg2); font-weight: 500; }
+.kv dd { margin: 0; }
+
+/* Actions */
+.acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.act { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 12px; align-content: start; }
+.act-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.act-top .tag { font: 500 0.7rem/1 var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--fg2); white-space: nowrap; }
+.opts { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 7px 10px; margin: 0; font-size: 0.88rem; line-height: 1.45; }
+.opts dt { justify-self: start; }
+.opts dt span { display: inline-block; min-width: 2.4rem; text-align: center; padding: 1px 7px; border-radius: 6px; background: var(--tint); color: var(--accent); font: 600 0.8rem/1.5 var(--font-mono); }
+.opts dd { margin: 0; }
+.act .mask, .act .ids { font-size: 0.8rem; color: var(--fg2); line-height: 1.45; border-top: 1px solid var(--line); padding-top: 9px; }
+.act .ids { border-top: 0; padding-top: 0; font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+
+/* Status diagram */
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 10px 6px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.diagram .box { fill: var(--bg); stroke: var(--axis); stroke-width: 1; }
+.diagram .pill { fill: var(--tint); }
+.diagram .t1 { font: 600 14px var(--font-display); fill: var(--fg); }
+.diagram .t2 { font: 400 11.5px var(--font-body); fill: var(--fg2); }
+.diagram .t3 { font: 600 11.5px var(--font-mono); fill: var(--accent); }
+.diagram .lbl { font: 500 11.5px var(--font-body); fill: var(--fg2); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+.diagram .mv { fill: none; stroke: var(--accent); stroke-width: 2; marker-end: url(#ah-mv); }
+.diagram .rnd { fill: none; stroke: var(--fg2); stroke-width: 1.6; stroke-dasharray: 5 4; marker-end: url(#ah-rnd); }
+.diagram .ah-mv { fill: var(--accent); }
+.diagram .ah-rnd { fill: var(--fg2); }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+figcaption { font-size: 0.84rem; color: var(--fg2); max-width: 74ch; }
+.keys { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.82rem; color: var(--fg2); }
+.keys span { display: inline-flex; align-items: center; gap: 7px; }
+
+/* Dynamics */
+.formula { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 12px; }
+.eq { font: 500 0.88rem/1.7 var(--font-mono); overflow-x: auto; white-space: nowrap; padding-bottom: 2px; }
+.params { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; font-size: 0.86rem; }
+.params div { display: grid; grid-template-columns: 8.2rem minmax(0, 1fr) auto; gap: 10px; align-items: baseline; border-bottom: 1px solid var(--line); padding-block: 6px; }
+.params .k { color: var(--fg2); }
+.src { display: inline-block; font: 500 0.66rem/1 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 5px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap; }
+.src.d { color: var(--accent); background: var(--tint); border-color: transparent; }
+.src.a { color: var(--muted); }
+
+/* Lists */
+.notes { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; counter-reset: n; }
+.notes li { display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 8px; max-width: 78ch; }
+.notes li::before { counter-increment: n; content: counter(n); font: 500 0.78rem/1.9 var(--font-mono); color: var(--fg2); }
+.notes b { font-weight: 600; }
+.notes .ids { font: 400 0.76rem/1 var(--font-mono); color: var(--muted); }
+
+/* Coverage chart */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.84rem; color: var(--fg2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; flex: none; }
+.sw.action, .seg.action { background: var(--c-action); color: var(--on-action); }
+.sw.event, .seg.event { background: var(--c-event); color: var(--on-event); }
+.sw.builtin, .seg.builtin { background: var(--c-builtin); color: var(--on-builtin); }
+.sw.param, .seg.param { background: var(--c-param); color: var(--on-param); }
+.sw.out, .seg.out { background: var(--c-out); color: var(--on-out); }
+.cov { display: grid; gap: 7px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.cov-row { display: grid; grid-template-columns: 12.5rem minmax(0, 1fr); gap: 14px; align-items: center; }
+.cov-row .lab { font-size: 0.87rem; line-height: 1.25; }
+.cov-row.total { padding-bottom: 10px; margin-bottom: 4px; border-bottom: 1px solid var(--grid); }
+.cov-row.total .lab { font-weight: 600; }
+.cov-bar { display: flex; gap: 2px; height: 24px; min-width: 0; }
+.cov-row.total .cov-bar { height: 30px; }
+.seg { display: flex; align-items: center; justify-content: center; min-width: 0; overflow: hidden; font: 600 0.74rem/1 var(--font-body); font-variant-numeric: tabular-nums; cursor: default; }
+.seg:first-child { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.seg:last-child { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.seg:hover, .seg:focus-visible { filter: brightness(1.08) saturate(1.05); }
+.seg:focus-visible { outline: 2px solid var(--fg); outline-offset: 1px; }
+details.all { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+details.all > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: 0.92rem; }
+details.all > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+details.all .tablewrap { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; max-height: 560px; overflow: auto; }
+#cat-table { min-width: 640px; }
+#cat-table td:first-child { font-family: var(--font-mono); font-size: 0.8rem; color: var(--fg2); white-space: nowrap; }
+#cat-table td.cls { white-space: nowrap; }
+#cat-table td.cls .sw { margin-right: 7px; vertical-align: -1px; }
+#cat-table tr.grp th { position: sticky; top: 0; background: var(--surface); font: 600 0.74rem/1.2 var(--font-display); text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg2); padding-top: 14px; }
+#cat-table thead th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+
+/* Tooltip */
+.tt { position: fixed; z-index: 20; max-width: 340px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16); font-size: 0.8rem; line-height: 1.35; pointer-events: none; display: grid; gap: 6px; }
+.tt .h { font: 600 0.86rem/1.3 var(--font-display); }
+.tt .item { display: grid; gap: 1px; }
+.tt .item b { font-weight: 600; }
+.tt .item span, .tt .idl { color: var(--fg2); }
+.tt .idl { font-family: var(--font-mono); font-size: 0.74rem; line-height: 1.5; }
+
+footer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 0.8rem; color: var(--fg2); display: grid; gap: 6px; }
+
+@media (max-width: 860px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .acts, .pair, .params { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  /* tables become one card per row */
+  table.stack { min-width: 0; }
+  table.stack thead { display: none; }
+  table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+  table.stack tr { padding: 10px 14px; border-bottom: 1px solid var(--grid); }
+  table.stack tr:last-child { border-bottom: 0; }
+  table.stack td { border: 0; padding: 2px 0; text-align: left; white-space: normal; }
+  table.stack td:first-child { font-weight: 600; padding-bottom: 4px; }
+  table.stack td::before { color: var(--muted); font: 400 0.86rem/1.5 var(--font-body); }
+  .state td:nth-child(3)::before { content: "Changed by: "; }
+  .state td:nth-child(4)::before { content: "Catalog: "; }
+  .events td:nth-child(2)::before { content: "Per month: "; }
+  .events td:nth-child(3)::before { content: "Effect: "; }
+  .ext td:nth-child(2)::before { content: "Adds: "; }
+  .ext td:nth-child(3)::before { content: "Unlocks: "; }
+  .ext td:nth-child(4)::before { content: "Scenarios: "; }
+  .ext td:nth-child(5)::before { content: "Why it waits: "; }
+  table.stack td .sub { display: inline; }
+  table.stack td .sub::before { content: " · "; }
+  .state td:nth-child(3), .state td:nth-child(4) { font-size: 0.82rem; }
+}
+@media (max-width: 560px) {
+  .cov-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .params div { grid-template-columns: minmax(0, 1fr) auto; }
+  .params div .k { grid-column: 1 / -1; }
+  .kv { grid-template-columns: minmax(0, 1fr); gap: 0 0; }
+  .kv dd { margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* plan page */
+.callout { border-left: 3px solid var(--accent); background: var(--tint); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 0.92rem; line-height: 1.55; max-width: 84ch; }
+.callout b { font-weight: 600; }
+.cards3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.card ul, .card ol { margin: 0; padding-left: 1.15em; display: grid; gap: 5px; font-size: 0.88rem; line-height: 1.5; }
+.card p { font-size: 0.88rem; line-height: 1.5; }
+.card .lbl2 { font: 500 0.7rem/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg2); }
+.diagram .grp { fill: none; stroke: var(--axis); stroke-width: 1; stroke-dasharray: 4 4; }
+.diagram .t4 { font: 500 11px var(--font-mono); fill: var(--muted); letter-spacing: 0.04em; }
+.comp td:first-child { font-weight: 600; white-space: nowrap; }
+.comp td:nth-child(2) { color: var(--fg2); }
+.comp .n { font: 500 0.74rem/1 var(--font-mono); color: var(--fg2); margin-right: 6px; }
+.steps td:first-child { font: 600 0.8rem/1.6 var(--font-mono); color: var(--accent); white-space: nowrap; }
+.steps td:nth-child(2) { font-weight: 600; white-space: nowrap; }
+.steps td:last-child { color: var(--fg2); }
+.steps tr.stretch td { background: var(--hover); }
+pre.code { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font: 400 0.82rem/1.65 var(--font-mono); }
+pre.code .c { color: var(--muted); }
+@media (max-width: 860px) { .cards3 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .comp td:nth-child(2)::before { content: "Learned from: "; }
+  .comp td:nth-child(3)::before { content: "How: "; }
+  .steps td:nth-child(3)::before { content: "Builds: "; }
+  .steps td:nth-child(4)::before { content: "Done when: "; }
+  .risks td:nth-child(2)::before { content: "Answer: "; }
+  .comp td:first-child, .steps td:nth-child(2) { white-space: normal; }
+  .steps td:first-child { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <div class="eyebrow">LauzHack 2026 · UBS AI Financial Twin · Build plan</div>
+  <h1>Learn the world, sample the person</h1>
+  <p class="lede">The twin shows the range of lives one person could lead over the next ten years, given how they tend to decide. It does not optimise. Two learned parts make that possible: a world model that learns from the ledger how a month unfolds, and a persona policy that chooses the way this person would, at random and with memory of their own path.</p>
+  <p class="small">States, actions and catalog coverage: <a href="mdp-spec.html">MDP spec</a>.</p>
+  <div class="tiles">
+    <div class="tile"><div class="v num">2,000</div><div class="l">lives sampled per person, 120 months each</div></div>
+    <div class="tile"><div class="v num">28,800</div><div class="l">profile-months the world model learns from (1,200 people × 24 months)</div></div>
+    <div class="tile"><div class="v num">0</div><div class="l">decisions observed in the data, so action effects come from comparing people</div></div>
+    <div class="tile"><div class="v num">4</div><div class="l">sources of spread: who they are, what they choose, luck, and what the model does not know</div></div>
+  </div>
+</header>
+
+<section id="loop">
+  <div class="section-head">
+    <div class="eyebrow">The loop</div>
+    <h2>One person, thousands of lives</h2>
+    <p>Each month the persona policy samples a choice from the person's traits and their own history so far, and the world model samples what happens next. One path is 120 months; the explorer runs 2,000 paths and summarises the spread.</p>
+  </div>
+  <figure>
+    <div class="diagram" role="img" aria-label="The person's profile, traits and intentions feed a persona policy and a world model. Each month the policy sends an action to the world model, which returns the next state and history. This loop repeats every month for every path, and the paths go to the explorer, which shows fan charts, goal odds, life stories and what-ifs.">
+      <svg viewBox="0 0 760 272" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <marker id="ah-mv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ah-mv" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ah-rnd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path class="ah-rnd" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+        <rect class="grp" x="250" y="6" width="262" height="258" rx="12"/>
+        <text class="t4" x="381" y="256" text-anchor="middle">EVERY MONTH, EVERY PATH</text>
+
+        <rect class="box" x="16" y="80" width="170" height="110" rx="8"/>
+        <text class="t1" x="101" y="108" text-anchor="middle">Person</text>
+        <text class="t2" x="101" y="130" text-anchor="middle">profile from the data</text>
+        <text class="t2" x="101" y="148" text-anchor="middle">traits z, with spread</text>
+        <text class="t2" x="101" y="166" text-anchor="middle">stated intentions</text>
+
+        <rect class="box" x="270" y="24" width="222" height="70" rx="8"/>
+        <text class="t1" x="381" y="52" text-anchor="middle">Persona policy</text>
+        <text class="t2" x="381" y="73" text-anchor="middle">π(a | s, h, z), always sampled</text>
+
+        <rect class="box" x="270" y="162" width="222" height="70" rx="8"/>
+        <text class="t1" x="381" y="190" text-anchor="middle">World model</text>
+        <text class="t2" x="381" y="211" text-anchor="middle">learned flow + redraws + priors</text>
+
+        <rect class="box" x="574" y="80" width="170" height="110" rx="8"/>
+        <text class="t1" x="659" y="108" text-anchor="middle">Explorer</text>
+        <text class="t2" x="659" y="130" text-anchor="middle">2,000 paths × 120 months</text>
+        <text class="t2" x="659" y="148" text-anchor="middle">fan charts, goal odds</text>
+        <text class="t2" x="659" y="166" text-anchor="middle">life stories, what-ifs</text>
+
+        <path class="mv" d="M186 110 C228 110, 228 59, 268 59"/>
+        <path class="mv" d="M186 160 C228 160, 228 197, 268 197"/>
+        <path class="mv" d="M430 95 L430 160"/>
+        <text class="lbl" x="440" y="132">action a<tspan dy="3" font-size="9">t</tspan></text>
+        <path class="rnd" d="M332 161 L332 96"/>
+        <text class="lbl" x="322" y="132" text-anchor="end">state, history</text>
+        <path class="mv" d="M512 135 L572 135"/>
+        <text class="lbl" x="542" y="126" text-anchor="middle">paths</text>
+      </svg>
+    </div>
+    <div class="keys">
+      <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--accent)" stroke-width="2"/></svg>input or choice</span>
+      <span><svg width="26" height="10" aria-hidden="true"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--fg2)" stroke-width="1.6" stroke-dasharray="5 4"/></svg>sampled outcome</span>
+    </div>
+  </figure>
+</section>
+
+<section id="world">
+  <div class="section-head">
+    <div class="eyebrow">World model <span class="m">T(s′ | s, a)</span></div>
+    <h2>Learn what the data can teach, state the rest</h2>
+    <p>The ledger shows 1,200 people for 24 months, but nobody in it changes mode, flat or spending. So the network learns how a month unfolds for a given state, and an action works by moving the person into a state other people already occupy. That is exactly how the synthetic data was generated; with real data it becomes an assumption to test.</p>
+  </div>
+  <div class="tablewrap">
+    <table class="comp stack">
+      <thead><tr><th>Component</th><th>Learned from</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td><span class="n">1</span>Monthly cash flow</td><td>Ledger: 28,800 profile-months</td><td>Mixture density network, ensemble of 5 (details below)</td></tr>
+        <tr><td><span class="n">2</span>Income after a mode change</td><td>Take-home pay by mode in the profiles: full-time 788, part-time 120, student 39, not working 253</td><td>Keep the person's pay rank and read it off the new mode's distribution; not working splits at 65 into benefits and pensions. In the data, pay depends on mode only, not on age, city or rent.</td></tr>
+        <tr><td><span class="n">3</span>Rent after a move</td><td>Rent by city and household in the profiles (R² 0.66)</td><td>Log-rent model, keeping the person's rank within the new tier</td></tr>
+        <tr><td><span class="n">4</span>Pay and cost drift</td><td>Ledger trends: +1.4% and +1.0% a year</td><td>Grows net_income and rent. The network never sees the calendar year, so it is never asked to extrapolate one.</td></tr>
+        <tr><td><span class="n">5</span>Master's</td><td>Scenario S001: 24 months, CHF 1,200–8,000 a year</td><td>Lookup</td></tr>
+        <tr><td><span class="n">6</span>Everything else</td><td>Not in the data</td><td>Life events, economy, returns, job offers, degree premium and the lifestyle effect stay priors in one editable file; each is also a catalog lever.</td></tr>
+        <tr><td><span class="n">7</span>Cash, investments, credit</td><td>Bookkeeping</td><td>Exact code: C′ = C + flow − invest − moving + credit interest</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="callout"><b>Why not one network for the whole step?</b> Bookkeeping is exact, so a network could only add error to it. And since nobody switches in the data, a network trained on whole steps would learn that actions do nothing.</p>
+  <p class="note">One step runs in this order: apply the action (mode and rent redraws, transfers) → draw events and the economy → draw the month's flow from the network → update the books.</p>
+</section>
+
+<section id="flow">
+  <div class="section-head">
+    <div class="eyebrow">Flow network</div>
+    <h2>A small network whose output is a distribution</h2>
+  </div>
+  <div class="pair">
+    <div class="card">
+      <div class="lbl2">Inputs</div>
+      <ul>
+        <li>work mode, plus a self-employed flag</li>
+        <li>net_income and rent (log)</li>
+        <li>household and housing tier</li>
+        <li>city (small embedding) and age</li>
+        <li>calendar month (12)</li>
+      </ul>
+      <p class="note">Left out on purpose: the calendar year (drift enters through net_income and rent), and lifestyle and economy, which never vary in the data and are applied afterwards as prior adjustments.</p>
+    </div>
+    <div class="card">
+      <div class="lbl2">Output and training</div>
+      <ul>
+        <li>a mixture of 5 Gaussians over next month's net flow, so bonuses, bills and fees fit as separate bumps</li>
+        <li>MLP with 2 × 64 units; negative log-likelihood; AdamW, weight decay, early stopping</li>
+        <li>5 folds split by person, so nobody is in both training and test</li>
+        <li>5 seeds: each path draws one member, so model uncertainty shows in the spread, and members that disagree flag states the data never covered</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Acceptance tests before it replaces the hand-calibrated simulator</h3>
+    <ol>
+      <li>At least as good on held-out people: log-likelihood and CRPS no worse than the hand-calibrated simulator.</li>
+      <li>Trained on 2025 only, its 2026 intervals cover about 50% and 90% of end-of-year cash (baseline: 51% and 89%).</li>
+      <li>Rolled 12 months forward from December 2025, about 61 profiles go below zero in 2026 (data: 61; baseline: 61.2).</li>
+      <li>Simulated months show the patterns of the data: a December bonus for about 56% of employees, bills in 37% of Februaries and Augusts, noise of about CHF 200 + 5% of pay, no carry-over between months, and bills unrelated to pay.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="policy">
+  <div class="section-head">
+    <div class="eyebrow">Persona policy <span class="m">π(a | s, h, z)</span></div>
+    <h2>Choose like this person, not optimally</h2>
+    <p>The policy gives a probability for every option, conditioned on the state, the person's own history h and their traits z. It is always sampled, never maximised, so two people with the same balances can choose differently, and so can the same person on two paths.</p>
+  </div>
+  <div class="cards3">
+    <div class="card">
+      <div class="lbl2">Traits z</div>
+      <p>Risk tolerance, frugality, career drive, wish for free time, housing aspiration, inertia, impatience and goal focus, plus a temperature for how random choices are.</p>
+      <p class="note">Set from the profile (age, mode, household, goal type: an "Education flexibility" goal raises the pull toward a master's), a short questionnaire, and a spread around the answers.</p>
+    </div>
+    <div class="card">
+      <div class="lbl2">History h</div>
+      <p>Months in the current mode, months since the last move, recent shocks (job loss, a big bill), cash trend, goal gap against time left, and past switches.</p>
+      <p class="note">The neural version reads the monthly path with a small GRU (32 units) instead.</p>
+    </div>
+    <div class="card">
+      <div class="lbl2">Output</div>
+      <p>Four heads in order: status (5) → housing (3) → spending (3) → assets (3), each masked to valid options.</p>
+      <p class="note">Status and housing are considered at a yearly review or right after an event; spending and assets every month.</p>
+    </div>
+  </div>
+  <p class="callout"><b>The person can state intentions too</b>, each with a probability: "start a master's in September 2026, 60%" or "move somewhere cheaper if cash falls below two months". Each adds to the logit of the matching option.</p>
+  <div class="tablewrap">
+    <table class="steps stack">
+      <thead><tr><th></th><th>Stage</th><th>What</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Rule persona (MVP)</td><td>Trait-weighted rules plus inertia, turned into probabilities with the person's temperature</td><td>Works on day one and is easy to explain</td></tr>
+        <tr><td>2</td><td>Neural persona</td><td>One network for all personas, cloned from rule-persona paths plus LLM persona demonstrations: an LLM plays sampled personas at decision points and returns a probability per option</td><td>Remembers history, fast enough for 2,000 paths, richer than rules</td></tr>
+        <tr><td>3</td><td>Refinement (optional)</td><td>KL-regularised RL toward the persona's own preferences, kept close to the cloned behaviour</td><td>Reacts to consequences without turning into an optimiser</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">The data holds no decisions, so behaviour cannot be checked against it. Check instead that yearly action rates look plausible against base rates the team sources, and show how results move when each trait changes.</p>
+</section>
+
+<section id="explore">
+  <div class="section-head">
+    <div class="eyebrow">Explorer</div>
+    <h2>What one person gets to see</h2>
+  </div>
+  <ol class="notes">
+    <li><div><b>Four sources of spread</b> on every path: traits drawn from the person's range, one ensemble member, the policy's choices, and the world's luck (flows, events, markets).</div></li>
+    <li><div><b>Fan charts</b> of cash and net worth, and the odds of a shortfall or of meeting each goal, year by year.</div></li>
+    <li><div><b>The five most common life stories</b> (clusters of yearly work mode, housing and household), each with its probability and typical outcome.</div></li>
+    <li><div><b>Turning points:</b> the decisions and events that most separate good from bad outcomes.</div></li>
+    <li><div><b>What-ifs</b> such as "start the master's now" on the same random numbers, so differences come from the change alone.</div></li>
+    <li><div><b>Where the spread comes from:</b> choices, luck or model uncertainty, found by fixing one source at a time.</div></li>
+  </ol>
+  <p class="note">2,000 paths × 120 months run batched in PyTorch (2.11, already installed here) in seconds.</p>
+</section>
+
+<section id="build">
+  <div class="section-head">
+    <div class="eyebrow">Build order</div>
+    <h2>Six steps to a working twin, one stretch</h2>
+  </div>
+  <div class="tablewrap">
+    <table class="steps stack">
+      <thead><tr><th></th><th>Step</th><th>Builds</th><th>Done when</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Data table</td><td>Profile-month table with work mode, net_income, rent, month and flow; folds by person</td><td>rows reconcile with the ledger</td></tr>
+        <tr><td>2</td><td>Baseline and tests</td><td>The calibrated simulator in <code>action_importance.py</code> wrapped as a baseline world; the acceptance tests</td><td>the baseline passes them</td></tr>
+        <tr><td>3</td><td>Flow network</td><td>Mixture density network ensemble</td><td>it passes the tests and matches or beats the baseline</td></tr>
+        <tr><td>4</td><td>World step</td><td>Income and rent redraws, priors file and exact bookkeeping behind one T(s′ | s, a) call</td><td>120-month paths stay stable and the money adds up</td></tr>
+        <tr><td>5</td><td>Persona policy</td><td>Traits, rules, decision clock, masks, history features</td><td>personas differ visibly and yearly action rates look plausible</td></tr>
+        <tr><td>6</td><td>Explorer</td><td>Rollouts, fan charts, life stories, what-ifs</td><td>one person end to end in seconds</td></tr>
+        <tr class="stretch"><td>7</td><td>Stretch</td><td>Neural persona from rules and LLM demonstrations; optional KL-regularised RL</td><td>the cloned policy matches its teacher on held-out personas</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="section-head">
+    <div class="eyebrow">Risks</div>
+    <h2>What could go wrong, and the answer</h2>
+  </div>
+  <div class="tablewrap">
+    <table class="risks stack">
+      <thead><tr><th>Risk</th><th>Answer</th></tr></thead>
+      <tbody>
+        <tr><td>Only 1,200 people</td><td>Small network, ensembles, folds by person, and the baseline as a floor</td></tr>
+        <tr><td>Nobody switches in the data</td><td>Action effects come only from comparing people; say so, and flag states where the ensemble disagrees</td></tr>
+        <tr><td>Ten years from two years of data</td><td>Drift through net_income and rent, never the calendar; priors for everything else</td></tr>
+        <tr><td>Errors compound over 120 months</td><td>Exact bookkeeping, the 12-month rollout test, and pattern tests on simulated paths</td></tr>
+        <tr><td>Personas are assumptions</td><td>Visible traits, base-rate checks, and sensitivity to each trait</td></tr>
+        <tr><td>LLM cost</td><td>Only at decision points, for training data or a few narrated paths; never inside the 2,000-path loop</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="layout">
+  <div class="section-head">
+    <div class="eyebrow">Code layout</div>
+    <h2>Suggested modules</h2>
+  </div>
+<pre class="code">twin/
+  data.py             <span class="c"># profile-month table and folds</span>
+  world/flow.py       <span class="c"># mixture density network and ensemble</span>
+  world/redraw.py     <span class="c"># income and rent when the mode or tier changes</span>
+  world/priors.yaml   <span class="c"># events, economy, returns, offers, premiums</span>
+  world/env.py        <span class="c"># T(s′ | s, a): action → events → flow → books</span>
+  policy/traits.py    <span class="c"># trait schema and questionnaire mapping</span>
+  policy/rules.py     <span class="c"># rule persona (MVP)</span>
+  policy/net.py       <span class="c"># neural persona (GRU) and behaviour cloning</span>
+  policy/llm.py       <span class="c"># LLM persona demonstrations (stretch)</span>
+  explore.py          <span class="c"># rollouts and summaries</span>
+tests/test_world.py   <span class="c"># acceptance and pattern tests</span></pre>
+</section>
+
+<footer>
+  <div>Numbers come from the profiles, the ledger and <code>analysis/action_importance/results/</code> (calibration, back-test and income–expense analysis). The MDP itself: <a href="mdp-spec.html">MDP spec</a>.</div>
+  <div>Synthetic data only; nothing here is financial advice. Built 2026-11-21.</div>
+</footer>
+</div>
+</body>
+</html>
