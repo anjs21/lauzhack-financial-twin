@@ -291,7 +291,13 @@ def train_snapshot_proxy(path, log=print):
     return report
 
 
-def load_net(path=C.ARTIFACTS / "persona_net.pt"):
+# The persona GRU every neural policy loads by default: the January 2026 proxy cloned from vLLM (Qwen) labels
+# by `python -m twin clone-snapshots`. `python -m twin clone` still writes its rule clone to persona_net.pt.
+PERSONA_NET = C.ARTIFACTS / "jan_2026_proxy_gru.pt"
+RULE_CLONE = C.ARTIFACTS / "persona_net.pt"        # the rule persona's clone; foresight is distilled on top of it
+
+
+def load_net(path=PERSONA_NET):
     net = PersonaNet()
     net.load_state_dict(torch.load(path, weights_only=True))
     net.eval()
@@ -328,7 +334,7 @@ def main(n_profiles=400, n_paths=6, use_llm=False, llm_weight=10.0, llm_sharpen=
         log(f"LLM persona answers: {n_llm} decision points, weight {llm_weight:g} each, sharpened x{llm_sharpen} (status, housing, spending, assets)")
     log(f"training on {len(X)} lives, testing on {len(Xv)} lives of unseen profiles ...")
     net, best = train_net(X, M, P, Xv, Mv, Pv, log=log, W=W)
-    torch.save(net.state_dict(), C.ARTIFACTS / "persona_net.pt")
+    torch.save(net.state_dict(), RULE_CLONE)
     heads = per_head_kl(net, Xv, Mv, Pv)
 
     # Whole lives: rule persona vs its clone on unseen profiles, same seeds.
@@ -356,5 +362,5 @@ def main(n_profiles=400, n_paths=6, use_llm=False, llm_weight=10.0, llm_sharpen=
             f"{r['high_goal_odds'][1]:.2f} neural | median NW {r['median_final_net_worth'][0]:,.0f} vs "
             f"{r['median_final_net_worth'][1]:,.0f} | status changes/yr {r['status_changes_per_year'][0]:.3f} vs "
             f"{r['status_changes_per_year'][1]:.3f}")
-    log(f"saved {C.ARTIFACTS / 'persona_net.pt'} ({res['seconds']:.0f}s)")
+    log(f"saved {RULE_CLONE} ({res['seconds']:.0f}s)")
     return res

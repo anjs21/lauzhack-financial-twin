@@ -107,7 +107,8 @@ reconsidered at the January review; spending and assets every month.
   conditional ones such as `{"head": "housing", "option": -1, "prob": 0.7, "cash_months_below": 2}`.
 * **Neural persona** ([`policy/net.py`](policy/net.py)): a GRU policy cloned from the rule
   persona's probabilities over 2,400 sampled lives, tested on unseen profiles
-  (`twin/artifacts/persona_net.json`). `--policy neural` in the explorer.
+  (`twin/artifacts/persona_net.json`). `--policy neural` in the explorer loads
+  `twin/artifacts/jan_2026_proxy_gru.pt` (the January 2026 Qwen proxy from `clone-snapshots`) by default.
 * **LLM persona** ([`policy/llm.py`](policy/llm.py)): an OpenAI model role-plays the person at
   decision points of the clone's training lives (situation, goals and traits in words) and answers
   how *this person* would likely act, as probabilities. Those answers replace the rule targets at

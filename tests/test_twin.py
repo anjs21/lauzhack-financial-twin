@@ -286,10 +286,15 @@ def test_llm_client_caches_and_never_needs_a_key_for_cached_prompts(tmp_path):
 def test_foresight_zero_stays_close_to_the_persona(world):
     from twin.explore import goal_met
     from twin.policy.foresight import at_level
-    from twin.policy.net import NeuralPolicy
+    from twin.policy.net import RULE_CLONE, NeuralPolicy, load_net
+    clone = load_net(RULE_CLONE)                   # foresight is distilled from the rule clone, not the default GRU
+
+    class RuleClone(NeuralPolicy):
+        def __init__(self, *a, **k):
+            super().__init__(*a, net=clone, **k)
     people = profiles().iloc[[10]]
     p = from_profile(people.iloc[0])
-    a = simulate(world, people, p, n_paths=600, seed=3, policy_cls=NeuralPolicy)
+    a = simulate(world, people, p, n_paths=600, seed=3, policy_cls=RuleClone)
     b = simulate(world, people, p, n_paths=600, seed=3, policy_cls=at_level(0.0))
     assert abs(goal_met(a)[0].mean() - goal_met(b)[0].mean()) < 0.06
     assert abs(np.median(a.nw[:, -1]) / np.median(b.nw[:, -1]) - 1) < 0.1
@@ -305,3 +310,14 @@ def test_life_utility_follows_preferences(world):
     paths = simulate(world, rich, lean, n_paths=200, seed=2, horizon=120)
     assert np.allclose(u, life_utility(paths)) and np.isfinite(u).all()
     assert (u > paths.nw[:, -1] - 120 * 2500).all()                      # bounded monthly terms
+
+
+def test_neural_persona_loads_the_january_2026_gru_by_default():
+    from twin.policy.net import PERSONA_NET, RULE_CLONE, load_net
+    assert PERSONA_NET == C.ARTIFACTS / "jan_2026_proxy_gru.pt" and RULE_CLONE == C.ARTIFACTS / "persona_net.pt"
+    if not PERSONA_NET.exists():
+        pytest.skip("python -m twin clone-snapshots")
+    import torch
+    loaded = load_net().state_dict()
+    saved = torch.load(PERSONA_NET, weights_only=True)
+    assert all(torch.equal(loaded[k], saved[k]) for k in saved)
