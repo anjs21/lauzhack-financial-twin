@@ -21,3 +21,11 @@ venv/
 .twin-sessions.sqlite3
 .twin-sessions.sqlite3-*
 /twin/artifacts/llm_cache.jsonl
+
+# Web client
+node_modules/
+web/dist/
+.vercel/
+web/test-results/
+web/playwright-report/
+*.tsbuildinfo
