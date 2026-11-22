@@ -310,3 +310,33 @@ test('compare taking the job alongside the studies or instead of them', async ({
   await page.getByRole('switch', { name: 'Compare both' }).click();                        // turning it off needs a new run
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
 });
+
+test('exploring keeps the page where it is; only a chat question scrolls to the answer', async ({ page }) => {
+  await page.route('http://127.0.0.1:8000/**', async route => {
+    const request = route.request();
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization,content-type', 'access-control-allow-methods': 'GET,POST,DELETE' } });
+    let json: unknown = {};
+    if (request.url().endsWith('/health')) json = { status: 'ok', llm_ready: true };
+    else if (request.url().endsWith('/messages')) json = { answer: 'Answered.' };
+    else if (request.method() === 'POST') { await new Promise(r => setTimeout(r, 400)); json = { session_id: 'scroll', evidence: example, answer: 'Explored.' }; }
+    await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Connect', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
+  await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
+  await expect(page.getByText('Explored.')).toBeVisible();
+  // Read the scroll of the page and of the text pane (the pane scrolls on desktop, the page on mobile).
+  const scrolled = () => page.evaluate(() => window.scrollY + (document.querySelector('.text-pane')?.scrollTop ?? 0));
+  await page.evaluate(() => { window.scrollTo(0, 0); document.querySelector('.text-pane')?.scrollTo(0, 0); });
+  await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
+  await expect(page.getByText('Explored.')).toBeVisible();
+  await page.waitForTimeout(600);
+  expect(await scrolled()).toBe(0);
+  await page.getByLabel('Ask about your financial future').fill('Why?');
+  await page.getByRole('button', { name: 'Send message' }).click();
+  await expect(page.getByText('Answered.')).toBeVisible();
+  await page.waitForTimeout(600);
+  expect(await scrolled()).toBeGreaterThan(0);
+});

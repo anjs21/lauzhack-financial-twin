@@ -115,6 +115,7 @@ export default function App() {
   const [growing, setGrowing] = useState(false);
   const [measure, setMeasure] = useState<Measure>('fan_net_worth');
   const chatEnd = useRef<HTMLDivElement>(null);
+  const followChat = useRef(false);   // only a chat question scrolls the page to its answer
   const current = evidence.alternative ?? evidence.baseline;
   // Working alongside studies only applies to a student choosing the part-time offer.
   const canKeepStudying = person.status === 'student' && scenario.kind === 'part_time';
@@ -137,7 +138,7 @@ export default function App() {
   const canBranch = !exampleMode && !!session && !stale;
   const salaryInvalid = scenario.kind === 'part_time' && (!Number.isFinite(scenario.salary) || scenario.salary <= 0 || scenario.salary > 100000);
 
-  useEffect(() => { if (messages.length > 1 || busy) chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages.length, busy]);
+  useEffect(() => { if (followChat.current) chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages.length, busy]);
 
   // Open the "Plan explained" tab on your own results: the laptop runs the analysis once per session (a few seconds).
   const explainable = !exampleMode && !!session && !stale && !!evidence.plan;
@@ -173,6 +174,7 @@ export default function App() {
       : scenario.kind === 'baseline' ? 'Help me understand my plan: how often its steps really happen and when, how it affects my goal, and the trade-offs for what I value.'
       : `Help me understand ${what} on top of my plan, how it affects my goal, when the big decisions typically happen, and the trade-offs for what I value.`;
     const wasStarted = started;
+    followChat.current = false;
     setBusy('run'); setError(''); setStarted(true); setPick(null);
     try {
       const result = await api<{ session_id: string; evidence: Evidence; answer: string }>(connection, '/sessions', {
@@ -189,6 +191,7 @@ export default function App() {
   async function send(text = question) {
     if (!text.trim() || busy) return;
     if (!session || stale) { setError('Explore your current choices first, so the conversation uses the right results.'); return; }
+    followChat.current = true;
     setBusy('chat'); setError('');
     try {
       const result = await api<ChatResult>(connection, `/sessions/${session}/messages`, { message: text.trim() });
@@ -208,6 +211,7 @@ export default function App() {
   // Planning runs on the laptop as a job (one to three minutes); poll it, then explore the new plan.
   async function runPlanJob(start: () => Promise<PlanState>, base: OwnPlan | null, snapshot: { person: Person; traits: Record<string, number> }) {
     const token = ++planJob.current;
+    followChat.current = false;
     setBusy('plan'); setError(''); setPlanProgress('Starting');
     try {
       let state = await start();
