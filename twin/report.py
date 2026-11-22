@@ -119,6 +119,8 @@ def describe(i: dict) -> str:
              "assets": {-1: "sell investments to the buffer", 0: "hold", 1: "invest above the buffer"}}
     what = words[i["head"]][i["option"]]
     when = [f"in {i['when']}"] if i.get("when") else []
+    if i.get("when") and i["head"] in ("status", "housing"):
+        when = [f"at the {C.month_label(C.next_review(C.month_index(i['when'])))} review"]
     when += [f"from age {i['min_age']:g}"] if i.get("min_age") is not None else []
     when += [f"if cash < {i['cash_months_below']:g} months"] if i.get("cash_months_below") is not None else []
     when += [f"if cash > {i['cash_months_above']:g} months"] if i.get("cash_months_above") is not None else []
@@ -138,18 +140,39 @@ def render(res: dict, validation: dict | None = None) -> str:
         f"<tr><td>{esc(t['feature'])}</td><td class='r'>{pct(t['share'])}</td><td class='r'>{chf(t['median_nw_with'])}</td>"
         f"<td class='r'>{chf(t['median_nw_without'])}</td><td class='r'>{pct(t['high_goal_with'])} vs {pct(t['high_goal_without'])}</td></tr>"
         for t in res["turning_points"])
+    def interval(v):
+        bounds = v.get("goal_change_mc95_pp")
+        if bounds is None:
+            return "—"
+        return f"{v['goal_change_pp']:+.1f} ({bounds[0]:+.1f} to {bounds[1]:+.1f})"
+
     wi = ""
     if res.get("what_ifs"):
         rows = "".join(
             f"<tr><td>{esc(k)}</td><td class='r'>{pct(v['high_goal_odds'][1])} <span class='small'>({pct(v['high_goal_odds'][0])})</span></td>"
-            f"<td class='r'>{pct(v['shortfall_odds'][1])} <span class='small'>({pct(v['shortfall_odds'][0])})</span></td>"
+            f"<td class='r'>{interval(v)}</td><td class='r'>{pct(v['credit_breach_odds'][1])}</td><td class='r'>{pct(v['shortfall_odds'][1])} <span class='small'>({pct(v['shortfall_odds'][0])})</span></td>"
             f"<td class='r'>{chf(v['median_final_net_worth'][1])} <span class='small'>({chf(v['median_final_net_worth'][0])})</span></td></tr>"
             for k, v in res["what_ifs"].items())
         wi = (f"<section><div class='eyebrow'>What-ifs</div><h2>Change one plan, keep the same luck</h2>"
               f"<p class='small'>Each row adds one stated plan and reruns the same {res['n_paths']:,} paths with the same random numbers, "
               f"so the difference comes from the plan alone. Brackets: as is.</p><div class='tablewrap'><table><thead><tr><th>Plan</th>"
-              f"<th class='r'>High goal</th><th class='r'>Ever below zero</th><th class='r'>Median net worth 2034</th></tr></thead>"
+              f"<th class='r'>High goal</th><th class='r'>Goal change, pp (paired 95% sampling interval)</th><th class='r'>Credit breach</th><th class='r'>Ever below zero</th><th class='r'>Median net worth 2034</th></tr></thead>"
               f"<tbody>{rows}</tbody></table></div></section>")
+    fs = ""
+    if res.get("foresight"):
+        rows = "".join(
+            f"<tr><td>{'as they tend to decide' if float(k) == 0 else f'foresight {k}'}</td><td class='r'>{pct(v['high_goal_odds'])}</td>"
+            f"<td class='r'>{pct(v['shortfall_odds'])}</td><td class='r'>{pct(v['lasting_shortfall_odds'])}</td>"
+            f"<td class='r'>{chf(v['median_final_net_worth'])}</td><td class='r'>{chf(v['median_life_utility'])}</td>"
+            f"<td>{esc(v['top_story']['story'])} <span class='small'>({pct(v['top_story']['share'])})</span></td></tr>"
+            for k, v in res["foresight"].items())
+        fs = (f"<section><div class='eyebrow'>Foresight</div><h2>{esc(name)} as they are, and with foresight</h2>"
+              f"<p class='small'>The neural persona with a foresight knob. At 0 it decides as {esc(name)} tends to; higher values "
+              f"use the world model to lean toward outcomes this persona values (lifestyle, home, free time, goals, net worth), "
+              f"while staying close to their habits and still random. Same {res['n_paths']:,} paths and random numbers in every row; "
+              f"the gap between rows is what foresight would change.</p><div class='tablewrap'><table><thead><tr><th>Who decides</th>"
+              f"<th class='r'>High goal</th><th class='r'>Ever below zero</th><th class='r'>3+ months</th><th class='r'>Median net worth 2034</th>"
+              f"<th class='r'>Median life utility</th><th>Most common story</th></tr></thead><tbody>{rows}</tbody></table></div></section>")
     sp = ""
     if res.get("spread_sources"):
         s = res["spread_sources"]
@@ -170,6 +193,8 @@ def render(res: dict, validation: dict | None = None) -> str:
                f"{validation['held_out_people']['monthly_flow_crps_baseline']:.0f}).")
     med = "" if res["medium_goal_odds"] is None else (
         f"<div class='tile'><div class='v num'>{pct(res['medium_goal_odds'])}</div><div class='l'>medium goal ({esc(p.get('med_goal'))}) by Dec 2032</div></div>")
+    opening = p['cash0'] if p['high_goal'] == "Emergency savings" else p['cash0'] + p['inv0'] - p['debt0']
+    gap = max(p['high_target'] - opening, 0)
     lasting = res.get("lasting_shortfall_odds", 0)
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(name)}'s Possible Lives</title><style>{CSS}</style></head><body><div class="page">
@@ -184,7 +209,7 @@ model learned from the ledger decides what happens. The spread is the point: it 
 <div class="tile"><div class="v num">{pct(res['high_goal_odds'])}</div><div class="l">high goal met by Dec 2029</div></div>{med}
 <div class="tile"><div class="v num">{pct(res['shortfall_odds'])}</div><div class="l">ever below zero cash; {pct(lasting)} for 3+ months in a row</div></div>
 <div class="tile"><div class="v num">{chf(fw['p50'])}</div><div class="l">median net worth in Dec 2034 (5–95%: {chf(fw['p5'])} to {chf(fw['p95'])})</div></div>
-</div></header>
+</div><p>The opening gap to the 2029 goal is {chf(gap)}. Goal success requires meeting the target and staying within the credit limit through its deadline. Across the full ten years, {pct(res['credit_breach_odds'])} of paths exceed their credit limit. Work and housing choices are reviewed each January.</p></header>
 <section><div class="tools"><div><div class="eyebrow">Fan chart</div><h2>How the money could move</h2></div>
 <div class="seg" id="fan-tabs" role="group" aria-label="Measure"><button aria-pressed="true" data-key="fan_net_worth">Net worth</button><button aria-pressed="false" data-key="fan_cash">Cash</button><button aria-pressed="false" data-key="fan_income">Income</button></div></div>
 <div class="legend"><span><i class="sw" style="background:var(--band-outer)"></i>5–95% of paths</span><span><i class="sw" style="background:var(--band-inner)"></i>25–75%</span><span><i class="sw" style="background:var(--median);height:3px"></i>median</span></div>
@@ -197,7 +222,7 @@ model learned from the ledger decides what happens. The spread is the point: it 
 <section><div class="eyebrow">Turning points</div><h2>What separates the better paths from the worse</h2>
 <div class="tablewrap"><table><thead><tr><th>On the path</th><th class="r">Share</th><th class="r">Median net worth with</th><th class="r">without</th><th class="r">High goal with vs without</th></tr></thead><tbody>{rows_tp}</tbody></table></div>
 <p class="small">These are associations across sampled lives, not causes: paths that go part-time also tend to be the ones under pressure.</p></section>
-{wi}{sp}
+{fs}{wi}{sp}
 <section><div class="eyebrow">Persona</div><h2>How {esc(name)} tends to decide</h2>
 <div class="tablewrap"><table><thead><tr><th>Trait</th><th class="r">Value (0–1)</th></tr></thead><tbody>{traits}</tbody></table></div>
 <p class="small">Temperature {res['persona']['temperature']:.2f}; trait uncertainty {res['persona']['spread']:.2f} (logit sd). Stated plans:</p><ul class="small">{intents}</ul></section>

@@ -71,6 +71,11 @@ household:
 housing:
   moving_cost: 2000
 
+markets:                                # learned in twin_game_theory (artifacts/markets.json); mapping assumptions:
+  default_education: bachelor           # highest degree when no master's is done (the data do not say)
+  grades: 0.0                           # standardised; 0 = average
+  applications: 2                       # job applications a month while searching
+
 credit:
   rate_per_year: 0.08
   limit_months_of_pay: 3

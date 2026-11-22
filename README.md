@@ -45,6 +45,11 @@ There is **no prescribed programming language, AI framework, model, interface, o
 
 ## Repository guide
 
+The [Parallel web app](web/README.md) adds a persona builder, scenario exploration,
+and LLM explanations. Its React frontend deploys to Vercel; the FastAPI service and
+simulation models stay on your laptop. See the setup guide for local startup,
+provider configuration, and the HTTPS tunnel connection.
+
 | Location | Purpose |
 |---|---|
 | [`docs/`](docs/) | Digital-twin foundations, financial mathematics, scenario modelling, and technical approaches |

@@ -17,11 +17,13 @@ import pandas as pd
 
 from . import config as C
 from .data import profiles
+from .policy.foresight import life_utility
 from .policy.rules import RulePolicy
 from .policy.traits import Persona, from_profile, sample_traits
 from .world.env import Streams, World
+from .timeline import Timeline, observed_month
 
-EVENTS = ["job_loss", "offer", "graduated", "partner", "child", "separation", "forced_move", "windfall"]
+EVENTS = ["job_loss", "offer", "graduated", "partner", "child", "separation", "forced_move", "windfall", "side_job"]
 
 
 @dataclass
@@ -42,6 +44,7 @@ class Paths:
     events: dict            # name -> (N, T)
     below_zero: np.ndarray  # (N, T)
     traits: np.ndarray
+    credit_breach: np.ndarray
 
     @property
     def nw(self):
@@ -61,7 +64,9 @@ def person_table(profile_id: str | None = None, custom: dict | None = None) -> p
                inv0=float(d.get("investments", 0)), debt0=float(d.get("debt", 0)), rate0=float(d.get("rate", 0)),
                high_goal=d.get("high_goal", "Emergency savings"), high_target=float(d.get("high_target", 20000)),
                med_goal=d.get("med_goal"), med_target=float(d.get("med_target", np.nan)),
-               tuition=float(d.get("tuition", np.nan)))
+               tuition=float(d.get("tuition", np.nan)),
+               study_left0=max(1, int(d.get("study_months_left", 1))) if status == "student" else 0,
+               masters0=bool(d.get("in_masters", False)) and status == "student")
     return pd.DataFrame([row], index=[d.get("id", "custom")])
 
 
@@ -73,7 +78,7 @@ def goals_per_path(people: pd.DataFrame, n_paths: int) -> dict:
 
 
 def simulate(world: World, people: pd.DataFrame, personas, n_paths=2000, seed=C.SEED, horizon=C.HORIZON,
-             shared=(), policy_cls=RulePolicy) -> Paths:
+             shared=(), policy_cls=RulePolicy, timeline=None) -> Paths:
     personas = personas if isinstance(personas, (list, tuple)) else [personas] * len(people)
     N = len(people) * n_paths
     streams = Streams(seed, N, shared)
@@ -95,16 +100,31 @@ def simulate(world: World, people: pd.DataFrame, personas, n_paths=2000, seed=C.
         for name in rec:
             rec[name][:, k] = getattr(st, name)
     keep(0, s)
+    timeline = timeline or Timeline()
+    breaches = np.zeros_like(below)
+    count, bias = 0, 0.0
     for t in range(T):
+        offer = timeline.offers.get(t)
+        if t in timeline.observations:
+            count, bias, breaches[:, t] = observed_month(
+                world, s, timeline.observations[t], offer, count, bias)
+            keep(t + 1, s)
+            below[:, t] = s.cash < 0
+            if offer:
+                action[:, t, 0] = np.where(s.mode == offer[0], 2 if offer[0] == C.PART_TIME else 3, 0)
+            continue
         a, _ = policy.act(s, streams)
-        s, info = world.step(s, a, streams)
+        if offer:
+            a[:, 0] = 0
+        s, info = world.step(s, a, streams, offer=offer)
+        breaches[:, t] = info["credit_breach"]
         policy.observe(info, s)
         keep(t + 1, s)
         action[:, t] = info["action"]
         for k in EVENTS:
             events[k][:, t] = info[k]
         below[:, t] = info["below_zero"]
-    return Paths(people=people, n_paths=n_paths, action=action, events=events, below_zero=below, traits=traits, **rec)
+    return Paths(people=people, n_paths=n_paths, action=action, events=events, below_zero=below, traits=traits, credit_breach=breaches, **rec)
 
 
 # ------------------------------------------------------------------------------- summaries
@@ -117,10 +137,11 @@ def goal_met(paths: Paths):
     p = paths.people.iloc[0]
     k = C.T_HIGH_GOAL + 1
     have = paths.cash[:, k] if p["high_goal"] == "Emergency savings" else paths.nw[:, k]
-    high = have >= p["high_target"]
+    high = (have >= p["high_target"]) & ~paths.credit_breach[:, :k].any(1)
     med = np.full(len(high), np.nan)
     if pd.notna(p["med_target"]):
-        med = (paths.nw[:, C.T_MED_GOAL + 1] >= p["high_target"] + p["med_target"]).astype(float)
+        med = ((paths.nw[:, C.T_MED_GOAL + 1] >= p["high_target"] + p["med_target"])
+               & ~paths.credit_breach[:, :C.T_MED_GOAL + 1].any(1)).astype(float)
     return high, med
 
 
@@ -205,6 +226,54 @@ def turning_points(paths: Paths, top=6):
     return rows[:top]
 
 
+def moment_masks(paths: Paths) -> dict:
+    """(N, T) masks, one per big decision or life event, true in the month it happens."""
+    m0, m1 = paths.mode[:, :-1], paths.mode[:, 1:]
+    idle = np.isin(m0, [C.STUDENT, C.NOT_WORKING])
+    work0, work1 = np.isin(m0, [C.PART_TIME, C.FULL_TIME]), np.isin(m1, [C.PART_TIME, C.FULL_TIME])
+    ev, age = paths.events, paths.age[:, :-1]
+    stop = work0 & (m1 == C.NOT_WORKING) & ~ev["job_loss"]
+    tier0, tier1 = paths.tier[:, :-1], paths.tier[:, 1:]
+    return {
+        ("decision", "Starts a master's"): paths.action[:, :, 0] == 1,
+        ("decision", "Takes a job alongside studies"): ev["side_job"],
+        ("event", "Finishes studies"): ev["graduated"],
+        ("decision", "Starts a full-time job"): idle & (m1 == C.FULL_TIME),
+        ("decision", "Starts a part-time job"): idle & (m1 == C.PART_TIME),
+        ("decision", "Moves up to full-time"): (m0 == C.PART_TIME) & (m1 == C.FULL_TIME),
+        ("decision", "Cuts back to part-time"): (m0 == C.FULL_TIME) & (m1 == C.PART_TIME),
+        ("event", "Loses a job"): ev["job_loss"],
+        ("decision", "Stops working"): stop & (age < 60),
+        ("decision", "Retires"): stop & (age >= 60),
+        ("decision", "Moves to a bigger home"): tier1 > tier0,
+        ("decision", "Moves somewhere cheaper"): tier1 < tier0,
+        ("event", "Partner moves in"): ev["partner"],
+        ("event", "Has a child"): ev["child"],
+        ("event", "Separates"): ev["separation"],
+    }
+
+
+def key_moments(paths: Paths, top=6, min_share=0.10) -> list:
+    """The big decisions and life events that happen in at least `min_share` of lives: how often and when.
+
+    share: lives where it happens at least once; typical_year: median year it first happens;
+    share_by_goal_deadline: lives where it has happened by December 2029. Ordered by typical year.
+    """
+    deadline = C.T_HIGH_GOAL + 1
+    rows = []
+    for (kind, label), mask in moment_masks(paths).items():
+        ever = mask.any(1)
+        share = float(ever.mean())
+        if share < min_share:
+            continue
+        first = mask.argmax(1)[ever]
+        rows.append(dict(moment=label, kind=kind, share=round(share, 4),
+                         typical_year=int(C.START_YEAR + np.median(first) // 12),
+                         share_by_goal_deadline=round(float((mask[:, :deadline].any(1)).mean()), 4)))
+    rows = sorted(rows, key=lambda r: -r["share"])[:top]
+    return sorted(rows, key=lambda r: (r["typical_year"], -r["share"]))
+
+
 def yearly_action_rates(paths: Paths) -> dict:
     """Share of paths taking each kind of action per year (for plausibility checks)."""
     a = paths.action
@@ -228,12 +297,15 @@ def summarize(paths: Paths) -> dict:
         "high_goal_odds": float(high.mean()),
         "medium_goal_odds": None if np.isnan(med).all() else float(np.nanmean(med)),
         "shortfall_odds": float(paths.below_zero.any(1).mean()),
+        "credit_breach_odds": float(paths.credit_breach.any(1).mean()),
         "lasting_shortfall_odds": float(lasting_shortfall(paths).mean()),
+        "median_life_utility": float(np.median(life_utility(paths))),
         "shortfall_by_year": dict(zip(years.tolist(), below_year.mean(0).round(4).tolist())),
         "final_net_worth": dict(zip(["p5", "p25", "p50", "p75", "p95"], fan(paths.nw[:, -1:])[:, 0].round(0).tolist())),
         "mode_share_by_year": {MODE_WORD[m]: [round(float((paths.mode[:, 12 * y] == m).mean()), 4) for y in range(11)]
                                for m in range(4)},
         "stories": stories(paths),
+        "key_moments": key_moments(paths),
         "turning_points": turning_points(paths),
         "action_rates_per_year": yearly_action_rates(paths),
     }
@@ -253,6 +325,23 @@ def spread_sources(world, people, persona, n_paths=600, seed=C.SEED, policy_cls=
             **{name: width([s for s in every if s not in keep]) for name, keep in groups.items()}}
 
 
+def compare(base, alternative):
+    """Common-random-number comparison; interval is Monte Carlo error conditional on this model."""
+    before, _ = goal_met(base)
+    after, _ = goal_met(alternative)
+    diff = after.astype(float) - before.astype(float)
+    se = np.std(diff, ddof=1) / np.sqrt(len(diff)) if len(diff) > 1 else float("nan")
+    return {
+        "high_goal_odds": [float(before.mean()), float(after.mean())],
+        "shortfall_odds": [float(p.below_zero.any(1).mean()) for p in (base, alternative)],
+        "credit_breach_odds": [float(p.credit_breach.any(1).mean()) for p in (base, alternative)],
+        "median_final_net_worth": [float(np.median(p.nw[:, -1])) for p in (base, alternative)],
+        "goal_change_pp": float(100 * diff.mean()),
+        "goal_change_mc95_pp": [float(100 * np.clip(diff.mean() + sign * 1.96 * se, -1, 1))
+                                for sign in (-1, 1)] if len(diff) > 1 else None,
+    }
+
+
 def default_what_ifs(person: pd.Series, persona: Persona) -> dict:
     """Up to three stated plans worth comparing for this person (each fires for sure)."""
     from dataclasses import replace
@@ -261,21 +350,23 @@ def default_what_ifs(person: pd.Series, persona: Persona) -> dict:
     plans = []
     mode, age = int(person["mode"]), float(person["age"])
     if mode == C.STUDENT:
-        plans.append(("Looks for a full-time job now", Intention("status", 3, 1.0, when="2025-02")))
+        plans.append(("Starts a master's at the opening review", Intention("status", 1, 1.0, when="2025-01")))
+        plans.append(("Looks for a full-time job now", Intention("status", 3, 1.0, when="2025-01")))
     if mode != C.STUDENT and age <= 40:
-        plans.append(("Starts a master's in September 2026", Intention("status", 1, 1.0, when="2026-09")))
+        plans.append(("Starts a master's in January 2026", Intention("status", 1, 1.0, when="2026-01")))
     if mode == C.FULL_TIME and age < 60:
         plans.append(("Goes part-time from January 2026", Intention("status", 2, 1.0, when="2026-01")))
     if mode in (C.PART_TIME, C.FULL_TIME) and age >= 52:
         plans.append(("Leaves paid work at 60", Intention("status", 4, 1.0, min_age=60)))
     if int(person["tier"]) > (1 if int(person["household"]) == C.FAMILY else 0):
-        plans.append(("Moves somewhere cheaper in March 2025", Intention("housing", -1, 1.0, when="2025-03")))
+        plans.append(("Moves somewhere cheaper in January 2025", Intention("housing", -1, 1.0, when="2025-01")))
     plans.append(("Cuts lifestyle to lean now", Intention("spending", -1, 1.0, when="2025-01")))
     return {name: replace(persona, intentions=list(persona.intentions) + [it]) for name, it in plans[:3]}
 
 
 def explore(profile_id=None, custom=None, persona: Persona | None = None, n_paths=2000, seed=C.SEED,
-            world: World | None = None, what_ifs: dict | None = None, with_spread=True, policy_cls=RulePolicy):
+            world: World | None = None, what_ifs: dict | None = None, with_spread=True, policy_cls=RulePolicy,
+            foresight_levels=None):
     """Everything the explorer shows for one person, JSON-ready (plus the raw paths)."""
     world = world or World.load()
     people = person_table(profile_id, custom)
@@ -291,13 +382,21 @@ def explore(profile_id=None, custom=None, persona: Persona | None = None, n_path
         out["what_ifs"] = {}
         for name, alt in what_ifs.items():
             alt_paths = simulate(world, people, alt, n_paths, seed, policy_cls=policy_cls)   # same seed: common random numbers
-            h0, _ = goal_met(paths)
-            h1, _ = goal_met(alt_paths)
-            out["what_ifs"][name] = {
-                "high_goal_odds": [float(h0.mean()), float(h1.mean())],
-                "shortfall_odds": [float(paths.below_zero.any(1).mean()), float(alt_paths.below_zero.any(1).mean())],
-                "median_final_net_worth": [float(np.median(paths.nw[:, -1])), float(np.median(alt_paths.nw[:, -1]))],
-                "fan_net_worth": fan(alt_paths.nw).round(0).tolist()}
+            out["what_ifs"][name] = compare(paths, alt_paths)
+            out["what_ifs"][name]["fan_net_worth"] = fan(alt_paths.nw).round(0).tolist()
     if with_spread:
         out["spread_sources"] = spread_sources(world, people, persona, seed=seed, policy_cls=policy_cls)
+    if foresight_levels:
+        from .policy.foresight import at_level
+        out["foresight"] = {}
+        for lv in foresight_levels:                                   # same seed: common random numbers
+            fp = simulate(world, people, persona, n_paths, seed, policy_cls=at_level(lv))
+            h, _ = goal_met(fp)
+            out["foresight"][f"{lv:g}"] = {
+                "high_goal_odds": float(h.mean()), "shortfall_odds": float(fp.below_zero.any(1).mean()),
+                "lasting_shortfall_odds": float(lasting_shortfall(fp).mean()),
+                "median_final_net_worth": float(np.median(fp.nw[:, -1])),
+                "median_life_utility": float(np.median(life_utility(fp))),
+                "top_story": stories(fp, 1)[0], "fan_net_worth_median": fan(fp.nw, (50,))[0].round(0).tolist(),
+                "action_rates_per_year": yearly_action_rates(fp)}
     return out, paths

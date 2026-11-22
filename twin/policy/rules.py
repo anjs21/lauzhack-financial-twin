@@ -3,10 +3,8 @@
 For every head the policy builds logits from trait-weighted rules plus inertia, masks
 invalid options, divides by the person's temperature and samples. Nothing is maximised.
 
-Decision clock: status and housing are reconsidered at the person's yearly review month,
-right after an event (job loss, offer, end of the master's, partner, child, separation,
-forced move, a month that ate more than a month of outgoings) or when a dated intention
-falls due. Spending and assets are reconsidered every month.
+January is the annual review for every voluntary decision: work, housing, lifestyle and
+investing. External events (job loss, bills, markets, family) still happen monthly.
 """
 from __future__ import annotations
 
@@ -19,6 +17,10 @@ from .traits import TRAIT, Intention, buffer_months
 HEADS = ["status", "housing", "spending", "assets"]
 N_OPTS = {"status": 5, "housing": 3, "spending": 3, "assets": 3}
 NEG = -1e9
+# Lifestyle odds were set per month; decided once a year they get log(12) so the yearly rate
+# stays the same. Investing or selling to the buffer becomes a likely annual rebalance.
+YEARLY = float(np.log(12))
+ANNUAL_REBALANCE = 1.5
 
 
 def softmax_masked(logits, mask, temperature):
@@ -48,11 +50,9 @@ class RulePolicy:
 
     def reset(self, s: State, streams: Streams):
         N = s.n
-        self.review_month = 1 + (streams.uniform("policy", 100_000, 1)[0] * 12).astype(int).clip(0, 11)
         self.last_move = np.full(N, -99)
         self.last_status = np.full(N, -99)
         self.last_job_loss = np.full(N, -99)
-        self.trigger = np.ones(N, bool)             # everyone takes stock in the first month
         self.fired = np.zeros((len(self.intentions), N), bool)
         self.switches = np.zeros(N, int)
 
@@ -117,22 +117,21 @@ class RulePolicy:
 
         sp = np.zeros((N, 3))
         sp[:, 1] = 3.5 + 2.0 * T("inertia")
-        sp[:, 0] = -2.0 + 4.0 * cp + 2.5 * gp + 1.0 * T("frugality")
-        sp[:, 2] = (-2.5 + 1.5 * (1 - T("frugality")) + 1.5 * T("impatience") + 1.5 * c["comfort"]
+        sp[:, 0] = YEARLY - 2.0 + 4.0 * cp + 2.5 * gp + 1.0 * T("frugality")
+        sp[:, 2] = (YEARLY - 2.5 + 1.5 * (1 - T("frugality")) + 1.5 * T("impatience") + 1.5 * c["comfort"]
                     - 4.0 * cp - 1.5 * gp)
 
         buffer = np.maximum(s.buffer_months * self.w.outgoings(s), 1.0)
         below = np.clip(1 - s.cash / buffer, 0, 1)               # 0 at the buffer, 1 at zero cash
         asst = np.zeros((N, 3))
         asst[:, 1] = 1.0 + 1.0 * T("inertia")
-        asst[:, 2] = -0.5 + 3.0 * T("risk_tolerance") + 1.0 * (s.cash > 2 * buffer)
-        asst[:, 0] = -1.5 + 6.0 * below + 1.0 * (1 - T("risk_tolerance"))
+        asst[:, 2] = ANNUAL_REBALANCE - 0.5 + 3.0 * T("risk_tolerance") + 1.0 * (s.cash > 2 * buffer)
+        asst[:, 0] = ANNUAL_REBALANCE - 1.5 + 6.0 * below + 1.0 * (1 - T("risk_tolerance"))
         return {"status": st, "housing": ho, "spending": sp, "assets": asst}
 
     # ----------------------------------------------------------------------------- acting
     def decision_points(self, s: State):
-        moy = (C.START_MONTH - 1 + s.t) % 12 + 1
-        return (self.review_month == moy) | self.trigger
+        return np.full(s.n, C.annual_review(s.t))
 
     def act(self, s: State, streams: Streams):
         """Sample (N, 4) actions; also return the probabilities they were drawn from."""
@@ -156,14 +155,14 @@ class RulePolicy:
         return action, probs
 
     def _apply_intentions(self, s, c, valid, decide, choice, probs, u):
-        """Stated plans: a dated plan makes its month a decision point; others wait for one."""
-        label = C.month_label(s.t)
+        """Stated plans fall due at the first January on or after the requested date."""
         for k, it in enumerate(self.intentions):
             idx = it.option if it.head == "status" else it.option + 1
             ok = valid[it.head][:, idx].copy()
             if it.when is not None:
-                ok &= label == it.when
-            elif it.head in ("status", "housing"):
+                due = C.month_index(it.when)
+                ok &= s.t == C.next_review(due)       # every plan falls due at a January review
+            else:
                 ok &= decide
             if it.min_age is not None:
                 ok &= s.age >= it.min_age
@@ -192,6 +191,3 @@ class RulePolicy:
         self.last_status = np.where(changed, t, self.last_status)
         self.switches += changed
         self.last_job_loss = np.where(info["job_loss"], t, self.last_job_loss)
-        big_bill = info["net"] < -np.maximum(self.w.outgoings(s), 1.0)
-        self.trigger = (info["job_loss"] | info["offer"] | info["graduated"] | info["partner"] | info["child"]
-                        | info["separation"] | info["forced_move"] | big_bill)
