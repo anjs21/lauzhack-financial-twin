@@ -28,4 +28,5 @@ web/dist/
 .vercel/
 web/test-results/
 web/playwright-report/
+*/.vite/
 *.tsbuildinfo
