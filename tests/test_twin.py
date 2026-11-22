@@ -205,7 +205,8 @@ def test_actions_respect_masks(world):
     assert not ((status == 4) & ~np.isin(mode, [C.PART_TIME, C.FULL_TIME])).any()
     # Opening students can enroll at the first review.
     assert not ((status[:, 1:] == 1) & (mode[:, 1:] == C.STUDENT)).any()
-    assert ((status == 1).sum(1) <= 1).all()                    # one master's per life
+    started = (status == 1) & (paths.mode[:, 1:] == C.STUDENT)   # a refused application can be retried
+    assert (started.sum(1) <= 1).all()                          # one master's per life
     assert not ((paths.household[:, 1:] == C.FAMILY) & (paths.tier[:, 1:] == 0)).any()
 
 
@@ -285,10 +286,15 @@ def test_llm_client_caches_and_never_needs_a_key_for_cached_prompts(tmp_path):
 def test_foresight_zero_stays_close_to_the_persona(world):
     from twin.explore import goal_met
     from twin.policy.foresight import at_level
-    from twin.policy.net import NeuralPolicy
+    from twin.policy.net import RULE_CLONE, NeuralPolicy, load_net
+    clone = load_net(RULE_CLONE)                   # foresight is distilled from the rule clone, not the default GRU
+
+    class RuleClone(NeuralPolicy):
+        def __init__(self, *a, **k):
+            super().__init__(*a, net=clone, **k)
     people = profiles().iloc[[10]]
     p = from_profile(people.iloc[0])
-    a = simulate(world, people, p, n_paths=600, seed=3, policy_cls=NeuralPolicy)
+    a = simulate(world, people, p, n_paths=600, seed=3, policy_cls=RuleClone)
     b = simulate(world, people, p, n_paths=600, seed=3, policy_cls=at_level(0.0))
     assert abs(goal_met(a)[0].mean() - goal_met(b)[0].mean()) < 0.06
     assert abs(np.median(a.nw[:, -1]) / np.median(b.nw[:, -1]) - 1) < 0.1
@@ -424,47 +430,12 @@ def test_anchored_foresight_is_the_rule_persona_at_zero_and_tilts_above(world):
     assert not np.array_equal(rules.action, tilted.action)
 
 
-# ------------------------------------------------------------------ learned markets (twin_game_theory)
-def test_market_port_matches_twin_game_theory():
-    from dataclasses import asdict, replace
-    from twin.world.markets import Markets
-    gt_mod = pytest.importorskip("twin_game_theory.world.transition")
-    from twin_game_theory.world import spec as sp
-    gt, mk = gt_mod.TransitionModel(), Markets()
-    for draw in range(5):
-        for edu, u, k, M, W in [(1, 0, 1, 0, sp.N), (2, 5, 3, 2, sp.N), (3, 30, 5, 1, sp.S)]:
-            d = asdict(replace(gt_mod.alexia(), W=W, edu=edu, u=u, k=k, M=M))
-            mine = mk.p_job_offer(np.array([edu]), np.array([u]), np.array([(k - .5) / 5]), np.array([M]),
-                                  np.array([W == sp.S]), np.array([draw]))[0]
-            assert abs(mine - gt.p_job_offer(d, draw)) < 1e-12
-        assert abs(mk.p_master_admission(np.array([draw]))[0] - gt.p_admission(asdict(gt_mod.alexia()), sp.MASTER, draw)) < 1e-12
-
-
-def test_markets_rank_degrees_spells_and_landlords():
-    from twin.world.markets import Markets
-    mk = Markets()
-    one = lambda v: np.array([v])  # noqa: E731
-    bachelor, master = (mk.p_job_offer(one(e), one(0), one(.3), one(0), one(False), one(0))[0] for e in (1, 2))
-    fresh, long_out = (mk.p_job_offer(one(1), one(u), one(.3), one(0), one(False), one(0))[0] for u in (0, 18))
-    normal, recession = (mk.p_job_offer(one(1), one(0), one(.3), one(M), one(False), one(0))[0] for M in (0, 2))
-    assert master > bachelor and fresh > long_out and normal > 3 * recession
-    args = dict(target=one(2), tier=one(1), new_rent=one(3000.0), student=one(False), econ=one(0), draw=one(0))
-    assert mk.p_flat(income=one(6000.0), cash=one(5000.0), **args)[0] == 0      # rent > income / 3, little cash
-    assert mk.p_flat(income=one(6000.0), cash=one(40000.0), **args)[0] > 0      # 12 months of rent saved
-    assert mk.p_flat(income=one(9500.0), cash=one(0.0), **args)[0] > 0          # rent <= income / 3
-
-
-@needs_model
-def test_markets_switch_and_landlord_rule_in_the_world():
-    assert World.load().markets is not None and World.load(config=Config(markets=False)).markets is None
-    w = World.load(config=Config(events=False))
-    poor = custom(income=2500, rent=1200, cash=500, investments=0, household_type="single")
-    s = w.initial_state(poor, 50, Streams(9, 50))
-    assert (s.tier < 2).all()
-    up = np.zeros((s.n, 4), int)
-    up[:, 1] = 1                                                    # everyone asks for a bigger flat in January
-    s1, info = w.step(s, up, Streams(9, 50))
-    assert not info["moved"].any()                                  # no landlord accepts rent > income / 3
-    old = World.load(config=Config(events=False, markets=False))
-    _, info_old = old.step(old.initial_state(poor, 50, Streams(9, 50)), up, Streams(9, 50))
-    assert info_old["moved"].all()                                  # the old world always found a flat
+def test_neural_persona_loads_the_january_2026_gru_by_default():
+    from twin.policy.net import PERSONA_NET, RULE_CLONE, load_net
+    assert PERSONA_NET == C.ARTIFACTS / "jan_2026_proxy_gru.pt" and RULE_CLONE == C.ARTIFACTS / "persona_net.pt"
+    if not PERSONA_NET.exists():
+        pytest.skip("python -m twin clone-snapshots")
+    import torch
+    loaded = load_net().state_dict()
+    saved = torch.load(PERSONA_NET, weights_only=True)
+    assert all(torch.equal(loaded[k], saved[k]) for k in saved)

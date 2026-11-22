@@ -184,8 +184,7 @@ class RulePolicy:
     def observe(self, info: dict, s: State):
         """Update the path's memory after the world moved."""
         t = s.t - 1
-        a = info["action"]
-        moved = (a[:, 1] != 0) | info["forced_move"]
+        moved = info["moved"] | info["forced_move"]           # moves that happened, not flat searches
         self.last_move = np.where(moved, t, self.last_move)
         changed = info["status_change"] | info["offer"] | info["job_loss"] | info["graduated"]
         self.last_status = np.where(changed, t, self.last_status)

@@ -21,6 +21,7 @@ from .policy.foresight import life_utility
 from .policy.rules import RulePolicy
 from .policy.traits import Persona, from_profile, sample_traits
 from .world.env import Streams, World
+from .world.market import EDUCATION
 from .timeline import Timeline, observed_month
 
 EVENTS = ["job_loss", "offer", "graduated", "partner", "child", "separation", "forced_move", "windfall", "side_job"]
@@ -57,6 +58,9 @@ def person_table(profile_id: str | None = None, custom: dict | None = None) -> p
         return profiles().loc[[profile_id]]
     d = dict(custom)
     status, hh = d["status"], d["household_type"]
+    education = d.get("education")                  # optional: none, bachelor, master or phd (market model)
+    if education is not None and str(education).lower() not in EDUCATION:
+        raise ValueError(f"education must be one of {sorted(EDUCATION)}")
     row = dict(name=d.get("name", "custom"), age=float(d["age"]), city=d["city"], city_idx=C.CITY[d["city"]],
                status=status, mode=C.STATUS_TO_MODE[status], self_employed=status == "self_employed",
                pensioner=status == "retired", household_type=hh, household=C.HOUSEHOLD_OF[hh], tier=C.TIER_OF[hh],
@@ -66,7 +70,9 @@ def person_table(profile_id: str | None = None, custom: dict | None = None) -> p
                med_goal=d.get("med_goal"), med_target=float(d.get("med_target", np.nan)),
                tuition=float(d.get("tuition", np.nan)),
                study_left0=max(1, int(d.get("study_months_left", 1))) if status == "student" else 0,
-               masters0=bool(d.get("in_masters", False)) and status == "student")
+               masters0=bool(d.get("in_masters", False)) and status == "student",
+               education=None if education is None else str(education).lower(),
+               grades=float(d.get("grades", np.nan)))
     return pd.DataFrame([row], index=[d.get("id", "custom")])
 
 
@@ -313,7 +319,7 @@ def summarize(paths: Paths) -> dict:
 
 def spread_sources(world, people, persona, n_paths=600, seed=C.SEED, policy_cls=RulePolicy):
     """Spread of final net worth when only one source of randomness is left on."""
-    groups = {"who they are (traits)": ["traits"], "what they choose": ["policy"],
+    groups = {"who they are (traits)": ["traits", "person"], "what they choose": ["policy"],
               "luck (events, flows, markets)": ["events", "flow", "market"], "what the model does not know": ["model"]}
     every = sum(groups.values(), [])
 

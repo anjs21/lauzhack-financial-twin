@@ -2,7 +2,7 @@
 
     export TOGETHER_API_KEY=...                  # read from the environment, never stored
     export TOGETHER_MODEL=<model id>             # a chat model from your Together account; or --model
-    python -m twin llm-demos --calls 300         # ask; answers cached in twin/artifacts/llm_cache.jsonl
+    python -m twin llm-demos --calls 300         # 300 simulated reviews plus 60 ledger snapshots
     python -m twin llm-demos --dry-run           # print one prompt, no API call
     python -m twin clone --llm                   # rule targets everywhere, LLM answers where asked
 
@@ -25,12 +25,15 @@ import numpy as np
 
 from .. import config as C
 from .. import llm_provider as provider
-from .net import SIZES, teacher_data
+from ..data import indices, ledger, profiles
+from .net import Recorder, SIZES, teacher_data
 from .rules import HEADS
-from .traits import QUESTIONS, TRAITS
+from .traits import QUESTIONS, TRAITS, from_profile
 
 DEMOS = C.ARTIFACTS / "llm_demos.json"
 CACHE = C.ARTIFACTS / "llm_cache.jsonl"
+JAN_2026 = C.month_index("2026-01")
+DEFAULT_JAN_2026_CALLS = 60
 OFFSET = [0, sum(SIZES[:1]), sum(SIZES[:2]), sum(SIZES[:3])]
 
 SYSTEM = ("You role-play one specific person deciding about their own work, home, spending and savings. "
@@ -107,6 +110,9 @@ def prompt_for(ctx, i, k):
         "How you are: " + "; ".join(f"you {level(v)} that \"{QUESTIONS[name]}\"" for name, v in zip(TRAITS, tr)) + ".",
         "This is one of your decision points (annual January review). Options you have:",
     ]
+    if "cash_flow" in ctx:
+        lines.insert(-1, f"Your average monthly net cash flow in 2025 was {chf(ctx['cash_flow'][i])}. "
+                     "Work, household, investments and debt use the opening profile assumptions.")
     for h in HEADS:
         valid = [j for j in range(len(OPTION_TEXT[h])) if st["valid"][h][i, j]]
         lines.append(f"- {h}: " + "; ".join(f"\"{option_value(h, j)}\" = {OPTION_TEXT[h][option_value(h, j)]}"
@@ -247,24 +253,71 @@ def pick_points(ctx, n, seed=C.SEED):
     return take
 
 
+def january_snapshots(world, train_ids, count):
+    """Build ledger-backed histories through the opening of January 2026."""
+    from ..explore import goals_per_path
+    from ..world.env import Streams
+
+    history = ledger().loc[lambda df: df["t"].between(0, JAN_2026)]
+    cash = history.pivot(index="profile_id", columns="t", values="opening_cash_chf")
+    cash = cash.reindex(index=train_ids, columns=range(JAN_2026 + 1)).dropna()
+    if cash.empty:
+        raise SystemExit("No training profiles have complete cash histories through January 2026.")
+    rng = np.random.default_rng(C.SEED)
+    ids = rng.choice(cash.index, min(count, len(cash)), replace=False)
+    people = profiles().loc[ids]
+    traits = np.stack([from_profile(row).vector() for _, row in people.iterrows()])
+    streams = Streams(C.SEED, len(people))
+    state = world.initial_state(people, 1, streams, buffer_months=Recorder.buffer_months(traits))
+    policy = Recorder(world, traits, 1.0, goals_per_path(people, 1))
+    policy.reset(state, streams)
+    policy.log, policy.states = [], []
+    policy.keep_states, policy.keep_full = True, False
+    for t, opening_cash in enumerate(cash.loc[ids].to_numpy().T):
+        state.t = t
+        state.age = people["age"].to_numpy() + t / 12
+        state.tau.fill(t)
+        state.G, state.P = (np.full(state.n, index) for index in indices(t, world.pr))
+        state.income = people["income0"].to_numpy() * state.G
+        state.rent = people["rent0"].to_numpy() * state.P
+        state.cash = opening_cash
+        policy.act(state, streams)
+    features = np.stack([x for x, _, _ in policy.log], axis=1)
+    cash_flow = history.loc[history["t"] < JAN_2026].groupby("profile_id")["net_transactions_chf"].mean()
+    ctx = {"states": policy.states, "people": people, "traits": traits, "cash_flow": cash_flow.loc[ids].to_numpy()}
+    return features, ctx
+
+
 def collect(calls=300, n_profiles=400, n_paths=6, model=None, workers=8, client=None, log=print, dry_run=False,
-            out=None):
-    """Ask the LLM at `calls` decision points of the clone's training lives; save the answers."""
+            out=None, jan_2026_calls=DEFAULT_JAN_2026_CALLS):
+    """Label simulated decisions and January 2026 ledger snapshots from training profiles."""
     from ..world.env import World
     from .net import split_ids
+
+    if min(calls, jan_2026_calls) < 0 or calls + jan_2026_calls == 0:
+        raise SystemExit("Use nonnegative demo counts with at least one decision point.")
     train_ids, _ = split_ids(n_profiles)
-    log(f"rule-persona lives for {len(train_ids)} training profiles x {n_paths} ...")
-    X, M, P, ctx = teacher_data(World.load(), train_ids, n_paths, keep_states=True)
-    pts = pick_points(ctx, calls)
+    world = World.load()
+    records = []
+    if jan_2026_calls:
+        features, ctx = january_snapshots(world, train_ids, 1 if dry_run else jan_2026_calls)
+        for i, pid in enumerate(ctx["people"].index):
+            records.append((ctx, i, JAN_2026, {
+                "profile_id": pid, "month": JAN_2026, "features": features[i].tolist(),
+            }, None))
+    if calls and not (dry_run and records):
+        log(f"rule-persona lives for {len(train_ids)} training profiles x {n_paths} ...")
+        _, _, P, ctx = teacher_data(world, train_ids, n_paths, keep_states=True)
+        records.extend((ctx, i, k, {"life": int(i), "month": k}, P[i, k]) for i, k in pick_points(ctx, calls))
     if dry_run:
-        i, k = pts[0]
+        ctx, i, k, _, _ = records[0]
         print(prompt_for(ctx, i, k))
         return None
     client = client or Client(model)
-    prompts = [prompt_for(ctx, i, k) for i, k in pts]
+    prompts = [prompt_for(ctx, i, k) for ctx, i, k, _, _ in records]
     cached = sum(client.key(p) in client.cache for p in prompts)
-    log(f"asking {client.model} at {len(pts)} decision points ({cached} cached, "
-        f"about {(len(pts) - cached) * 900 / 1e6:.2f}M tokens) ...")
+    log(f"asking {client.model} at {len(records)} decision points ({cached} cached, "
+        f"about {(len(prompts) - cached) * 900 / 1e6:.2f}M tokens) ...")
     t0 = time.time()
     first = next((p for p in prompts if client.key(p) not in client.cache), None)
     if first is not None:                  # one call up front: a bad key or model fails fast and clearly
@@ -272,27 +325,34 @@ def collect(calls=300, n_profiles=400, n_paths=6, model=None, workers=8, client=
         log("first answer received; asking the rest ...")
     with ThreadPoolExecutor(workers) as ex:
         answers = list(ex.map(client.ask, prompts))
-    demos, bad = [], 0
-    for (i, k), ans in zip(pts, answers):
-        valid = {h: ctx["states"][k]["valid"][h][i].astype(float) for h in HEADS}
+    demos, snapshots, bad = [], [], 0
+    for (ctx, i, k, record, rule_probs), ans in zip(records, answers):
+        valid = {h: ctx["states"][k]["valid"][h][i] for h in HEADS}
         p = parse(ans, valid)
         if p is None:
             bad += 1
             continue
-        demos.append({"life": int(i), "month": int(k), "probs": p.round(5).tolist(), "why": str(ans.get("why", ""))[:300],
-                      "rule_probs": P[i, k].round(5).tolist()})
-    meta = {"decision_clock": "annual_january_v1", "model": client.model, "n_profiles": n_profiles, "n_paths": n_paths, "seed": C.SEED,
+        record.update(probs=p.round(5).tolist(), why=str(ans.get("why", ""))[:300])
+        if rule_probs is None:
+            record["mask"] = np.concatenate([valid[h] for h in HEADS]).tolist()
+            snapshots.append(record)
+        else:
+            record["rule_probs"] = rule_probs.round(5).tolist()
+            demos.append(record)
+    meta = {"decision_clock": "annual_january_v1", "model": client.model, "n_profiles": n_profiles,
+            "n_paths": n_paths, "seed": C.SEED,
             "train_ids_hash": hashlib.sha256(",".join(train_ids).encode()).hexdigest()[:16],
-            "asked": len(pts), "usable": len(demos), "unusable": bad, "new_calls": client.calls,
-            "seconds": round(time.time() - t0, 1)}
+            "asked": len(records), "usable": len(demos) + len(snapshots), "unusable": bad,
+            "jan_2026_usable": len(snapshots), "new_calls": client.calls, "seconds": round(time.time() - t0, 1)}
     out = out or DEMOS
-    out.write_text(json.dumps({"meta": meta, "demos": demos}, indent=1))
-    log(f"{len(demos)} usable answers ({bad} unusable) from {client.calls} new calls -> {out}")
+    out.write_text(json.dumps({"meta": meta, "demos": demos, "jan_2026_snapshots": snapshots}, indent=1))
+    log(f"{len(demos)} simulated and {len(snapshots)} ledger answers ({bad} unusable) "
+        f"from {client.calls} new calls -> {out}")
     if demos:
         llm = change_rates([d["probs"] for d in demos])
         sharp = change_rates([sharpen(d["probs"], 2.0) for d in demos])
         rules = change_rates([d["rule_probs"] for d in demos])
-        log("chance of acting at these decision points (LLM / LLM sharpened x2 / rule persona):")
+        log("chance of acting at simulated decision points (LLM / LLM sharpened x2 / rule persona):")
         for h in HEADS:
             log(f"  {h:9s} {llm[h]:.3f} / {sharp[h]:.3f} / {rules[h]:.3f}")
     return meta
@@ -341,3 +401,25 @@ def apply_demos(P, M, train_ids, n_paths, weight=10.0, path=DEMOS, power=(1.0, 2
         print(f"skipped {len(d['demos']) - used} of {len(d['demos'])} LLM answers whose situations changed; "
               "rerun `python -m twin llm-demos` to ask about the current decision points")
     return P, W, used
+
+
+def append_january_demos(X, M, P, W, weight, power, path=DEMOS):
+    """Add ledger histories with supervision only at the January 2026 review."""
+    snapshots = json.loads(path.read_text()).get("jan_2026_snapshots", [])
+    if not snapshots:
+        return X, M, P, W, 0
+
+    n = len(snapshots)
+    months, inputs = X.shape[1:]
+    features = np.zeros((n, months, inputs), dtype=X.dtype)
+    masks = np.ones((n, months, M.shape[-1]), dtype=M.dtype)
+    probs = np.zeros((n, months, P.shape[-1]), dtype=P.dtype)
+    weights = np.zeros((n, months), dtype=W.dtype)
+    for i, demo in enumerate(snapshots):
+        k = demo["month"]
+        features[i, :k + 1] = demo["features"]
+        masks[i, k] = demo["mask"]
+        probs[i, k] = sharpen(demo["probs"], power) * masks[i, k]
+        weights[i, k] = weight
+    return (np.concatenate([X, features]), np.concatenate([M, masks]), np.concatenate([P, probs]),
+            np.concatenate([W, weights]), n)

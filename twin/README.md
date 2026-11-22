@@ -17,7 +17,7 @@ python -m twin explore --custom twin/examples/custom_person.json --answers twin/
     --plan '{"head": "status", "option": 1, "prob": 0.6, "when": "2026-01"}'
 python -m twin clone                     # ~2 min, stretch: neural persona cloned from the rule persona
 python -m twin explore P00003 --policy neural   # the same explorer driven by the neural persona
-PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q    # 20 checks, ~6 s
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q    # 46 checks, ~1 min
 ```
 
 Needs numpy, pandas, scipy, PyTorch and PyYAML. `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` only matters on
@@ -28,7 +28,7 @@ machines where another install (such as ROS) puts broken pytest plugins on the p
 `s' ~ T(s, a)` in [`world/env.py`](world/env.py), for many paths at once:
 
 1. **Apply the action** (status 0-4, housing / spending / assets -1, 0, +1; invalid options are masked).
-2. **Draw events and the economy**: job loss, job offers, promotions, the master's ending, partner,
+2. **Draw events and the economy**: job loss, job offers (learned market), promotions, the master's ending, partner,
    child, separation, windfalls, and switches between normal, inflation and recession.
 3. **Draw the month's net flow** from the learned network.
 4. **Update the books** exactly: cash, investments, loan principal and interest, credit interest.
@@ -39,12 +39,47 @@ machines where another install (such as ROS) puts broken pytest plugins on the p
 | Income when the work mode changes | Take-home pay by mode in the profiles | The person keeps their pay rank in the new mode's distribution ([`world/redraw.py`](world/redraw.py)) |
 | Rent after a move | Rent by city and housing tier (R² 0.66) | Log-rent model; the person keeps their place in the distribution |
 | Pay and price drift | Ledger trends: +1.4% and +1.0% a year | Indices outside the network, which never sees the calendar year |
-| Everything the data lacks | Nothing: assumptions | [`world/priors.yaml`](world/priors.yaml): event rates, economy, returns, offers, degree premium, lifestyle, credit |
+| Job offers, master's admission, finding a flat | A simulated Swiss society calibrated to SECO and BFS statistics | Learned market model ([`world/market.py`](world/market.py), see below) |
+| Everything the data lacks | Nothing: assumptions | [`world/priors.yaml`](world/priors.yaml): event rates, economy, returns, degree premium, lifestyle, credit |
 
 The network works in real terms (deflated by the price index), so ten-year rollouts never ask it
 to extrapolate past the two years it saw. Nobody changes job, flat or spending in the data, so an
 action works by moving the person into a state other people already occupy; that is how the
 synthetic data was generated and would need checking on real data.
+
+## Learned markets: job offers, admission and flats
+
+The ledger never shows anyone getting a job, a study place or a flat. So these three probabilities
+come from [`twin_game_theory/world`](../twin_game_theory/README.md): societies of 200 to 2,000 simulated
+people compete for limited openings, study places and flats. The societies are calibrated to SECO and
+BFS statistics, and three small models are fitted on what happens.
+[`world/market.py`](world/market.py) reads the result (`world_model.json`) and the world uses it every month:
+
+| Event | Before | Now |
+|---|---|---|
+| Job offer while searching | 20% a month (10% in a recession) | Learned: depends on degree, grades, months without work, pay level, applications and the economy |
+| Starting a master's | Always admitted | Admitted with the learned probability (about 98% for average grades); a refused person can apply again next January |
+| Moving flat | Immediate at the January review | A flat search: each month the flat market decides, after the landlord's rule (rent at most a third of income, or 12 months' rent saved, or a student). The search lasts until a flat is found or the next review |
+
+* **Mean field.** The person never sees how tight the market is, so each probability is averaged over
+  the tightness the simulated society produced in that economy.
+* **Model uncertainty.** Each path uses one of five bootstrap refits, chosen by its ensemble member.
+  The market's uncertainty therefore counts under "what the model does not know".
+* **New person inputs.** A custom person can give `education` (none, bachelor, master, phd) and
+  `grades` (standard deviations from the average). Without them, grades are average and education is
+  drawn per path from an assumed prior that rises with pay ([`world/priors.yaml`](world/priors.yaml),
+  `markets`). A student earns a bachelor's on graduating, or a master's after the master's.
+* **Off switch.** `Config(markets=False)`, or `python -m twin explore ... --markets priors`, brings back
+  the fixed rates. The markets only run with events on, so `Config(events=False)` is unchanged.
+* **Effect.** For Alexia (P00001, 2,000 lives): 6.5 months without work instead of 8.9, high-goal odds
+  65% instead of 56%, median 2034 net worth CHF 638k instead of 608k. Established workers and retirees
+  barely change. The landlord's rule now blocks some retirees with little cash from moving.
+* **Persona models.** The neural persona and foresight were trained on the old dynamics. The rule
+  persona needs nothing; retrain `foresight` when its numbers matter.
+
+Tests: [`tests/test_market.py`](../tests/test_market.py) checks that the adapter equals the learned
+model, the directions, offer rates in the world, the landlord's rule on every move, flat searches,
+and education.
 
 ## Acceptance tests (`twin/artifacts/validation.json`)
 
@@ -72,7 +107,8 @@ reconsidered at the January review; spending and assets every month.
   conditional ones such as `{"head": "housing", "option": -1, "prob": 0.7, "cash_months_below": 2}`.
 * **Neural persona** ([`policy/net.py`](policy/net.py)): a GRU policy cloned from the rule
   persona's probabilities over 2,400 sampled lives, tested on unseen profiles
-  (`twin/artifacts/persona_net.json`). `--policy neural` in the explorer.
+  (`twin/artifacts/persona_net.json`). `--policy neural` in the explorer loads
+  `twin/artifacts/jan_2026_proxy_gru.pt` (the January 2026 Qwen proxy from `clone-snapshots`) by default.
 * **LLM persona** ([`policy/llm.py`](policy/llm.py)): a Together AI model role-plays the person at
   decision points of the clone's training lives (situation, goals and traits in words) and answers
   how *this person* would likely act, as probabilities. Those answers replace the rule targets at
@@ -91,12 +127,16 @@ reconsidered at the January review; spending and assets every month.
 ```bash
 export TOGETHER_API_KEY=...             # read from the environment only; never written to files
 export TOGETHER_MODEL=<model id>         # a chat model from https://api.together.ai/models (or --model)
-python -m twin llm-demos --dry-run       # see one prompt, no call
-python -m twin llm-demos --calls 300     # ~0.3M tokens; answers in twin/artifacts/llm_demos.json
+python -m twin llm-demos --dry-run       # preview a January 2026 ledger prompt, no call
+python -m twin llm-demos --calls 300     # 300 simulated reviews + 60 January 2026 ledger snapshots
 python -m twin clone --llm               # retrain the neural persona with the LLM answers
 python -m twin foresight                # ~5 min: look ahead, distil the foresight knob into the (new) clone
 python -m twin explore P00001 --policy foresight --foresight 0.5
 ```
+
+Set `--jan-2026-calls 0` to collect only simulated reviews, or `--calls 0` to collect only ledger snapshots.
+The ledger examples use opening cash through January 2026, with opening profile assumptions for work,
+housing, investments, and debt. The clone receives the cash history and is supervised at the January 2026 review.
 
 Retrain `foresight` after every `clone`, since foresight starts from the clone and keeps it as its reference.
 

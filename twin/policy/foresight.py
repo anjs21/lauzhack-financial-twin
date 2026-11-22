@@ -31,7 +31,7 @@ import torch
 
 from .. import config as C
 from ..world.env import STREAMS, State, Streams, World
-from .net import N_IN, SIZES, NeuralPolicy, PersonaNet, kl_loss, load_net, split_ids, teacher_data
+from .net import N_IN, RULE_CLONE, SIZES, NeuralPolicy, PersonaNet, kl_loss, load_net, split_ids, teacher_data
 from .rules import HEADS, RulePolicy, sample, softmax_masked
 from .traits import from_profile
 
@@ -288,7 +288,7 @@ def train(n_points=2000, K=6, horizon=60, epochs=15, weight=10.0, n_paths=6, log
     Xv = torch.as_tensor(np.concatenate([Xv, np.zeros(Xv.shape[:2] + (1,), np.float32)], -1))
     Mv, Pv = torch.as_tensor(Mv), torch.as_tensor(Pv)
     torch.manual_seed(C.SEED)
-    net = foresight_net_from_clone(load_net())
+    net = foresight_net_from_clone(load_net(RULE_CLONE))      # its f=0 targets are the rule persona
     opt = torch.optim.Adam(net.parameters(), lr=1e-3)
     gen = torch.Generator().manual_seed(C.SEED)
     for ep in range(epochs):

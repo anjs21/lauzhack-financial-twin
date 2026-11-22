@@ -30,3 +30,4 @@ web/test-results/
 web/playwright-report/
 */.vite/
 *.tsbuildinfo
+analysis/society_sim/*.out

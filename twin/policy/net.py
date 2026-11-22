@@ -194,17 +194,17 @@ def kl_loss(logits, M, P, W=None):
         lq = masked_log_softmax(lg, m)
         lp = torch.log(p.clamp_min(1e-9))
         kl = (p * (lp - lq) * m).sum(-1)
-        total = total + (kl.mean() if W is None else (kl * W).sum() / W.sum())
+        total = total + (kl.mean() if W is None else (kl * W).sum() / W.sum().clamp_min(torch.finfo(W.dtype).tiny))
     return total
 
 
 def train_net(X, M, P, Xv, Mv, Pv, epochs=80, batch=64, lr=2e-3, seed=C.SEED, log=print, W=None):
-    """W (lives x months): weight of each step's target; LLM answers get more than rule targets."""
+    """Train on the trailing steps that have targets, with optional per-target weights."""
     torch.manual_seed(seed)
     net = PersonaNet()
     opt = torch.optim.Adam(net.parameters(), lr=lr)
     X, M, P = torch.as_tensor(X), torch.as_tensor(M), torch.as_tensor(P)
-    W = torch.ones(X.shape[:2]) if W is None else torch.as_tensor(W, dtype=torch.float32)
+    W = torch.ones(M.shape[:2]) if W is None else torch.as_tensor(W, dtype=torch.float32)
     Xv, Mv, Pv = torch.as_tensor(Xv), torch.as_tensor(Mv), torch.as_tensor(Pv)
     gen = torch.Generator().manual_seed(seed)
     best, state = float("inf"), None
@@ -213,13 +213,15 @@ def train_net(X, M, P, Xv, Mv, Pv, epochs=80, batch=64, lr=2e-3, seed=C.SEED, lo
         perm = torch.randperm(len(X), generator=gen)
         for i in range(0, len(X), batch):
             idx = perm[i:i + batch]
-            loss = kl_loss(net(X[idx])[0], M[idx], P[idx], W[idx])
+            logits = [head[:, -M.shape[1]:] for head in net(X[idx])[0]]
+            loss = kl_loss(logits, M[idx], P[idx], W[idx])
             opt.zero_grad()
             loss.backward()
             opt.step()
         net.eval()
         with torch.no_grad():
-            v = kl_loss(net(Xv)[0], Mv, Pv).item()
+            logits = [head[:, -Mv.shape[1]:] for head in net(Xv)[0]]
+            v = kl_loss(logits, Mv, Pv).item()
         if v < best:
             best, state = v, {k: t.clone() for k, t in net.state_dict().items()}
         if ep % 10 == 9:
@@ -231,7 +233,7 @@ def train_net(X, M, P, Xv, Mv, Pv, epochs=80, batch=64, lr=2e-3, seed=C.SEED, lo
 
 def per_head_kl(net, X, M, P):
     with torch.no_grad():
-        logits = net(torch.as_tensor(X))[0]
+        logits = [head[:, -M.shape[1]:] for head in net(torch.as_tensor(X))[0]]
     out = {}
     for h, lg, m, p in zip(HEADS, logits, split_heads(torch.as_tensor(M)), split_heads(torch.as_tensor(P))):
         lq = masked_log_softmax(lg, m)
@@ -239,7 +241,63 @@ def per_head_kl(net, X, M, P):
     return out
 
 
-def load_net(path=C.ARTIFACTS / "persona_net.pt"):
+def train_snapshot_proxy(path, log=print):
+    """Clone vLLM action probabilities at the January review using the full cash history."""
+    data = json.loads(path.read_text())
+    snapshots = data["jan_2026_snapshots"]
+    if data["missing"] or len(snapshots) != data["asked"]:
+        raise SystemExit("The snapshot label file is incomplete.")
+    ids = [row["profile_id"] for row in snapshots]
+    if len(ids) < 10 or len(set(ids)) != len(ids):
+        raise SystemExit("Expected at least 10 snapshots with one January review per profile.")
+    month = C.month_index("2026-01")
+    if any(row["month"] != month for row in snapshots):
+        raise SystemExit("Expected January 2026 labels.")
+    X = np.asarray([row["features"] for row in snapshots], dtype=np.float32)
+    M = np.asarray([row["mask"] for row in snapshots], dtype=bool)[:, None, :]
+    P = np.asarray([row["probs"] for row in snapshots], dtype=np.float32)[:, None, :]
+    if X.shape != (len(ids), month + 1, N_IN) or M.shape != P.shape or P.shape[-1] != sum(SIZES):
+        raise SystemExit("Snapshot inputs, masks or targets have unexpected dimensions.")
+    if (not np.isfinite(X).all() or not np.isfinite(P).all() or np.any(P < 0)
+            or np.any(P[~M] != 0) or any(not np.allclose(head.sum(-1), 1) for head in split_heads(P))):
+        raise SystemExit("Snapshot features or action probabilities failed validation.")
+
+    order = np.random.default_rng(C.SEED).permutation(len(ids))
+    n_holdout = int(0.15 * len(ids))
+    test, validation, train = np.split(order, [n_holdout, 2 * n_holdout])
+    log(f"January 2026 GRU proxy: {len(train)} train, {len(validation)} validation, {len(test)} test profiles")
+    net, best = train_net(X[train], M[train], P[train], X[validation], M[validation], P[validation],
+                          batch=16, log=log)
+    heads = per_head_kl(net, X[test], M[test], P[test])
+    report = {
+        "source": str(path),
+        "teacher_model": data["model"],
+        "target_month": C.month_label(month),
+        "seed": C.SEED,
+        "epochs": 80,
+        "batch_size": 16,
+        "validation_kl_total": best,
+        "held_out_kl_total": sum(heads.values()),
+        "held_out_kl_by_head": heads,
+        "split_profile_ids": {name: [ids[i] for i in indices]
+                              for name, indices in (("train", train), ("validation", validation), ("test", test))},
+    }
+    output = C.ARTIFACTS / "jan_2026_proxy_gru"
+    torch.save(net.state_dict(), output.with_suffix(".pt"))
+    output.with_suffix(".json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+    log(f"Test KL: {report['held_out_kl_total']:.6f}")
+    for head, value in heads.items():
+        log(f"  {head:9s} {value:.6f}")
+    return report
+
+
+# The persona GRU every neural policy loads by default: the January 2026 proxy cloned from vLLM (Qwen) labels
+# by `python -m twin clone-snapshots`. `python -m twin clone` still writes its rule clone to persona_net.pt.
+PERSONA_NET = C.ARTIFACTS / "jan_2026_proxy_gru.pt"
+RULE_CLONE = C.ARTIFACTS / "persona_net.pt"        # the rule persona's clone; foresight is distilled on top of it
+
+
+def load_net(path=PERSONA_NET):
     net = PersonaNet()
     net.load_state_dict(torch.load(path, weights_only=True))
     net.eval()
@@ -268,12 +326,15 @@ def main(n_profiles=400, n_paths=6, use_llm=False, llm_weight=10.0, llm_sharpen=
     Xv, Mv, Pv = teacher_data(world, test_ids, n_paths, seed=C.SEED + 1)
     W, n_llm = None, 0
     if use_llm:
-        from .llm import apply_demos
+        from .llm import append_january_demos, apply_demos
         P, W, n_llm = apply_demos(P, M, train_ids, n_paths, weight=llm_weight, power=llm_sharpen)
+        X, M, P, W, n_jan = append_january_demos(X, M, P, W, llm_weight, llm_sharpen)
+        n_llm += n_jan
+        log(f"January 2026 ledger demos: {n_jan}")
         log(f"LLM persona answers: {n_llm} decision points, weight {llm_weight:g} each, sharpened x{llm_sharpen} (status, housing, spending, assets)")
     log(f"training on {len(X)} lives, testing on {len(Xv)} lives of unseen profiles ...")
     net, best = train_net(X, M, P, Xv, Mv, Pv, log=log, W=W)
-    torch.save(net.state_dict(), C.ARTIFACTS / "persona_net.pt")
+    torch.save(net.state_dict(), RULE_CLONE)
     heads = per_head_kl(net, Xv, Mv, Pv)
 
     # Whole lives: rule persona vs its clone on unseen profiles, same seeds.
@@ -301,5 +362,5 @@ def main(n_profiles=400, n_paths=6, use_llm=False, llm_weight=10.0, llm_sharpen=
             f"{r['high_goal_odds'][1]:.2f} neural | median NW {r['median_final_net_worth'][0]:,.0f} vs "
             f"{r['median_final_net_worth'][1]:,.0f} | status changes/yr {r['status_changes_per_year'][0]:.3f} vs "
             f"{r['status_changes_per_year'][1]:.3f}")
-    log(f"saved {C.ARTIFACTS / 'persona_net.pt'} ({res['seconds']:.0f}s)")
+    log(f"saved {RULE_CLONE} ({res['seconds']:.0f}s)")
     return res
