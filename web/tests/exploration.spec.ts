@@ -7,8 +7,8 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Your life. A little clearer.' })).toBeVisible();
-  await expect(page.getByText('Example script')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Hi Mia' })).toBeVisible();
+  await expect(page.getByText('Example', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
   await page.getByRole('button', { name: 'Net worth', exact: true }).click();
   const year = page.getByLabel('Explore a year');
@@ -24,10 +24,10 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   await dialog.getByLabel('Your main money goal').selectOption('Housing deposit');
   await dialog.getByLabel('Target by December 2029').fill('70000');
   await dialog.getByRole('button', { name: 'Save my persona' }).click();
-  await expect(page.getByText('Alex’s financial twin')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Hi Alex' })).toBeVisible();
   await expect(page.getByText('Your choices have changed.', { exact: false })).toBeVisible();
   // Results must remain explicitly attached to the old fictional persona until explored.
-  await expect(page.getByRole('heading', { name: 'A glimpse of Mia’s possibilities' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Mia’s outlook/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: `/tmp/parallel-${test.info().project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);
@@ -56,14 +56,14 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
-  await expect(page.getByText('Live exploration', { exact: true })).toBeVisible();
+  await expect(page.getByText('Example', { exact: true })).toBeHidden();
   await expect(page.getByText('Your simulation is ready.', { exact: false })).toBeVisible();
   await page.getByLabel('Ask about your financial future').fill('What matters most?');
   await page.getByRole('button', { name: 'Send message' }).click();
   await expect(page.getByText('This explanation uses the same stored simulation.', { exact: false })).toBeVisible();
   expect(requests).toHaveLength(2);
   expect(requests[1]).toEqual({ message: 'What matters most?' });
-  await page.getByRole('button', { name: 'Spend a little less', exact: false }).click();
+  await page.getByRole('button', { name: 'Spend less', exact: true }).click();
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
 });
 

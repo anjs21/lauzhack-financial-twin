@@ -20,7 +20,8 @@ export type Message = { role: 'user' | 'assistant'; content: string };
 export type Connection = { url: string; key: string };
 export const money = (value: number) => new Intl.NumberFormat('en-CH', { maximumFractionDigits: 0 }).format(value);
 export const percent = (value: number) => `${Math.round(value * 100)}%`;
-export const scenarioNames = { baseline: 'Your current path', part_time: 'Make room for life', spend_less: 'Spend a little less', cheaper_home: 'Rethink your home' };
+export const compact = (value: number) => new Intl.NumberFormat('en-CH', { notation: 'compact', maximumFractionDigits: Math.abs(value) >= 1e6 ? 1 : 0 }).format(value);
+export const scenarioNames = { baseline: 'Staying on my path', part_time: 'Going part-time', spend_less: 'Spending less', cheaper_home: 'Moving to a cheaper home' };
 
 export async function api<T>(connection: Connection, path: string, body?: unknown, method = body ? 'POST' : 'GET'): Promise<T> {
   const url = new URL(connection.url);
