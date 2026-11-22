@@ -4,6 +4,14 @@ import { money } from './types';
 
 const axis = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 0 });
 
+// Shown under the chart for the selected measure (definitions in docs/model-assumptions.md §11–12).
+const MEASURES: Record<Measure, { label: string; note: string }> = {
+  fan_net_worth: { label: 'Net worth', note: 'Net worth is everything owned minus everything owed: cash + investments − debt.' },
+  fan_cash: { label: 'Cash', note: 'Cash is the money in the bank account: income left after rent, bills and spending. '
+    + 'Money moved into investments leaves cash. Cash can go below zero as an overdraft at 8% a year, down to the credit limit '
+    + '(3 months of income, at least CHF 5,000); when it does, investments are sold to top it back up.' },
+};
+
 type Props = {
   nodes: PathNode[];                       // every path in the tree (roots first)
   activeId: string;                        // the highlighted path: shaded range, decision points
@@ -49,7 +57,7 @@ export default function Chart({ nodes, activeId, decisionMonths, pick, onPick, g
     <div className="chart-head">
       <p className="readout"><span>{label}</span><b>CHF {money(fan[2][month])}</b><span style={{ color: active.color }}>{active.label}</span>
         {parent && month >= active.from && <span className="vs">vs CHF {money(median(parent)[month])} without it</span>}</p>
-      <div className="toggle" role="group" aria-label="Chart measure">{(['fan_cash', 'fan_net_worth'] as const).map(key => <button key={key} aria-pressed={measure === key} onClick={() => onMeasure(key)}>{key === 'fan_cash' ? 'Cash' : 'Net worth'}</button>)}</div>
+      <div className="toggle" role="group" aria-label="Chart measure">{(['fan_net_worth', 'fan_cash'] as const).map(key => <button key={key} aria-pressed={measure === key} title={MEASURES[key].note} onClick={() => onMeasure(key)}>{MEASURES[key].label}</button>)}</div>
     </div>
     <div className="plot" ref={plotRef} onPointerMove={e => scrub(e.clientX)}>
       <svg viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
@@ -72,5 +80,6 @@ export default function Chart({ nodes, activeId, decisionMonths, pick, onPick, g
         onClick={() => onPick(m)} />)}
     </div>
     <p className="legend"><span><i className="key-dot" />January review: tap to decide</span><span><i className="key-band" style={{ background: active.color }} />Likely range</span>{showGoal && <span><i className="key-line goal" />Goal</span>}</p>
+    <p className="measure-note">{MEASURES[measure].note}</p>
   </div>;
 }

@@ -21,6 +21,10 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   await expect(page.getByText('Example', { exact: true })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Your paths' })).toBeVisible();
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
+  // Net worth is the default measure; Cash comes with its definition.
+  await expect(page.getByRole('button', { name: 'Net worth', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Cash', exact: true }).click();
+  await expect(page.getByText('Cash is the money in the bank account', { exact: false })).toBeVisible();
   await page.getByRole('button', { name: 'Net worth', exact: true }).click();
   const moments = page.getByRole('region', { name: 'Key moments' });
   await expect(moments.getByText('Takes a job alongside studies')).toBeVisible();
@@ -221,7 +225,7 @@ test('the assistant changes the persona and grows branches from a chat message',
                        summary: { ...example.alternative, high_goal_odds: 0.96 } };
       json = { answer: 'Done: you are now 31 on CHF 7\'000, and the full-time branch is on the chart.',
                notes: ['Updated age 31; income CHF 7\'000 · re-ran 500 lives', 'Grew a branch: Work full-time · 2028'],
-               actions: [{ type: 'rerun', evidence: rerun }, { type: 'branch', branch }, { type: 'highlight', path_id: 'b1', measure: 'net_worth' }] };
+               actions: [{ type: 'rerun', evidence: rerun }, { type: 'branch', branch }, { type: 'highlight', path_id: 'b1', measure: 'cash' }] };
     } else if (request.method() === 'POST') json = { session_id: 'chat', evidence: example, answer: 'Ready.' };
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
@@ -236,7 +240,7 @@ test('the assistant changes the persona and grows branches from a chat message',
   await expect(page.getByRole('list', { name: 'Changes made' })).toContainText('Updated age 31; income CHF 7\'000');
   const tree = page.getByRole('region', { name: 'Paths' });
   await expect(tree.getByRole('button', { name: /^Work full-time · 2028/ })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: 'Net worth', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Cash', exact: true })).toHaveAttribute('aria-pressed', 'true');   // the assistant switched the measure
   await expect(page.getByText('Your choices have changed', { exact: false })).toHaveCount(0);   // controls follow the new run
   await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
   await page.getByRole('button', { name: 'Edit your persona' }).click();

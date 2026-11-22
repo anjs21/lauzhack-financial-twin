@@ -111,7 +111,7 @@ export default function App() {
   const [activeId, setActiveId] = useState(example.alternative ? 'alternative' : 'baseline');
   const [pick, setPick] = useState<number | null>(null);
   const [growing, setGrowing] = useState(false);
-  const [measure, setMeasure] = useState<Measure>('fan_cash');
+  const [measure, setMeasure] = useState<Measure>('fan_net_worth');
   const chatEnd = useRef<HTMLDivElement>(null);
   const current = evidence.alternative ?? evidence.baseline;
   // Working alongside studies only applies to a student choosing the part-time offer.
