@@ -52,6 +52,7 @@ provider configuration, and the HTTPS tunnel connection.
 
 | Location | Purpose |
 |---|---|
+| [`pipeline/`](pipeline/) | How our Financial Twin works: data, states and actions, the transition function, the persona, validation, and what we tried |
 | [`docs/`](docs/) | Digital-twin foundations, financial mathematics, scenario modelling, and technical approaches |
 | [`examples/`](examples/) | Sample questions, interactions, experiences, and output structures |
 | [`data/`](data/) | Fictional profiles, synthetic financial records, and scenario inputs |
