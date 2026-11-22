@@ -310,3 +310,17 @@ def test_assistant_tools_turn_words_into_simulation_changes(client, payload, mon
     errors = [r["error"] for r in tool_results if "error" in r]
     assert len(errors) == 3 and any("later review" in e for e in errors) and any("city" in e for e in errors)
     assert any("Unknown path" in e for e in errors)
+
+
+def test_life_events_branch_from_now_and_decisions_from_2026(client, payload, monkeypatch):
+    monkeypatch.setattr(api, "explain", lambda evidence, history, message: "Ready.")
+    sid = client.post("/sessions", json=payload, headers=AUTH).json()["session_id"]
+    now = client.post(f"/sessions/{sid}/branches", json={"parent": "baseline", "month": 0, "choice": "lose_job"}, headers=AUTH)
+    assert now.status_code == 200 and now.json()["label"] == "Lose my job · 2025" and now.json()["applied"] > 0.5
+    too_early = client.post(f"/sessions/{sid}/branches", json={"parent": "baseline", "month": 0, "choice": "full_time"}, headers=AUTH)
+    assert too_early.status_code == 422 and "2026" in too_early.text
+    then = client.post(f"/sessions/{sid}/branches", json={"parent": "b1", "month": 24, "choice": "recession"}, headers=AUTH)
+    assert then.status_code == 200 and then.json()["applied"] == 1.0
+    result, action, note = api.run_tool(api.sessions[sid], "explore_decision",
+                                        json.dumps({"from_path": "baseline", "year": 2025, "choice": "lose_job"}))
+    assert action["type"] == "branch" and note == "Grew a branch: Lose my job · 2025"

@@ -41,10 +41,11 @@ export function DecisionSheet({ month, from, busy, canBranch, reason, onChoose, 
   month: number; from: PathNode; busy: boolean; canBranch: boolean; reason: string;
   onChoose: (choice: ChoiceKey) => void; onClose: () => void; onConnect?: () => void;
 }) {
-  const groups = ['Work', 'Home', 'Money'] as const;
+  // January 2025 is the scenario's own review: only life events can be imposed then.
+  const groups = month === 0 ? ['Life events'] as const : ['Work', 'Home', 'Money', 'Life events'] as const;
   return <section className="sheet" aria-label={`Decision in January ${yearOf(month)}`}>
     <div className="sheet-head">
-      <h3>In January {yearOf(month)}, on <span style={{ color: from.color }}>{from.label}</span>, I would…</h3>
+      <h3>{month === 0 ? 'Now, in January 2025' : `In January ${yearOf(month)}`}, on <span style={{ color: from.color }}>{from.label}</span>, what if…</h3>
       <button className="icon-button" aria-label="Close" onClick={onClose}><X size={16} /></button>
     </div>
     {canBranch
@@ -52,6 +53,6 @@ export function DecisionSheet({ month, from, busy, canBranch, reason, onChoose, 
           <button key={c.key} className="chip" disabled={busy} onClick={() => onChoose(c.key)}>{c.label}</button>)}</div></div>)
       : <p className="note">{reason}{onConnect && <> <button className="text-button" onClick={onConnect}>Connect my workspace</button></>}</p>}
     {busy && <p className="thinking" role="status"><LoaderCircle size={16} className="spin" />Growing the branch…</p>}
-    {canBranch && <p className="tree-key">Same lives up to January {yearOf(month)}; from there, this decision wherever it is possible.</p>}
+    {canBranch && <p className="tree-key">Same lives up to January {yearOf(month)}; from there, this decision or event wherever it can happen.</p>}
   </section>;
 }

@@ -150,8 +150,8 @@ test('grow a tree of branches from decision points on the chart', async ({ page 
     else if (request.url().endsWith('/branches')) {
       const body = request.postDataJSON();
       bodies.push(body);
-      const depth = body.parent === 'alternative' ? 1 : 2;
-      const label = { full_time: 'Work full-time', spend_less: 'Spend less' }[body.choice as string] + ` · ${2025 + body.month / 12}`;
+      const depth = body.parent === 'b1' ? 2 : 1;
+      const label = { full_time: 'Work full-time', spend_less: 'Spend less', lose_job: 'Lose my job' }[body.choice as string] + ` · ${2025 + body.month / 12}`;
       const decisions = [...(depth === 2 ? [{ month: bodies[0].month, choice: bodies[0].choice }] : []), { month: body.month, choice: body.choice }];
       json = { id: `b${bodies.length}`, parent: body.parent, root: 'alternative', from: body.month, label, applied: depth === 1 ? 0.6 : 1,
                decisions, summary: { ...example.alternative, final_net_worth: { ...example.alternative.final_net_worth, p50: example.alternative.final_net_worth.p50 + 100000 * depth } } };
@@ -181,10 +181,19 @@ test('grow a tree of branches from decision points on the chart', async ({ page 
   await expect(tree.getByRole('button', { name: /^Spend less · 2029/ })).toHaveAttribute('aria-pressed', 'true');
   expect(bodies[1]).toEqual({ parent: 'b1', month: 48, choice: 'spend_less' });
 
+  // "Now" (January 2025) takes life events only.
+  await tree.getByRole('button', { name: /^Current path/ }).click();
+  await page.getByRole('button', { name: 'Decide in January 2025' }).click();
+  const now = page.getByRole('region', { name: 'Decision in January 2025' });
+  await expect(now).toContainText('Now, in January 2025');
+  await expect(now.getByRole('button', { name: 'Work full-time' })).toHaveCount(0);
+  await now.getByRole('button', { name: 'Lose my job' }).click();
+  expect(bodies[2]).toEqual({ parent: 'baseline', month: 0, choice: 'lose_job' });
+
   // Removing a branch removes what grew from it.
   await tree.getByRole('button', { name: 'Remove Work full-time · 2027' }).click();
   await expect(tree.getByRole('button', { name: /^Spend less · 2029/ })).toHaveCount(0);
-  await expect(tree.getByRole('button', { name: /^Part-time/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(tree.getByRole('button', { name: /^Part-time/ })).toHaveAttribute('aria-pressed', 'false');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });
 

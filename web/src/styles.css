@@ -158,7 +158,7 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .sheet { margin-top: 16px; padding: 16px 18px; border-radius: 20px; background: var(--surface); }
 .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .sheet h3 { font-size: 1rem; font-weight: 500; line-height: 1.4; }
-.sheet-group { display: grid; grid-template-columns: 4rem minmax(0, 1fr); align-items: baseline; gap: 10px; margin-top: 12px; }
+.sheet-group { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); align-items: baseline; gap: 10px; margin-top: 12px; }
 .sheet-group > span { font-size: .8125rem; color: var(--muted); }
 .sheet .chips { margin-top: 0; gap: 6px; }
 .sheet .chip { padding: 6px 12px; font-size: .875rem; background: var(--bg); }

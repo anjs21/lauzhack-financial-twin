@@ -439,3 +439,19 @@ def test_neural_persona_loads_the_january_2026_gru_by_default():
     loaded = load_net().state_dict()
     saved = torch.load(PERSONA_NET, weights_only=True)
     assert all(torch.equal(loaded[k], saved[k]) for k in saved)
+
+
+@needs_model
+def test_forced_life_events_happen_that_month_where_they_can(world):
+    from twin.timeline import Timeline
+    people = custom()                                                   # employed, single
+    persona = steady()
+    base = simulate(world, people, persona, 120, 6, horizon=40)
+    t = Timeline(events={0: ["lose_job"], 24: ["recession", "have_child"]})
+    hit = simulate(world, people, persona, 120, 6, horizon=40, timeline=t)
+    # Decisions come first at a review (a few start a master's that January); everyone still in a job loses it.
+    assert not np.isin(hit.mode[:, 1], [C.PART_TIME, C.FULL_TIME]).any() and hit.events["job_loss"][:, 0].mean() > 0.9
+    assert (hit.econ[:, 25] == 2).all() and (hit.household[:, 25] == C.FAMILY).all()      # a child, if none yet
+    assert np.array_equal(base.mode[:, 0], hit.mode[:, 0])                # nothing changes before the event
+    with pytest.raises(ValueError):
+        world.step(world.initial_state(people, 2, Streams(1, 2)), np.zeros((2, 4), int), Streams(1, 2), forced=["meteor"])

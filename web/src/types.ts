@@ -30,6 +30,12 @@ export const CHOICES = [
   { key: 'spend_less', label: 'Spend less', group: 'Money' },
   { key: 'spend_more', label: 'Spend more', group: 'Money' },
   { key: 'invest', label: 'Invest spare cash', group: 'Money' },
+  // Life events happen to the person; they can be imposed from January 2025 ("now").
+  { key: 'lose_job', label: 'Lose my job', group: 'Life events' },
+  { key: 'recession', label: 'A recession hits', group: 'Life events' },
+  { key: 'have_child', label: 'Have a child', group: 'Life events' },
+  { key: 'partner', label: 'Partner moves in', group: 'Life events' },
+  { key: 'separate', label: 'Separate', group: 'Life events' },
 ] as const;
 export type ChoiceKey = typeof CHOICES[number]['key'];
 export type Decision = { month: number; choice: ChoiceKey };

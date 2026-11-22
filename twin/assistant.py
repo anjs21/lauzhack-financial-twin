@@ -76,15 +76,18 @@ def tools(choices: dict) -> list:
             }}}},
         {"type": "function", "function": {
             "name": "explore_decision",
-            "description": ("Grow a what-if branch: start from an existing path, force one decision at a January review "
-                            "and simulate the rest of every life on the same random draws. The chart shows the new "
-                            "branch. Use it for 'what if I ... in 2028?'; for 'and then ...' branch from the branch you "
-                            "just made. The year must be later than the path's last decision. Call it once per decision."),
+            "description": ("Grow a what-if branch: start from an existing path, impose one decision or life event at a "
+                            "January review and simulate the rest of every life on the same random draws. The chart "
+                            "shows the new branch. Decisions are the person's choices (from 2026); life events happen "
+                            "to them: lose_job, recession, have_child, partner, separate (from 2025; 'now' = 2025). "
+                            "Use it for 'what if I ... in 2028?' or 'what if I lose my job now?'; for 'and then ...' "
+                            "branch from the branch you just made. The year must be later than the path's last "
+                            "decision or event. Call it once per decision or event."),
             "parameters": {"type": "object", "additionalProperties": False, "required": ["from_path", "year", "choice"],
                            "properties": {
                 "from_path": {"type": "string", "description": "id of the path to branch from (see the paths list)"},
-                "year": {"type": "integer", "minimum": C.START_YEAR + 1, "maximum": C.START_YEAR + 9,
-                         "description": "the January review when the decision happens"},
+                "year": {"type": "integer", "minimum": C.START_YEAR, "maximum": C.START_YEAR + 9,
+                         "description": "the January when it happens: decisions 2026-2034, life events 2025-2034"},
                 "choice": {"type": "string", "enum": list(choices),
                            "description": "; ".join(f"{k}: {v}" for k, v in choice.items())},
             }}}},
@@ -101,8 +104,10 @@ def tools(choices: dict) -> list:
 TOOL_RULES = """You can change the simulation with tools. Translate what the user says into the simulator's
 variables: monthly amounts in CHF ('7k' -> 7000), rates as fractions, years as January reviews.
 - New facts about the user, their preferences or what to explore -> update_simulation (only what changes).
-- A what-if decision in a later year -> explore_decision, from the path the user means (default: the
-  highlighted path, else the alternative, else the current path). Chain branches for 'and then'.
+- A what-if decision in a later year, or a life event that happens to them ('what if I lose my job',
+  'a recession', 'we have a baby') -> explore_decision, from the path the user means (default: the
+  highlighted path, else the alternative, else the current path). 'Now' or 'today' means January 2025,
+  the start of the simulation; events can be imposed then, decisions from 2026. Chain branches for 'and then'.
 - To point at something on the chart -> highlight_path.
 - Pure questions need no tool. If a request is ambiguous or outside the tools (e.g. a year outside
   2026-2034 or an unsupported city), ask a short question instead of guessing.

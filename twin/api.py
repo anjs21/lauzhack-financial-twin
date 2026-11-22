@@ -20,7 +20,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from openai import OpenAI, OpenAIError
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from . import assistant
 from . import config as C
@@ -106,21 +106,40 @@ CHOICES = {
     "spend_less": ("spending", -1, "Spend less"),
     "spend_more": ("spending", 1, "Spend more"),
     "invest": ("assets", 1, "Invest spare cash"),
+    # Life events: things that happen to the person, imposed that month on every life where they can happen.
+    "lose_job": ("event", "lose_job", "Lose my job"),
+    "recession": ("event", "recession", "A recession hits"),
+    "have_child": ("event", "have_child", "Have a child"),
+    "partner": ("event", "partner", "Partner moves in"),
+    "separate": ("event", "separate", "Separate"),
 }
 HEAD_INDEX = {"status": 0, "housing": 1, "spending": 2, "assets": 3}
-REVIEWS = tuple(range(12, C.HORIZON, 12))        # January 2026 .. January 2034
+REVIEWS = tuple(range(12, C.HORIZON, 12))        # January 2026 .. January 2034: decisions
+EVENT_MONTHS = (0, *REVIEWS)                     # events can also be imposed now, in January 2025
+EVENT_SHARE = {"lose_job": "job_loss", "have_child": "child", "partner": "partner", "separate": "separation"}
+
+
+def is_event(choice: str) -> bool:
+    return CHOICES[choice][0] == "event"
 
 
 class Decision(StrictModel):
-    month: int = Field(ge=REVIEWS[0], le=REVIEWS[-1])
+    month: int = Field(ge=0, le=REVIEWS[-1])
     choice: Literal[tuple(CHOICES)]
 
     @field_validator("month")
     @classmethod
     def january(cls, value):
         if value % 12:
-            raise ValueError("Decisions happen at a January review.")
+            raise ValueError("Decisions and events happen at a January review.")
         return value
+
+    @model_validator(mode="after")
+    def decisions_start_in_2026(self):
+        if self.month == 0 and not is_event(self.choice):
+            raise ValueError("January 2025 is the scenario's review; decisions start in January 2026 "
+                             "(life events can be imposed from January 2025).")
+        return self
 
 
 class BranchRequest(StrictModel):
@@ -341,12 +360,20 @@ def run_branch(request: SessionRequest, branch: BranchRequest) -> dict:
         apply_scenario(request, persona, timeline)
     for d in branch.decisions:
         head, option, _ = CHOICES[d.choice]
-        persona.intentions.append(Intention(head, option, 1.0, when=C.month_label(d.month)))
+        if head == "event":
+            timeline.events.setdefault(d.month, []).append(option)
+        else:
+            persona.intentions.append(Intention(head, option, 1.0, when=C.month_label(d.month)))
     paths = simulate(model, people, persona, request.n_paths, C.SEED, timeline=timeline, policy_cls=policy)
     summary = summarize(paths)
     last = branch.decisions[-1]
     head, option, _ = CHOICES[last.choice]
-    applied = float((paths.action[:, last.month, HEAD_INDEX[head]] == option).mean())
+    if head != "event":                                          # lives where the decision was open then
+        applied = float((paths.action[:, last.month, HEAD_INDEX[head]] == option).mean())
+    elif option == "recession":
+        applied = float((paths.econ[:, last.month + 1] == 2).mean())
+    else:                                                        # lives where the event could happen then
+        applied = float(paths.events[EVENT_SHARE[option]][:, last.month].mean())
     keep = ("months", "fan_cash", "fan_net_worth", "high_goal_odds", "credit_breach_odds", "shortfall_odds",
             "final_net_worth", "key_moments")
     return {**{k: summary[k] for k in keep}, "applied_share": applied,

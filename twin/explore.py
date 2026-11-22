@@ -122,7 +122,7 @@ def simulate(world: World, people: pd.DataFrame, personas, n_paths=2000, seed=C.
         a, _ = policy.act(s, streams)
         if offer:
             a[:, 0] = 0
-        s, info = world.step(s, a, streams, offer=offer)
+        s, info = world.step(s, a, streams, offer=offer, forced=timeline.events.get(t, ()))
         breaches[:, t] = info["credit_breach"]
         policy.observe(info, s)
         keep(t + 1, s)

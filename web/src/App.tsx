@@ -85,7 +85,9 @@ export default function App() {
   const nodes = [...rootsOf(evidence), ...branches];
   const active = nodes.find(n => n.id === activeId) ?? nodes[0];
   const lastDecision = Math.max(0, ...active.decisions.map(d => d.month));
-  const decisionMonths = stale || active.decisions.length >= MAX_DECISIONS ? [] : REVIEW_MONTHS.filter(m => m > lastDecision);
+  // January 2025 ("now") takes life events only; later Januaries take decisions too.
+  const decisionMonths = stale || active.decisions.length >= MAX_DECISIONS ? []
+    : [0, ...REVIEW_MONTHS].filter(m => active.decisions.length ? m > lastDecision : true);
   const canBranch = !exampleMode && !!session && !stale;
   const salaryInvalid = scenario.kind === 'part_time' && (!Number.isFinite(scenario.salary) || scenario.salary <= 0 || scenario.salary > 100000);
 

@@ -102,6 +102,9 @@ class Config:
                                # admission certain, moves immediate. Markets only run with events on.
 
 
+FORCEABLE = {"lose_job", "recession", "have_child", "partner", "separate"}
+
+
 class World:
     def __init__(self, flow: FlowModel, income: IncomeModel, rent: RentModel, priors: dict | None = None,
                  config: Config | None = None):
@@ -256,8 +259,16 @@ class World:
         s.rent[rows] = self.rent_model.rent(s.tier[rows], s.city[rows], s.rent_z[rows]) * s.P[rows]
 
     # ------------------------------------------------------------------------------ step
-    def step(self, s: State, action: np.ndarray, streams: Streams, offer=None):
-        """Advance one month. action: (N, 4) = status 0..4, housing/spending/assets as -1/0/+1."""
+    def step(self, s: State, action: np.ndarray, streams: Streams, offer=None, forced=()):
+        """Advance one month. action: (N, 4) = status 0..4, housing/spending/assets as -1/0/+1.
+
+        forced: life events imposed this month on every path where they can happen (a what-if):
+        "lose_job", "recession", "have_child", "partner", "separate". They go through the same code
+        as the random events, so everything that follows (search, leave, forced moves) is unchanged."""
+        forced = set(forced or ())
+        unknown = forced - FORCEABLE
+        if unknown:
+            raise ValueError(f"Unknown forced events: {sorted(unknown)}")
         s = s.copy()
         t, N, pr = s.t, s.n, self.pr
         info = {k: np.zeros(N, bool) for k in ["job_loss", "offer", "graduated", "partner", "child",
@@ -345,9 +356,14 @@ class World:
             new[(s.econ == 1) & (u < e["inflation"]["normal"])] = 0
             new[(s.econ == 2) & (u < e["recession"]["normal"])] = 0
             s.econ = new
+            if "recession" in forced:
+                s.econ[:] = 2                                    # then it recovers at the usual rate
 
             working = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
-            lost = working & (ev[1] < self.p_loss[s.econ])
+            lost = working & ((ev[1] < self.p_loss[s.econ]) | ("lose_job" in forced))
+            if "lose_job" in forced:                             # a student's side job ends too
+                s.wage_adjustment[s.side_job] = 0
+                s.side_job[:] = False
             pension_age = pr["retirement"]["pension_age"]
             s.search[lost] = np.where(s.age[lost] < pension_age, np.where(s.mode[lost] == C.FULL_TIME, 2, 1), 0)
             s.mode[lost], s.tau[lost] = C.NOT_WORKING, 0
@@ -376,6 +392,13 @@ class World:
             partner = (s.household == C.SINGLE) & (s.age < hh["partner_max_age"]) & (ev[4] < hh["partner_per_month"])
             child = (s.household == C.COUPLE) & (s.age < hh["child_max_age"]) & (ev[5] < hh["child_per_month"])
             sep = (s.household == C.COUPLE) & ~child & (ev[6] < hh["separation_per_month"])
+            if "partner" in forced:
+                partner |= s.household == C.SINGLE
+            if "have_child" in forced:                           # with or without a partner
+                child |= s.household != C.FAMILY
+                partner &= ~child
+            if "separate" in forced:
+                sep |= (s.household == C.COUPLE) & ~child
             s.household[partner], s.household[child], s.household[sep] = C.COUPLE, C.FAMILY, C.SINGLE
             s.child_cost[child] = True
             leave_cost = hh["parental_leave_months"] * (1 - hh["parental_leave_pay"]) * s.income
