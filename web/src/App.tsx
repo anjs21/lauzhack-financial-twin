@@ -1,12 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUp, Check, Compass, Home, Leaf, LoaderCircle, Sparkles, Wallet, X } from 'lucide-react';
+import { ArrowUp, Check, Compass, Home, Leaf, LoaderCircle, RefreshCw, Sparkles, Wallet, X } from 'lucide-react';
 import Chart from './Chart';
 import Dialog from './Dialog';
 import Moments from './Moments';
+import { DecisionSheet, Tree } from './Tree';
 import PersonaBuilder from './PersonaBuilder';
 import exampleData from './example.json';
-import { api, compact, money, percent, scenarioNames, withScenarioDefaults, withStudyDefaults } from './types';
-import type { Connection, Evidence, Message, Person, Scenario } from './types';
+import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, withScenarioDefaults, withStudyDefaults } from './types';
+import type { BranchNode, ChatResult, ChoiceKey, Connection, Evidence, Measure, Message, PathNode, Person, Scenario } from './types';
+
+const PALETTE = ['#10b981', '#a855f7', '#ec4899', '#06b6d4', '#eab308', '#6366f1', '#f97316', '#14b8a6'];
+const scenarioLabel = (s: Scenario) => s.kind === 'part_time' ? `${s.alongside_studies ? 'Part-time while studying' : 'Part-time'} · CHF ${compact(s.salary)}`
+  : s.kind === 'spend_less' ? 'Spend less' : s.kind === 'cheaper_home' ? 'Cheaper home' : 'Current path';
+/** The two paths every run has: the current path, and the selected scenario branching from it in January 2025. */
+const rootsOf = (ev: Evidence): PathNode[] => [
+  { id: 'baseline', parent: null, root: 'baseline', label: 'Current path', color: 'var(--accent)', from: 0, decisions: [], summary: ev.baseline },
+  ...(ev.alternative ? [{ id: 'alternative', parent: 'baseline', root: 'alternative' as const, label: scenarioLabel(ev.scenario), color: 'var(--alt)', from: 0, decisions: [], summary: ev.alternative }] : []),
+];
 
 const example: Evidence = { ...(exampleData as unknown as Evidence), person: withStudyDefaults(exampleData.person), scenario: withScenarioDefaults(exampleData.scenario as Scenario) };
 const initialExplanation = `In this example, ${percent(example.baseline.high_goal_odds)} of simulated paths reach Mia’s CHF ${money(example.person.high_target)} emergency fund by December 2029, and ${percent(example.alternative!.high_goal_odds)} with the part-time offer.\n\nThe bigger difference comes later: median net worth at the end of 2034 falls from CHF ${money(example.baseline.final_net_worth.p50)} to CHF ${money(example.alternative!.final_net_worth.p50)}. How much would more time today matter to you?`;
@@ -60,6 +70,11 @@ export default function App() {
   const [busy, setBusy] = useState<'run' | 'chat' | null>(null);
   const [error, setError] = useState('');
   const [question, setQuestion] = useState('');
+  const [branches, setBranches] = useState<PathNode[]>([]);
+  const [activeId, setActiveId] = useState(example.alternative ? 'alternative' : 'baseline');
+  const [pick, setPick] = useState<number | null>(null);
+  const [growing, setGrowing] = useState(false);
+  const [measure, setMeasure] = useState<Measure>('fan_cash');
   const chatEnd = useRef<HTMLDivElement>(null);
   const current = evidence.alternative ?? evidence.baseline;
   // Working alongside studies only applies to a student choosing the part-time offer.
@@ -67,6 +82,11 @@ export default function App() {
   const request = { ...scenario, alongside_studies: canKeepStudying && scenario.alongside_studies };
   const changed = JSON.stringify({ person, traits, scenario: request }) !== JSON.stringify({ person: evidence.person, traits: evidence.traits, scenario: evidence.scenario });
   const stale = changed || edited || deliberate !== (evidence.deliberate ?? false);
+  const nodes = [...rootsOf(evidence), ...branches];
+  const active = nodes.find(n => n.id === activeId) ?? nodes[0];
+  const lastDecision = Math.max(0, ...active.decisions.map(d => d.month));
+  const decisionMonths = stale || active.decisions.length >= MAX_DECISIONS ? [] : REVIEW_MONTHS.filter(m => m > lastDecision);
+  const canBranch = !exampleMode && !!session && !stale;
   const salaryInvalid = scenario.kind === 'part_time' && (!Number.isFinite(scenario.salary) || scenario.salary <= 0 || scenario.salary > 100000);
 
   useEffect(() => { if (messages.length > 1 || busy) chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages.length, busy]);
@@ -80,7 +100,7 @@ export default function App() {
         question: `Help me understand ${request.alongside_studies ? 'working part-time alongside my studies' : scenarioNames[scenario.kind].toLowerCase()}, how it affects my goal, when the big decisions in this life typically happen, and the trade-offs for what I value.`,
       });
       const previous = session;
-      setEvidence({ ...result.evidence, person: withStudyDefaults(result.evidence.person), scenario: withScenarioDefaults(result.evidence.scenario) }); setSession(result.session_id); setExampleMode(false); setEdited(false);
+      adopt(result.evidence); setSession(result.session_id); setExampleMode(false);
       setMessages([{ role: 'assistant', content: result.answer }]); setQuestion('');
       if (previous) void api(connection, `/sessions/${previous}`, undefined, 'DELETE').catch(() => {});
     } catch (err) { setError((err as Error).message); } finally { setBusy(null); }
@@ -91,10 +111,49 @@ export default function App() {
     if (!session || stale) { setError('Explore your current choices first, so the conversation uses the right results.'); return; }
     setBusy('chat'); setError('');
     try {
-      const result = await api<{ answer: string }>(connection, `/sessions/${session}/messages`, { message: text.trim() });
-      setMessages(m => [...m, { role: 'user', content: text.trim() }, { role: 'assistant', content: result.answer }]);
+      const result = await api<ChatResult>(connection, `/sessions/${session}/messages`, { message: text.trim() });
+      for (const action of result.actions ?? []) {
+        if (action.type === 'rerun') adopt(action.evidence);
+        else if (action.type === 'branch') addBranch(action.branch);
+        else if (action.type === 'highlight') {
+          setActiveId(action.path_id); setPick(null);
+          if (action.measure) setMeasure(action.measure === 'net_worth' ? 'fan_net_worth' : 'fan_cash');
+        }
+      }
+      setMessages(m => [...m, { role: 'user', content: text.trim() }, { role: 'assistant', content: result.answer, notes: result.notes }]);
       setQuestion('');
     } catch (err) { setError((err as Error).message); } finally { setBusy(null); }
+  }
+
+  async function grow(choice: ChoiceKey) {
+    if (!session || pick === null || growing) return;
+    const from = active, month = pick;
+    setGrowing(true); setError('');
+    try {
+      addBranch(await api<BranchNode>(connection, `/sessions/${session}/branches`, { parent: from.id, month, choice }));
+    } catch (err) { setError((err as Error).message); } finally { setGrowing(false); }
+  }
+
+  /** New results (an exploration or the assistant's re-run): the controls follow them, and the tree restarts. */
+  function adopt(ev: Evidence) {
+    const next = { ...ev, person: withStudyDefaults(ev.person), scenario: withScenarioDefaults(ev.scenario) };
+    setEvidence(next); setPerson(next.person); setTraits(next.traits); setDeliberate(!!next.deliberate);
+    setScenario(s => ({ ...next.scenario, alongside_studies: next.scenario.alongside_studies || (next.person.status !== 'student' && s.alongside_studies) }));
+    setBranches([]); setPick(null); setActiveId(next.alternative ? 'alternative' : 'baseline'); setEdited(false);
+  }
+
+  function addBranch(node: BranchNode) {
+    setBranches(b => [...b, { ...node, color: PALETTE[b.length % PALETTE.length] }]);
+    setActiveId(node.id); setPick(null);
+  }
+
+  function removeBranch(id: string) {
+    const gone = new Set([id]);
+    for (let grew = true; grew;) { grew = false; for (const n of branches) if (n.parent && gone.has(n.parent) && !gone.has(n.id)) { gone.add(n.id); grew = true; } }
+    setBranches(b => b.filter(n => !gone.has(n.id)));
+    if (session && !exampleMode) void api(connection, `/sessions/${session}/branches/${id}`, undefined, 'DELETE').catch(() => {});
+    if (gone.has(activeId)) setActiveId(nodes.find(n => n.id === id)?.parent ?? 'baseline');
+    setPick(null);
   }
 
   function savePersona(p: Person, t: Record<string, number>) {
@@ -145,14 +204,23 @@ export default function App() {
           <span>Net worth 2034<b>CHF {compact(current.final_net_worth.p50)}</b>{evidence.alternative && <span className="was">from {compact(evidence.baseline.final_net_worth.p50)}</span>}</span>
           <span>Credit-limit risk<b>{percent(current.credit_breach_odds)}</b>{evidence.alternative && <span className="was">from {percent(evidence.baseline.credit_breach_odds)}</span>}</span>
         </div>
-        <Chart evidence={evidence} />
-        <Moments evidence={evidence} />
+        <Chart nodes={nodes} activeId={active.id} decisionMonths={decisionMonths} pick={pick} onPick={m => setPick(p => p === m ? null : m)}
+          measure={measure} onMeasure={setMeasure}
+          goal={{ target: evidence.person.high_target, cashGoal: evidence.person.high_goal === 'Emergency savings' }} />
+        {pick !== null && <DecisionSheet month={pick} from={active} busy={growing} canBranch={canBranch}
+          reason={exampleMode ? 'This is an example. Connect your workspace to grow your own branches.' : 'Explore your current choices first.'}
+          onChoose={c => void grow(c)} onClose={() => setPick(null)} onConnect={exampleMode ? () => setModal('connection') : undefined} />}
+        <Tree nodes={nodes} activeId={active.id} onSelect={id => { setActiveId(id); setPick(null); }} onRemove={removeBranch} />
+        <Moments moments={active.summary.key_moments} label={active.label} color={active.color} />
       </section>
 
       <section className="thread" aria-label="Conversation" aria-live="polite" aria-relevant="additions">
         {messages.map((m, i) => <div className={`msg ${m.role}`} key={i}>
           {m.role === 'assistant' && <span className="spark" aria-hidden="true"><Sparkles size={18} /></span>}
-          <div className="msg-body">{m.content.split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}</div>
+          <div className="msg-body">
+            {!!m.notes?.length && <ul className="msg-notes" aria-label="Changes made">{m.notes.map(n => <li key={n}><RefreshCw size={13} aria-hidden="true" />{n}</li>)}</ul>}
+            {m.content.split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}
+          </div>
         </div>)}
         {busy && <div className="thinking" role="status"><LoaderCircle size={17} className="spin" />{busy === 'run' ? 'Exploring 500 paths…' : 'Thinking…'}</div>}
         <div className="thread-end" ref={chatEnd} />
@@ -173,7 +241,7 @@ export default function App() {
     </main>
 
     {modal === 'persona' && <Dialog title="Build your persona" wide onClose={() => setModal(null)}><PersonaBuilder person={person} traits={traits} onSave={savePersona} onClose={() => setModal(null)} /></Dialog>}
-    {modal === 'connection' && <Dialog title="Connect workspace" onClose={() => setModal(null)}><ConnectionForm connection={connection} onConnect={c => { if (c.url !== connection.url || c.key !== connection.key) { setSession(null); setExampleMode(true); setEvidence(example); setMessages(starterMessages); setEdited(true); } setConnection(c); setConnected(true); setModal(null); setError(''); }} /></Dialog>}
+    {modal === 'connection' && <Dialog title="Connect workspace" onClose={() => setModal(null)}><ConnectionForm connection={connection} onConnect={c => { if (c.url !== connection.url || c.key !== connection.key) { setSession(null); setExampleMode(true); setEvidence(example); setMessages(starterMessages); setEdited(true); setBranches([]); setPick(null); setActiveId('alternative'); } setConnection(c); setConnected(true); setModal(null); setError(''); }} /></Dialog>}
     {modal === 'method' && <Dialog title="How it works" onClose={() => setModal(null)}>
       <div className="modal-heading"><h2>How it works</h2></div>
       <div className="method-list">
@@ -181,6 +249,7 @@ export default function App() {
         <div><h3>Your laptop simulates 500 paths</h3><p>January 2025 to December 2034. Choices happen each January; events and cash flows evolve monthly. A fixed historical start, not a forecast from today.</p></div>
         <div><h3>An assistant explains the results</h3><p>It receives persona details (not your name), the results and your messages. Change your choices and explore again for a new comparison.</p></div>
         <div><h3>Habit or deliberate</h3><p>By default your twin decides like people tend to: mostly sticking with what they do. “Decide deliberately” nudges every yearly choice toward what is worth more to you over the next five years.</p></div>
+        <div><h3>Branch at any January</h3><p>Tap a dot on the chart to try a new decision that year. The branch shares every life with its parent up to that January, then follows the decision wherever it is possible. Branch again from a branch to build a tree.</p></div>
         <div><h3>What “goal success” means</h3><p>Reaching the target by December 2029 without exceeding the credit limit before then. Emergency savings counts cash; other goals use net worth.</p></div>
       </div>
       <p className="note">Research prototype on synthetic data. No bank connection. Sessions live in laptop memory for up to an hour.</p>

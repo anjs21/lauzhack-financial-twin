@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pytest
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
@@ -84,11 +85,17 @@ def test_real_projection_and_conversation_grounding(client, payload, monkeypatch
     assert evidence["comparison"]["high_goal_odds"][0] == evidence["baseline"]["high_goal_odds"]
     assert evidence["comparison"]["high_goal_odds"][1] == evidence["alternative"]["high_goal_odds"]
     sid = data["session_id"]
+    seen = []
+    def complete(messages, tools=None):
+        seen.append((messages, tools))
+        return SimpleNamespace(content="Grounded in the stored run.", tool_calls=None)
+    monkeypatch.setattr(api, "complete", complete)
     answer = client.post(f"/sessions/{sid}/messages", json={"message": "What if I earned more?"}, headers=AUTH)
-    assert answer.status_code == 200
-    assert calls[1][0] is calls[0][0]  # Server evidence, not a client-submitted summary.
-    assert calls[1][1][0]["role"] == "user"
-    assert calls[1][1][1]["role"] == "assistant"
+    assert answer.status_code == 200 and answer.json() == {"answer": "Grounded in the stored run.", "actions": [], "notes": []}
+    messages, tools = seen[0]
+    assert json.loads(messages[1]["content"].split(": ", 1)[1])["baseline"]["high_goal_odds"] == evidence["baseline"]["high_goal_odds"]
+    assert [m["role"] for m in messages[2:]] == ["user", "assistant", "user"]       # history, then the new message
+    assert {t["function"]["name"] for t in tools} == {"update_simulation", "explore_decision", "highlight_path"}
     assert client.post(f"/sessions/{sid}/messages", json={"message": " "}, headers=AUTH).status_code == 422
     assert client.post(f"/sessions/{sid}/messages", json={"message": "hello", "evidence": {}}, headers=AUTH).status_code == 422
     api.sessions[sid].expires = time.monotonic() - 1
@@ -213,3 +220,93 @@ def test_persona_demos_fall_back_without_json_mode(tmp_path, monkeypatch):
     c = Client("some/model", cache=tmp_path / "c.jsonl", sdk_client=NoJsonMode())
     assert c.ask("hello") == {"status": {"0": 1}} and len(attempts) == 2
     assert parse_json("no json here") == {}
+
+
+def test_branches_fork_from_a_root_at_a_later_review(client, payload, monkeypatch):
+    monkeypatch.setattr(api, "explain", lambda evidence, history, message: "A grounded explanation.")
+    session = client.post("/sessions", json=payload, headers=AUTH).json()
+    sid, evidence = session["session_id"], session["evidence"]
+    branch = client.post(f"/sessions/{sid}/branches", json={"parent": "alternative", "month": 24, "choice": "full_time"},
+                         headers=AUTH)
+    assert branch.status_code == 200
+    b = branch.json()
+    assert b["id"] == "b1" and b["parent"] == "alternative" and b["label"] == "Work full-time · 2027"
+    for k in ("fan_cash", "fan_net_worth"):                    # the same lives up to the fork
+        assert np.allclose(np.array(b["summary"][k])[:, :25], np.array(evidence["alternative"][k])[:, :25])
+    assert 0 <= b["applied"] <= 1 and b["summary"]["fan_net_worth"] != evidence["alternative"]["fan_net_worth"]
+    deeper = client.post(f"/sessions/{sid}/branches", json={"parent": "b1", "month": 48, "choice": "spend_less"}, headers=AUTH)
+    assert deeper.status_code == 200 and [d["month"] for d in deeper.json()["decisions"]] == [24, 48]
+    assert set(api.sessions[sid].branches) == {"b1", "b2"}                                # known to the assistant
+    for bad in ({"parent": "alternative", "month": 30, "choice": "full_time"},             # not a January
+                {"parent": "b2", "month": 36, "choice": "invest"},                         # before the parent's decision
+                {"parent": "alternative", "month": 24, "choice": "win_lottery"},
+                {"parent": "nowhere", "month": 24, "choice": "invest"}):
+        assert client.post(f"/sessions/{sid}/branches", json=bad, headers=AUTH).status_code == 422
+    assert client.delete(f"/sessions/{sid}/branches/b1", headers=AUTH).json() == {"deleted": ["b1", "b2"]}
+    assert api.sessions[sid].branches == {}
+    assert client.post("/sessions/missing/branches", json={"parent": "baseline", "month": 24, "choice": "invest"},
+                       headers=AUTH).status_code == 404
+    payload["scenario"] = {"kind": "baseline"}
+    plain = client.post("/sessions", json=payload, headers=AUTH).json()["session_id"]
+    assert client.post(f"/sessions/{plain}/branches", json={"parent": "alternative", "month": 24, "choice": "invest"},
+                       headers=AUTH).status_code == 422
+
+
+def test_provider_refusals_explain_what_to_change(monkeypatch):
+    import httpx
+    from openai import PermissionDeniedError
+    monkeypatch.setenv("TOGETHER_API_KEY", "k")
+    monkeypatch.setenv("TOGETHER_MODEL", "Qwen/Qwen3.8-Flash")
+    refusal = {"error": {"message": "This model sends your prompts to a third-party provider, and your organization has "
+                                    "not enabled third-party data sharing."}}
+    class Client:
+        def __init__(self, **kwargs):
+            self.chat = SimpleNamespace(completions=self)
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def create(self, **kwargs):
+            response = httpx.Response(403, request=httpx.Request("POST", "https://api.together.xyz/v1/chat/completions"))
+            raise PermissionDeniedError("refused", response=response, body=refusal)
+    monkeypatch.setattr(api, "OpenAI", Client)
+    with pytest.raises(api.HTTPException) as error:
+        api.explain({"person": {"name": "x"}, "baseline": {}, "alternative": None}, [], "Why?")
+    detail = error.value.detail
+    assert error.value.status_code == 502 and "(403)" in detail and "third-party" in detail
+    assert "served by Together" in detail and "k" != detail
+
+
+
+def test_assistant_tools_turn_words_into_simulation_changes(client, payload, monkeypatch):
+    monkeypatch.setattr(api, "explain", lambda evidence, history, message: "Ready.")
+    sid = client.post("/sessions", json=payload, headers=AUTH).json()["session_id"]
+    call = lambda i, name, args: SimpleNamespace(id=f"c{i}", function=SimpleNamespace(name=name, arguments=json.dumps(args)))  # noqa: E731
+    script = [
+        [call(1, "update_simulation", {"person": {"age": 31, "income": 7000}, "traits": {"free_time": 0.2}})],
+        [call(2, "explore_decision", {"from_path": "alternative", "year": 2028, "choice": "full_time"}),
+         call(3, "explore_decision", {"from_path": "b1", "year": 2030, "choice": "bigger_home"}),
+         call(4, "highlight_path", {"path_id": "b2", "measure": "net_worth"})],
+        [call(5, "explore_decision", {"from_path": "b2", "year": 2029, "choice": "invest"}),          # before b2's decision
+         call(6, "update_simulation", {"person": {"city": "Paris"}}),                                  # unsupported
+         call(7, "highlight_path", {"path_id": "b9"})],
+        None,
+    ]
+    tool_results = []
+    def complete(messages, tools=None):
+        tool_results.extend(json.loads(m["content"]) for m in messages if m["role"] == "tool")
+        step = script.pop(0)
+        return SimpleNamespace(content="Done." if step is None else "", tool_calls=step)
+    monkeypatch.setattr(api, "complete", complete)
+    reply = client.post(f"/sessions/{sid}/messages", json={"message": "I'm 31, take home 7k ..."}, headers=AUTH).json()
+    assert reply["answer"] == "Done."
+    assert [a["type"] for a in reply["actions"]] == ["rerun", "branch", "branch", "highlight"]
+    assert reply["actions"][0]["evidence"]["person"]["income"] == 7000
+    assert reply["actions"][2]["branch"]["parent"] == "b1" and reply["actions"][3] == {"type": "highlight", "path_id": "b2", "measure": "net_worth"}
+    assert reply["notes"][0].startswith("Updated age 31; income CHF 7,000; free time 0.2")
+    s = api.sessions[sid]
+    assert s.request.person.age == 31 and s.request.traits["free_time"] == 0.2 and s.request.person.name == payload["person"]["name"]
+    assert set(s.branches) == {"b1", "b2"}
+    errors = [r["error"] for r in tool_results if "error" in r]
+    assert len(errors) == 3 and any("later review" in e for e in errors) and any("city" in e for e in errors)
+    assert any("Unknown path" in e for e in errors)

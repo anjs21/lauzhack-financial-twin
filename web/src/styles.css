@@ -124,12 +124,14 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .toggle button { border: 0; background: none; border-radius: 999px; padding: 5px 12px; font-size: .8125rem; color: var(--muted); }
 .toggle button[aria-pressed=true] { background: var(--bg); color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
 .plot { position: relative; margin-top: 12px; border-radius: 6px; }
-.plot:focus-within { outline: 2px solid var(--accent); outline-offset: 6px; }
+.plot:has(.scrub:focus-visible) { outline: 2px solid var(--accent); outline-offset: 6px; }
 .plot svg { display: block; width: 100%; height: 240px; overflow: visible; }
 .plot text { font-size: 12px; fill: var(--faint); }
 .grid { stroke: var(--line); }
-.band-outer { fill: var(--band-1); }
-.band-inner { fill: var(--band-2); }
+.band-outer { fill: var(--accent); fill-opacity: .12; }
+.band-inner { fill: var(--accent); fill-opacity: .24; }
+.branch-line { fill: none; stroke-width: 1.6; stroke-opacity: .7; stroke-linejoin: round; }
+.fork { stroke: var(--bg); stroke-width: 2; }
 .median { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linejoin: round; }
 .alt-line { fill: none; stroke: var(--alt); stroke-width: 2.2; stroke-dasharray: 6 5; }
 .goal { stroke: var(--faint); stroke-dasharray: 2 4; }
@@ -141,7 +143,51 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .key-line { width: 16px; border-top: 2.4px solid var(--accent); }
 .key-line.alt { border-top: 2.2px dashed var(--alt); }
 .key-line.goal { border-top: 1.5px dotted var(--faint); }
-.key-band { width: 16px; height: 10px; border-radius: 2px; background: var(--band-2); }
+.key-band { width: 16px; height: 10px; border-radius: 2px; background: var(--band-2); opacity: .35; }
+.key-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--muted); background: var(--bg); }
+.readout .vs { color: var(--faint); }
+
+/* Decision points on the chart */
+.decide { position: absolute; z-index: 2; width: 14px; height: 14px; margin: 0; padding: 0; transform: translate(-50%, -50%);
+  border-radius: 50%; border: 2px solid var(--accent); background: var(--bg); cursor: pointer; transition: transform .12s, background .12s; }
+.decide::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; }      /* a bigger touch target */
+.decide:hover, .decide:focus-visible { transform: translate(-50%, -50%) scale(1.35); }
+.decide.picked { background: var(--ink); border-color: var(--ink) !important; transform: translate(-50%, -50%) scale(1.35); }
+
+/* Decision sheet */
+.sheet { margin-top: 16px; padding: 16px 18px; border-radius: 20px; background: var(--surface); }
+.sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.sheet h3 { font-size: 1rem; font-weight: 500; line-height: 1.4; }
+.sheet-group { display: grid; grid-template-columns: 4rem minmax(0, 1fr); align-items: baseline; gap: 10px; margin-top: 12px; }
+.sheet-group > span { font-size: .8125rem; color: var(--muted); }
+.sheet .chips { margin-top: 0; gap: 6px; }
+.sheet .chip { padding: 6px 12px; font-size: .875rem; background: var(--bg); }
+.sheet .thinking, .sheet .note { margin-top: 12px; margin-bottom: 0; }
+.sheet .tree-key { margin-top: 12px; }
+
+/* Paths tree */
+.tree { margin-top: 28px; }
+.tree h3 { font-size: .875rem; font-weight: 500; color: var(--muted); }
+.tree ul { list-style: none; margin: 8px 0 0; padding: 0; }
+.tree li { position: relative; display: flex; align-items: center; }
+.tree-row { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 12px; background: none; text-align: left; font-size: .9375rem; }
+.tree-row:hover { background: var(--surface); }
+.tree li.active .tree-row { background: var(--surface-2); }
+.tree-row > i { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.elbow { flex: none; width: 10px; height: 14px; margin: -8px -4px 0 -6px; border-left: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line); border-bottom-left-radius: 6px; }
+.tree-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-label small { color: var(--faint); font-size: .8125rem; }
+.tree-stats { display: inline-flex; gap: 12px; color: var(--muted); font-size: .875rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tree-stats .up { color: var(--ok); }
+.tree-stats .down { color: var(--err); }
+.tree-remove { margin-left: 2px; color: var(--faint); }
+.tree-key { margin-top: 6px; font-size: .75rem; color: var(--faint); }
+@media (max-width: 600px) {
+  .tree-row { flex-wrap: wrap; row-gap: 2px; }
+  .tree-label { white-space: normal; }
+  .tree-stats { flex-basis: 100%; padding-left: 20px; font-size: .8125rem; }
+  .sheet-group { grid-template-columns: 1fr; gap: 6px; }
+}
 
 /* Key moments */
 .moments { margin-top: 32px; }
@@ -165,6 +211,9 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .msg p + p { margin-top: 12px; }
 .spark { flex: none; width: 28px; height: 28px; display: grid; place-items: center; color: var(--accent); margin-top: 1px; }
 .msg.user { align-self: flex-end; max-width: 80%; padding: 10px 16px; border-radius: 20px 20px 6px 20px; background: var(--surface); }
+.msg-notes { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.msg-notes li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--surface); color: var(--muted); font-size: .8125rem; line-height: 1.4; }
+.msg-notes svg { color: var(--accent); }
 .thinking { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .9375rem; }
 
 .dock { position: sticky; bottom: 0; margin-top: auto; padding: 20px 0 12px; background: linear-gradient(to bottom, transparent, var(--bg) 20px); }
