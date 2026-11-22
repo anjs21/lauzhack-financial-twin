@@ -23,6 +23,30 @@ export type Evidence = {
   comparison: { goal_change_pp: number; goal_change_mc95_pp: number[]; median_final_net_worth: number[] } | null;
   assumptions: string[];
   deliberate?: boolean;
+  plan?: { narrative: string; spontaneity: number; steps: string[]; carried_out: StepResult[] | null };
+};
+
+// Long-term plans (POST /plans, GET /plans/{id}): written by the planner agent, carried out by the simulator.
+export type PlanStep = {
+  id: string; label: string; head: 'status' | 'housing' | 'spending' | 'assets'; option: string;
+  start?: string; until?: string; commitment: number; after?: string; after_months?: number;
+  event?: string; within_months?: number; cash_months_below?: number; cash_months_above?: number;
+  min_age?: number; max_age?: number; repeat?: boolean;
+};
+export type StepResult = {
+  id: string; label: string; head: string; option: string; taken_share: number; typical_year: number | null;
+  blocked_share: number; declined_share: number; turned_down_share: number; trigger_share: number; blocked_because?: string;
+};
+export type PlanVersion = {
+  version: number; kind: 'draft' | 'nudge'; said: string; as_of: string | null; signed: boolean;
+  plan: { narrative: string; spontaneity: number; notes: string[]; steps: PlanStep[] };
+  evaluation: { n_lives: number; steps: StepResult[]; outcomes: { high_goal_odds: number; credit_breach_odds: number; final_net_worth: { p50: number } } };
+  changes: string;
+  comparison: { high_goal_odds: number[]; credit_breach_odds: number[]; median_final_net_worth: number[] };
+};
+export type PlanState = {
+  plan_id?: string; status: 'working' | 'ready' | 'failed'; progress: string; error: string | null;
+  latest: PlanVersion | null; versions: { version: number; kind: string; said: string; as_of: string | null }[];
 };
 export type Message = { role: 'user' | 'assistant'; content: string };
 export type Connection = { url: string; key: string };

@@ -95,7 +95,18 @@ Persona builder + scenario
 Follow-up question
     → POST /sessions/{id}/messages
     → server-held evidence + bounded conversation history → LLM response
+
+Your plan (own words) or a change of plans
+    → POST /plans or POST /plans/{id}/nudges  → 202, a planning job on the laptop
+    → GET /plans/{id} every 1.5 s: progress, then the plan and how its steps played out
+    → POST /sessions with plan_id: the new plan is explored and explained
 ```
+
+The planner agent writes the person's plan as yearly steps with fallbacks and tests it
+in 300 simulated lives (one to three minutes). A nudge revises only what the change
+affects. While "Follow my plan" is on, explorations follow the latest version; editing
+the persona detaches the plan until the user starts over. Without a connection the page
+shows a real planner run for the example persona (`src/example-plan.json`).
 
 Changing a persona or scenario marks the results as old and disables follow-up
 chat until the user runs the new exploration. Follow-ups discuss the existing run;
@@ -126,8 +137,8 @@ origins. This is a shared-key research workspace, not a multi-user banking servi
 The provider receives relevant persona details (name excluded), simulation summaries,
 and conversation messages; user-entered names in messages are not automatically removed.
 The frontend keeps persona drafts and connection details in memory only.
-Sessions expire after one hour, are removed on subsequent access/creation, and are
-bounded to 32 in memory. Restarting the API clears all sessions. A new successful
+Sessions and plans expire after one hour, are removed on subsequent access/creation, and are
+bounded to 32 each in memory. The planner receives the person's own words about their plans. Restarting the API clears all sessions. A new successful
 exploration requests deletion of the previous conversation. No chat is written to disk.
 Two concurrent model/LLM requests are allowed; extra requests receive a retryable 429.
 Provider requests have a 45-second timeout and no automatic paid retry.

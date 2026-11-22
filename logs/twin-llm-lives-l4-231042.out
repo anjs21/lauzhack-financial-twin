@@ -1,0 +1,58 @@
+name, memory.total [MiB]
+NVIDIA L4, 23034 MiB
+W1122 02:39:36.403000 3340791 torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1122 02:39:36.404000 3340791 torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1122 02:39:36.405000 3340791 torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+Loading safetensors checkpoint shards:   0% Completed | 0/5 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  20% Completed | 1/5 [00:01<00:07,  1.78s/it]
+Loading safetensors checkpoint shards:  40% Completed | 2/5 [00:03<00:05,  1.79s/it]
+Loading safetensors checkpoint shards:  60% Completed | 3/5 [00:05<00:03,  1.76s/it]
+Loading safetensors checkpoint shards:  80% Completed | 4/5 [00:06<00:01,  1.63s/it]
+Loading safetensors checkpoint shards: 100% Completed | 5/5 [00:07<00:00,  1.27s/it]
+Loading safetensors checkpoint shards: 100% Completed | 5/5 [00:07<00:00,  1.47s/it]
+
+[rank0]:W1122 02:40:23.522000 3340830 torch/_inductor/utils.py:1806] Not enough SMs to use max_autotune_gemm mode
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/51 [00:00<?, ?it/s]Capturing CUDA graphs (PIECEWISE):   2%|▏         | 1/51 [00:00<00:08,  5.88it/s]Capturing CUDA graphs (PIECEWISE):   4%|▍         | 2/51 [00:00<00:07,  6.16it/s]Capturing CUDA graphs (PIECEWISE):   6%|▌         | 3/51 [00:00<00:07,  6.02it/s]Capturing CUDA graphs (PIECEWISE):   8%|▊         | 4/51 [00:00<00:07,  6.01it/s]Capturing CUDA graphs (PIECEWISE):  10%|▉         | 5/51 [00:00<00:07,  6.08it/s]Capturing CUDA graphs (PIECEWISE):  12%|█▏        | 6/51 [00:00<00:07,  6.06it/s]Capturing CUDA graphs (PIECEWISE):  14%|█▎        | 7/51 [00:01<00:07,  6.09it/s]Capturing CUDA graphs (PIECEWISE):  16%|█▌        | 8/51 [00:01<00:06,  6.16it/s]Capturing CUDA graphs (PIECEWISE):  18%|█▊        | 9/51 [00:01<00:06,  6.48it/s]Capturing CUDA graphs (PIECEWISE):  20%|█▉        | 10/51 [00:01<00:06,  6.75it/s]Capturing CUDA graphs (PIECEWISE):  22%|██▏       | 11/51 [00:01<00:05,  6.96it/s]Capturing CUDA graphs (PIECEWISE):  24%|██▎       | 12/51 [00:01<00:05,  7.14it/s]Capturing CUDA graphs (PIECEWISE):  25%|██▌       | 13/51 [00:01<00:05,  7.28it/s]Capturing CUDA graphs (PIECEWISE):  27%|██▋       | 14/51 [00:02<00:05,  7.38it/s]Capturing CUDA graphs (PIECEWISE):  29%|██▉       | 15/51 [00:02<00:04,  7.33it/s]Capturing CUDA graphs (PIECEWISE):  31%|███▏      | 16/51 [00:02<00:04,  7.37it/s]Capturing CUDA graphs (PIECEWISE):  33%|███▎      | 17/51 [00:02<00:04,  7.80it/s]Capturing CUDA graphs (PIECEWISE):  35%|███▌      | 18/51 [00:02<00:04,  8.16it/s]Capturing CUDA graphs (PIECEWISE):  37%|███▋      | 19/51 [00:02<00:03,  8.44it/s]Capturing CUDA graphs (PIECEWISE):  39%|███▉      | 20/51 [00:02<00:03,  8.51it/s]Capturing CUDA graphs (PIECEWISE):  41%|████      | 21/51 [00:02<00:03,  8.58it/s]Capturing CUDA graphs (PIECEWISE):  43%|████▎     | 22/51 [00:03<00:03,  8.74it/s]Capturing CUDA graphs (PIECEWISE):  45%|████▌     | 23/51 [00:03<00:03,  8.92it/s]Capturing CUDA graphs (PIECEWISE):  47%|████▋     | 24/51 [00:03<00:02,  9.07it/s]Capturing CUDA graphs (PIECEWISE):  49%|████▉     | 25/51 [00:03<00:02,  8.85it/s]Capturing CUDA graphs (PIECEWISE):  51%|█████     | 26/51 [00:03<00:02,  8.90it/s]Capturing CUDA graphs (PIECEWISE):  53%|█████▎    | 27/51 [00:03<00:02,  8.85it/s]Capturing CUDA graphs (PIECEWISE):  55%|█████▍    | 28/51 [00:03<00:02,  8.99it/s]Capturing CUDA graphs (PIECEWISE):  57%|█████▋    | 29/51 [00:03<00:02,  9.15it/s]Capturing CUDA graphs (PIECEWISE):  59%|█████▉    | 30/51 [00:03<00:02,  8.95it/s]Capturing CUDA graphs (PIECEWISE):  61%|██████    | 31/51 [00:04<00:02,  9.04it/s]Capturing CUDA graphs (PIECEWISE):  63%|██████▎   | 32/51 [00:04<00:02,  9.20it/s]Capturing CUDA graphs (PIECEWISE):  67%|██████▋   | 34/51 [00:04<00:01,  9.72it/s]Capturing CUDA graphs (PIECEWISE):  71%|███████   | 36/51 [00:04<00:01,  9.87it/s]Capturing CUDA graphs (PIECEWISE):  73%|███████▎  | 37/51 [00:04<00:01,  9.88it/s]Capturing CUDA graphs (PIECEWISE):  76%|███████▋  | 39/51 [00:04<00:01, 10.16it/s]Capturing CUDA graphs (PIECEWISE):  80%|████████  | 41/51 [00:05<00:00, 10.32it/s]Capturing CUDA graphs (PIECEWISE):  84%|████████▍ | 43/51 [00:05<00:00, 10.26it/s]Capturing CUDA graphs (PIECEWISE):  88%|████████▊ | 45/51 [00:05<00:00, 10.44it/s]Capturing CUDA graphs (PIECEWISE):  92%|█████████▏| 47/51 [00:06<00:00,  4.92it/s]Capturing CUDA graphs (PIECEWISE):  96%|█████████▌| 49/51 [00:06<00:00,  5.97it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 51/51 [00:06<00:00,  7.03it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 51/51 [00:06<00:00,  7.71it/s]
+Capturing CUDA graphs (FULL):   0%|          | 0/35 [00:00<?, ?it/s]Capturing CUDA graphs (FULL):   3%|▎         | 1/35 [00:00<00:03,  9.82it/s]Capturing CUDA graphs (FULL):   6%|▌         | 2/35 [00:00<00:03,  9.72it/s]Capturing CUDA graphs (FULL):   9%|▊         | 3/35 [00:00<00:03,  9.71it/s]Capturing CUDA graphs (FULL):  14%|█▍        | 5/35 [00:00<00:03,  9.93it/s]Capturing CUDA graphs (FULL):  20%|██        | 7/35 [00:00<00:02, 10.11it/s]Capturing CUDA graphs (FULL):  26%|██▌       | 9/35 [00:00<00:02, 10.07it/s]Capturing CUDA graphs (FULL):  31%|███▏      | 11/35 [00:01<00:02, 10.18it/s]Capturing CUDA graphs (FULL):  37%|███▋      | 13/35 [00:01<00:02, 10.21it/s]Capturing CUDA graphs (FULL):  43%|████▎     | 15/35 [00:01<00:01, 10.17it/s]Capturing CUDA graphs (FULL):  49%|████▊     | 17/35 [00:01<00:01, 10.47it/s]Capturing CUDA graphs (FULL):  54%|█████▍    | 19/35 [00:01<00:01, 10.87it/s]Capturing CUDA graphs (FULL):  60%|██████    | 21/35 [00:02<00:01, 10.91it/s]Capturing CUDA graphs (FULL):  66%|██████▌   | 23/35 [00:02<00:01, 11.24it/s]Capturing CUDA graphs (FULL):  71%|███████▏  | 25/35 [00:02<00:00, 11.49it/s]Capturing CUDA graphs (FULL):  77%|███████▋  | 27/35 [00:02<00:00, 11.58it/s]Capturing CUDA graphs (FULL):  83%|████████▎ | 29/35 [00:02<00:00, 11.71it/s]Capturing CUDA graphs (FULL):  89%|████████▊ | 31/35 [00:02<00:00, 11.95it/s]Capturing CUDA graphs (FULL):  94%|█████████▍| 33/35 [00:02<00:00, 12.25it/s]Capturing CUDA graphs (FULL): 100%|██████████| 35/35 [00:03<00:00, 12.43it/s]Capturing CUDA graphs (FULL): 100%|██████████| 35/35 [00:03<00:00, 11.11it/s]
+model loaded in 81 s
+agent: alexia
+(EngineCore pid=3340830) WARNING 11-22 02:41:17 [jit_monitor.py:143] Triton kernel JIT compilation during inference: kernel_unified_attention. This causes a latency spike; consider extending warmup to cover this shape/config.
+  2025: 2,882 decisions so far, 38 s
+  2026: 4,975 decisions so far, 99 s
+  2027: 7,574 decisions so far, 178 s
+  2028: 9,879 decisions so far, 253 s
+  2029: 12,053 decisions so far, 323 s
+  2030: 14,185 decisions so far, 389 s
+  2031: 16,366 decisions so far, 457 s
+  2032: 18,611 decisions so far, 527 s
+  2033: 20,851 decisions so far, 596 s
+  2034: 23,077 decisions so far, 663 s
+{
+ "model": "Qwen/Qwen3-8B",
+ "agent_key": "alexia",
+ "lives": 500,
+ "months": 120,
+ "seed": 0,
+ "simulation_seconds": 663.4,
+ "decisions": 23077,
+ "prompts": 23077,
+ "unique": 21073,
+ "seconds": 649.5982029438019,
+ "load_seconds": 80.99637150764465,
+ "valid_mass_mean": 0.9989507377585656,
+ "valid_mass_p05": 0.9923238635443382,
+ "heads": [
+  "status",
+  "housing",
+  "spending",
+  "assets"
+ ],
+ "triggers": [
+  "review",
+  "graduated",
+  "lost_job",
+  "offer",
+  "admitted"
+ ]
+}
+saved /shared/home/guillem.masdemont.serra/lauzhack-financial-twin/twin_game_theory/agent/results/lives_alexia_qwen3-8b.npz

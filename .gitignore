@@ -31,3 +31,6 @@ web/playwright-report/
 */.vite/
 *.tsbuildinfo
 analysis/society_sim/*.out
+
+# Long-term plans hold the person's own words
+/twin/artifacts/plans/

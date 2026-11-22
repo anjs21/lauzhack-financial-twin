@@ -10,8 +10,14 @@
       --plan '{"head": "status", "option": 1, "prob": 0.6, "when": "2026-01"}'   (repeatable)
       --custom person.json    a person who is not in the data (see twin/examples)
       --out report.html --json result.json --no-what-ifs --no-spread --no-foresight
+      --life-plan plan.json   carry out the latest saved long-term plan (from `plan`)
   llm-demos                   ask an LLM (Together AI; needs TOGETHER_API_KEY) to role-play personas at decision points
       --calls 300 --jan-2026-calls 60 --model <Together model id> --workers 8 --dry-run
+  plan PROFILE_ID             the persona planner agent (LLM, Together AI) writes a long-term plan and checks it
+      --wish "Master's next year, then a bigger flat in Zurich"   draft a new plan from the person's own words
+      --nudge "I got a job offer, no master's" --as-of 2026-01    revise the saved plan after a change of plans
+      --show                  print the saved plan and how it plays out
+      --custom person.json --answers answers.json --rounds 4 --paths 300 --model <id> --dry-run
   replay                      score monthly updates on the held-out 2026 ledger
   clone [--llm] [--llm-sharpen 1,2,2,1]  train the neural persona on the rule persona (plus the LLM answers) and compare
   clone-snapshots             train and evaluate a GRU on January 2026 vLLM labels
@@ -53,6 +59,22 @@ def main(argv=None):
     ex.add_argument("--foresight", type=float, default=0.5)
     ex.add_argument("--markets", choices=["learned", "priors"], default="learned",
                     help="job offers, admission and flats: learned market model or the fixed rates in priors.yaml")
+    ex.add_argument("--life-plan", type=Path)
+    pl = sub.add_parser("plan")
+    pl.add_argument("profile_id", nargs="?")
+    pl.add_argument("--custom", type=Path)
+    pl.add_argument("--answers", type=Path)
+    group = pl.add_mutually_exclusive_group(required=True)
+    group.add_argument("--wish", help="the person's own words about their plans (may be empty: \"\")")
+    group.add_argument("--nudge", help="a change of plans, in the person's words")
+    group.add_argument("--show", action="store_true")
+    pl.add_argument("--as-of", help="YYYY-MM of the nudge; steps that ended before it stay as they were")
+    pl.add_argument("--rounds", type=int, default=4)
+    pl.add_argument("--paths", type=int, default=300)
+    pl.add_argument("--seed", type=int, default=C.SEED)
+    pl.add_argument("--model")
+    pl.add_argument("--out", type=Path, help="plan file (default twin/artifacts/plans/<id>.json)")
+    pl.add_argument("--dry-run", action="store_true", help="print the first prompt; no API call")
     ld = sub.add_parser("llm-demos")
     ld.add_argument("--calls", type=int, default=300)
     ld.add_argument("--jan-2026-calls", type=int, default=None,
@@ -98,6 +120,10 @@ def main(argv=None):
         if a.answers:
             persona = persona.with_answers(json.loads(a.answers.read_text()))
         persona.intentions = [Intention.parse(json.loads(p)) for p in a.plan]
+        if a.life_plan:
+            from .plan import store
+            life_plan, _ = store.latest(a.life_plan)
+            persona.intentions = life_plan.intentions() + persona.intentions
         if a.temperature:
             persona.temperature = a.temperature
         what_ifs = None if a.no_what_ifs else default_what_ifs(person, persona)
@@ -128,6 +154,8 @@ def main(argv=None):
         print(f"report: {out}")
         if a.json:
             a.json.write_text(json.dumps(res, indent=1))
+    elif a.cmd == "plan":
+        plan_command(a, ap)
     elif a.cmd == "llm-demos":
         from .policy.llm import DEFAULT_JAN_2026_CALLS, collect
         jan_calls = DEFAULT_JAN_2026_CALLS if a.jan_2026_calls is None else a.jan_2026_calls
@@ -141,6 +169,75 @@ def main(argv=None):
     elif a.cmd == "foresight":
         from .policy.foresight import main as foresight_main
         foresight_main(n_points=a.points)
+
+
+def plan_command(a, ap):
+    from .explore import person_table
+    from .plan import store
+    from .plan.agent import PlannerAgent, PlanError, together_chat
+    from .plan.evaluate import evaluate
+    from .policy.traits import from_profile
+    from .world.env import World
+    custom = json.loads(a.custom.read_text()) if a.custom else None
+    if not (a.profile_id or custom):
+        ap.error("give a PROFILE_ID (e.g. P00042) or --custom person.json")
+    people = person_table(a.profile_id, custom)
+    persona = from_profile(people.iloc[0])
+    if a.answers:
+        persona = persona.with_answers(json.loads(a.answers.read_text()))
+    key = a.profile_id or (custom or {}).get("id", "custom")
+    path = a.out or store.path_for(key)
+    world = World.load()
+    agent = PlannerAgent(world, chat=None if a.dry_run or a.show else together_chat(a.model),
+                         max_rounds=a.rounds, n_paths=a.paths, seed=a.seed, log=print)
+    if a.show:
+        plan, entry = store.latest(path)
+        ev, _, _ = evaluate(world, people, persona, plan, a.paths, a.seed)
+        print_plan(plan, ev, f"version {entry['version']} ({entry['kind']}, {entry['created']})")
+        return
+    if a.dry_run:
+        if a.nudge is not None:
+            plan, entry = store.latest(path)
+            print(agent.nudge_prompt(people, persona, plan, a.nudge, a.as_of, entry.get("evaluation"), store.history(path)))
+        else:
+            print(agent.draft_prompt(people, persona, a.wish))
+        return
+    try:
+        if a.nudge is not None:
+            plan, entry = store.latest(path)
+            res = agent.nudge(people, persona, plan, a.nudge, a.as_of, entry.get("evaluation"), store.history(path))
+            entry = store.append(path, key, "nudge", a.nudge, res, a.as_of)
+        else:
+            res = agent.draft(people, persona, a.wish)
+            entry = store.append(path, key, "draft", a.wish, res)
+    except PlanError as e:
+        raise SystemExit(str(e)) from None
+    print_plan(res.plan, res.evaluation, f"version {entry['version']} -> {path}")
+    if not res.signed:
+        print("  note: the agent did not sign this plan within its rounds; it is the last valid draft")
+    if res.diff:
+        d = res.diff
+        print("what changed: " + (res.changes or "(no explanation)"))
+        for k in ("added", "removed"):
+            for line in d[k]:
+                print(f"  {k}: {line}")
+        for c in d["changed"]:
+            print(f"  changed {c['id']}: " + ", ".join(f"{f} {v[0]} -> {v[1]}" for f, v in c["fields"].items()))
+        if res.kept_past:
+            print("  kept (already played out): " + ", ".join(res.kept_past))
+
+
+def print_plan(plan, ev, title):
+    print(f"Plan {title}")
+    print(f"  {plan.narrative}")
+    print(f"  spontaneity {plan.spontaneity:.0%} (unplanned changes of work or home the habits would make)")
+    for s, r in zip(plan.steps, ev["steps"]):
+        when = f"typically {r['typical_year']}" if r["typical_year"] else "never"
+        extra = f", blocked {r['blocked_share']:.0%}: {r['blocked_because']}" if r.get("blocked_because") else ""
+        print(f"  - {s.describe()}\n      happens in {r['taken_share']:.0%} of lives, {when}{extra}")
+    o = ev["outcomes"]
+    print(f"  high goal {o['high_goal_odds']:.0%} · ever below zero {o['shortfall_odds']:.0%} · credit limit hit "
+          f"{o['credit_breach_odds']:.0%} · median net worth 2034 CHF {o['final_net_worth']['p50']:,.0f}")
 
 
 if __name__ == "__main__":

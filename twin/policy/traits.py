@@ -30,6 +30,9 @@ QUESTIONS = {
 }
 
 
+EVENTS = ("job_loss", "offer", "graduated", "partner", "child", "separation", "windfall")
+
+
 @dataclass
 class Intention:
     """A plan the person states, acted on with probability `prob` when it applies.
@@ -37,6 +40,15 @@ class Intention:
     head: "status" (option 0..4), "housing", "spending" or "assets" (option -1/0/+1).
     when: "YYYY-MM" for a one-off plan; otherwise it applies whenever its conditions hold
     at a decision point, until it fires once (once=True) or every time (once=False).
+
+    Long-term plans (twin/plan) also use:
+    until: "YYYY-MM", the last month of a window starting at `when` (or now). Within the window
+        the plan is retried every January review while its option is not possible, or the
+        world turned it down (no admission, no flat); declining it (1 - prob) ends it.
+    after: id of another intention that must have been carried out first, at least
+        `after_months` months earlier.
+    event: a life event (EVENTS) that must have happened in the last `within_months` months:
+        a contingency such as "if I lose my job, I move somewhere cheaper".
     """
     head: str
     option: int
@@ -47,6 +59,20 @@ class Intention:
     cash_months_below: float | None = None
     cash_months_above: float | None = None
     once: bool = True
+    id: str | None = None
+    until: str | None = None
+    after: str | None = None
+    after_months: int = 0
+    event: str | None = None
+    within_months: int = 12
+
+    def __post_init__(self):
+        if self.event is not None and self.event not in EVENTS:
+            raise ValueError(f"unknown event {self.event!r}; use one of {', '.join(EVENTS)}")
+
+    @property
+    def windowed(self):
+        return self.until is not None
 
     @classmethod
     def parse(cls, d: dict) -> "Intention":

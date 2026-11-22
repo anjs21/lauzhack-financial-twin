@@ -159,6 +159,46 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .moments-key { margin-top: 8px; font-size: .75rem; color: var(--faint); }
 .moments-key span { display: inline-flex; align-items: center; gap: 5px; margin-left: 6px; }
 
+/* Long-term plan */
+.plan { margin-top: 36px; }
+.plan-card { padding: 22px 22px 18px; border-radius: 20px; background: var(--surface); }
+.plan-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; }
+.plan-head h2 { font-size: 1.125rem; font-weight: 500; letter-spacing: -.01em; }
+.plan-meta { display: inline-flex; align-items: center; gap: 8px; font-size: .8125rem; color: var(--faint); }
+.plan-narrative { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--accent); font-size: 1rem; line-height: 1.6; color: var(--ink); }
+.plan-compare { margin-top: 16px; }
+.plan-compare .was { margin-left: 2px; }
+.plan h3 { margin-top: 20px; font-size: .875rem; font-weight: 500; color: var(--muted); }
+.plan h3 span { font-weight: 400; color: var(--faint); }
+.plan-steps { list-style: none; margin: 6px 0 0; padding: 0; }
+.plan-steps li { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) auto; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .9375rem; }
+.plan-steps li:last-child { border-bottom: 0; }
+.plan-steps .year { color: var(--muted); font-variant-numeric: tabular-nums; }
+.plan-steps .what { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.plan-steps .what b { font-weight: 500; }
+.plan-steps small { font-size: .8125rem; line-height: 1.45; color: var(--muted); }
+.plan-steps .flag { color: var(--warn); }
+.plan-steps .share { color: var(--muted); font-size: .875rem; white-space: nowrap; }
+.plan-steps .fallback .what b { font-weight: 400; }
+.plan-changes { margin-top: 18px; padding-top: 4px; border-top: 1px solid var(--line); font-size: .9375rem; line-height: 1.55; }
+.plan-changes p { margin-top: 6px; }
+.plan-changes .said { color: var(--muted); font-style: italic; }
+.plan-changes ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
+.plan-card .note { margin: 14px 0 0; }
+.plan-form { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.plan-form > label { font-size: .9375rem; font-weight: 500; }
+.plan-form textarea { width: 100%; min-height: 64px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--bg); font-size: 1rem; line-height: 1.5; resize: vertical; }
+.plan-form textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.plan-form .note { margin: 0; }
+.plan-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px 16px; }
+.plan-actions .from { display: inline-flex; align-items: center; gap: 8px; margin-right: auto; font-size: .875rem; color: var(--muted); }
+.plan-actions select { min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); font-size: .875rem; }
+.plan-actions .text-button { font-size: .875rem; }
+.plan-start { margin-top: 12px; }
+.plan-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 12px; font-size: .9375rem; color: var(--muted); }
+.plan-progress span { color: var(--faint); font-size: .875rem; }
+.plan .stale { margin-top: 10px; }
+
 /* Conversation */
 .thread { margin-top: 52px; display: flex; flex-direction: column; gap: 24px; padding-bottom: 8px; }
 .msg { display: flex; gap: 14px; font-size: 1rem; line-height: 1.7; overflow-wrap: anywhere; }
@@ -238,6 +278,9 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
   .chips { margin-top: 28px; }
   .results, .thread { margin-top: 40px; }
   .headline b { font-size: 2.25rem; }
+  .plan-card { padding: 18px 16px 14px; }
+  .plan-steps li { grid-template-columns: 2.75rem minmax(0, 1fr); }
+  .plan-steps .share { grid-column: 2; white-space: normal; }
   .form-grid, .trait-list { grid-template-columns: 1fr; }
   .modal { padding: 24px 18px; }
   .composer { padding-left: 18px; }

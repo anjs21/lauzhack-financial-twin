@@ -12,7 +12,7 @@ import numpy as np
 
 from .. import config as C
 from ..world.env import State, Streams, World
-from .traits import TRAIT, Intention, buffer_months
+from .traits import EVENTS, TRAIT, Intention, buffer_months
 
 HEADS = ["status", "housing", "spending", "assets"]
 N_OPTS = {"status": 5, "housing": 3, "spending": 3, "assets": 3}
@@ -43,6 +43,12 @@ class RulePolicy:
         self.temp = np.broadcast_to(np.asarray(temperature, float), (len(traits),)).copy()
         self.goals = goals
         self.intentions = [i if isinstance(i, Intention) else Intention.parse(i) for i in intentions]
+        ids = [it.id for it in self.intentions]
+        self._after = []
+        for it in self.intentions:
+            if it.after is not None and it.after not in ids:
+                raise ValueError(f"intention {it.id!r} comes after unknown id {it.after!r}")
+            self._after.append(None if it.after is None else ids.index(it.after))
 
     @staticmethod
     def buffer_months(traits):
@@ -53,8 +59,19 @@ class RulePolicy:
         self.last_move = np.full(N, -99)
         self.last_status = np.full(N, -99)
         self.last_job_loss = np.full(N, -99)
-        self.fired = np.zeros((len(self.intentions), N), bool)
+        K = len(self.intentions)
+        self.fired = np.zeros((K, N), bool)
         self.switches = np.zeros(N, int)
+        # Plan bookkeeping, per intention and path: month carried out (-1 = not yet), chosen this
+        # month, ever due (time and conditions met), ever due and possible, ever due but not possible.
+        self.done_at = np.full((K, N), -1)
+        self.chosen = np.zeros((K, N), bool)
+        self.was_due = np.zeros((K, N), bool)
+        self.was_open = np.zeros((K, N), bool)
+        self.tried = np.zeros((K, N), bool)          # chosen at least once (the world may still say no)
+        self.searching = np.zeros((K, N), bool)      # a housing intention's flat search is still open
+        self.blocked = np.zeros((K, N), bool)
+        self.last_event = {e: np.full(N, -999) for e in EVENTS}
 
     # ------------------------------------------------------------------ features of the state
     def context(self, s: State):
@@ -154,30 +171,53 @@ class RulePolicy:
         action = np.stack([choice["status"], choice["housing"] - 1, choice["spending"] - 1, choice["assets"] - 1], 1)
         return action, probs
 
+    def _due(self, k, it, s, c, decide):
+        """Paths where intention k applies this month (timing and conditions), open option or not."""
+        t = s.t
+        if it.when is not None and not it.windowed:
+            ok = np.full(s.n, t == C.next_review(C.month_index(it.when)))  # falls due at a January review
+        else:
+            start = 0 if it.when is None else C.next_review(C.month_index(it.when))
+            ok = decide & (t >= start)
+            if it.windowed:
+                ok &= t <= C.month_index(it.until)
+        if it.min_age is not None:
+            ok &= s.age >= it.min_age
+        if it.max_age is not None:
+            ok &= s.age <= it.max_age
+        if it.cash_months_below is not None:
+            ok &= c["cash_m"] < it.cash_months_below
+        if it.cash_months_above is not None:
+            ok &= c["cash_m"] > it.cash_months_above
+        if self._after[k] is not None:
+            done = self.done_at[self._after[k]]
+            ok &= (done >= 0) & (t - done >= it.after_months)
+        if it.event is not None:
+            ok &= t - self.last_event[it.event] <= it.within_months
+        if it.once:
+            ok &= ~self.fired[k]
+        return ok
+
     def _apply_intentions(self, s, c, valid, decide, choice, probs, u):
         """Stated plans fall due at the first January on or after the requested date."""
         for k, it in enumerate(self.intentions):
             idx = it.option if it.head == "status" else it.option + 1
-            ok = valid[it.head][:, idx].copy()
-            if it.when is not None:
-                due = C.month_index(it.when)
-                ok &= s.t == C.next_review(due)       # every plan falls due at a January review
-            else:
-                ok &= decide
-            if it.min_age is not None:
-                ok &= s.age >= it.min_age
-            if it.max_age is not None:
-                ok &= s.age <= it.max_age
-            if it.cash_months_below is not None:
-                ok &= c["cash_m"] < it.cash_months_below
-            if it.cash_months_above is not None:
-                ok &= c["cash_m"] > it.cash_months_above
-            if it.once:
-                ok &= ~self.fired[k]
+            due = self._due(k, it, s, c, decide)
+            possible = valid[it.head][:, idx]
+            ok = due & possible
             act_now = ok & (u[k] < it.prob)
             choice[it.head] = np.where(act_now, idx, choice[it.head])
+            self.chosen[k] = act_now
+            self.tried[k] |= act_now
+            if it.head == "housing":                 # a January choice opens or replaces the flat search
+                self.searching[k] = np.where(decide, act_now, self.searching[k])
+            self.was_due[k] |= due
+            self.was_open[k] |= ok
+            self.blocked[k] |= due & ~possible
             if it.once:
-                self.fired[k] |= ok          # considered once; acted on with probability prob
+                # Considered once; acted on with probability prob. A windowed plan the world turns
+                # down (no admission, no flat) is retried at the next review; see observe().
+                self.fired[k] |= (ok & ~act_now) if it.windowed else ok
             onehot = np.eye(N_OPTS[it.head])[idx]
             probs[it.head] = np.where(ok[:, None], it.prob * onehot + (1 - it.prob) * probs[it.head], probs[it.head])
 
@@ -190,3 +230,23 @@ class RulePolicy:
         self.last_status = np.where(changed, t, self.last_status)
         self.switches += changed
         self.last_job_loss = np.where(info["job_loss"], t, self.last_job_loss)
+        for e in EVENTS:
+            self.last_event[e] = np.where(info[e], t, self.last_event[e])
+        a = info["action"]
+        col = {h: j for j, h in enumerate(HEADS)}
+        refused = info.get("admission_refused", np.zeros(s.n, bool))
+        for k, it in enumerate(self.intentions):
+            # Carried out = it really happened: a move once the flat search finds a flat (that can
+            # take months), a master's once admitted, anything else once the world applied it.
+            if it.head == "housing" and it.option != 0:
+                done = self.searching[k] & info["moved"]
+                self.searching[k] &= ~info["moved"]
+            else:
+                done = self.chosen[k] & (a[:, col[it.head]] == it.option)
+                if it.head == "status" and it.option == 1:
+                    done &= ~refused
+            done &= self.done_at[k] < 0
+            self.done_at[k] = np.where(done, t, self.done_at[k])
+            if it.once and it.windowed:
+                self.fired[k] |= done
+        self.chosen[:] = False

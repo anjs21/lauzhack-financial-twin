@@ -46,6 +46,7 @@ class Paths:
     below_zero: np.ndarray  # (N, T)
     traits: np.ndarray
     credit_breach: np.ndarray
+    plan_log: dict | None = None   # per stated intention: ids, done_at / was_due / blocked (K, N); see RulePolicy
 
     @property
     def nw(self):
@@ -130,7 +131,13 @@ def simulate(world: World, people: pd.DataFrame, personas, n_paths=2000, seed=C.
         for k in EVENTS:
             events[k][:, t] = info[k]
         below[:, t] = info["below_zero"]
-    return Paths(people=people, n_paths=n_paths, action=action, events=events, below_zero=below, traits=traits, credit_breach=breaches, **rec)
+    plan_log = None
+    if intentions:
+        plan_log = {"ids": [it.id for it in policy.intentions], "done_at": policy.done_at.copy(),
+                    "was_due": policy.was_due.copy(), "was_open": policy.was_open.copy(), "tried": policy.tried.copy(),
+                    "blocked": policy.blocked.copy()}
+    return Paths(people=people, n_paths=n_paths, action=action, events=events, below_zero=below, traits=traits,
+                 credit_breach=breaches, plan_log=plan_log, **rec)
 
 
 # ------------------------------------------------------------------------------- summaries

@@ -140,6 +140,77 @@ housing, investments, and debt. The clone receives the cash history and is super
 
 Retrain `foresight` after every `clone`, since foresight starts from the clone and keeps it as its reference.
 
+## Persona planner agent: the person's own long-term plan
+
+The GRU persona learns how people *like* this one tend to decide; it cannot know what *this*
+person intends. The planner agent ([`plan/agent.py`](plan/agent.py)) writes that down. An LLM
+speaks as the person's planning self, takes their own words ("a master's next year, then a
+bigger flat"), and drafts a 2025–2034 plan. The predictor carries the plan out in a few hundred
+lives. The agent sees which steps really happened, when, which were blocked and why, and how
+often money ran out, then revises the plan and signs it. A **nudge** is a change of plans from
+the user: the agent revises the latest plan, keeps what the update does not touch, and says
+what changed.
+
+```bash
+python -m twin plan --custom twin/examples/custom_person.json --wish "Master's next year, then a bigger flat"
+python -m twin plan --custom twin/examples/custom_person.json --as-of 2026-01 \
+    --nudge "I got a promotion if I stay, so no master's; bigger flat around 2027"
+python -m twin plan --custom twin/examples/custom_person.json --show      # the saved plan, re-simulated
+python -m twin explore --custom twin/examples/custom_person.json --life-plan twin/artifacts/plans/mia.json
+python -m twin plan P00003 --wish "" --dry-run                            # the prompt, no call
+```
+
+Versions are saved in `twin/artifacts/plans/<id>.json` (git-ignored: it holds the person's words).
+It uses the same Together AI settings as the rest; any OpenAI-compatible server works through
+`TOGETHER_BASE_URL`.
+
+**A plan** ([`plan/schema.py`](plan/schema.py)) is a narrative plus up to 16 steps. Each step is one
+choice (`status`: continue, start_masters, part_time, full_time, stop_working; `housing`: cheaper,
+stay, bigger; `spending`: cut, keep, raise; `assets`: sell_to_buffer, hold, invest_surplus). It has:
+
+| Field | Meaning in the simulator |
+|---|---|
+| `start` / `until` | the window; the step falls due at the first January review in it and is retried each January while it is not possible or the world turns it down (no admission, no landlord) |
+| `commitment` | the chance of following through when the step is possible; declining ends the step |
+| `after` + `after_months` | wait until another step was carried out (realised, not just chosen) |
+| `event` + `within_months` | a contingency: only after job_loss, offer, graduated, partner, child, separation or windfall |
+| `cash_months_below/above`, `min_age/max_age`, `repeat` | conditions, and "every year" |
+| `spontaneity` (per plan) | the chance that an unplanned change of work or home the habits would make still happens; lifestyle and investing outside the steps follow the habits |
+
+The plan compiles into the rule persona's intentions, so `--policy rules|neural|foresight` stay the
+habit model under the plan: `spontaneity = 1` with no steps reproduces the habits exactly. The
+agent signs only after it has seen at least one simulation, and it is told to fix feasibility, not to
+chase better numbers; a plan it never signs is returned with `signed: false`.
+
+What the agent sees after each round, per step: the share of lives where it happened and the typical
+year, where it was never possible (`blocked_share`, with the rule that blocked it), where the person
+declined, and where they tried but the world said no (`turned_down_share`: no flat, no admission).
+It also sees when and in what situation cash first crossed the credit limit (for example "2027, while
+studying, on CHF 708 a month"), so it can add a fallback that addresses that cause.
+
+A nudge is answered with **edits** (`remove` step ids, `set` new or changed fields), not a rewritten
+plan, so steps the update does not mention cannot drift. Steps whose window closed before
+`--as-of` are kept as they were. Slips small models repeat are repaired and reported back: a no-op
+step is dropped, and `after` naming an event becomes an `event` trigger.
+
+Tested end to end with Qwen3-8B on a local vLLM server (`TOGETHER_BASE_URL=http://host:port/v1`):
+a draft takes 1–3 minutes on one L4 GPU, a nudge 40 s to 2 min; a larger Together model should
+need fewer rounds.
+
+**API** (`twin/api.py`). Planning takes one to three minutes, longer than an HTTPS tunnel keeps a
+request open, so it runs as a job: `POST /plans` {person, traits, wishes} and `POST /plans/{id}/nudges`
+{message, as_of} answer 202 at once; poll `GET /plans/{id}` for `status` (working, ready, failed),
+a `progress` line, and `latest`: the plan, how each step played out, whether the agent signed it, what
+changed, and a paired comparison with the habits alone. `POST /sessions` with `plan_id` explores and
+explains lives that follow the plan. A job holds one of the laptop's two work slots.
+
+**Web UI** (`web/src/Plan.tsx`): the person writes their plans in their own words, watches the
+planner's progress, and sees the plan as steps with the year each usually happens and the share of
+lives where it does, fallbacks, and warnings for steps the world blocks or turns down. "Something
+changed?" sends a nudge and shows what changed. A new plan or version is explored right away; the
+"Follow my plan" switch compares with habits alone. The example page shows a real planner run for
+Mia (`web/src/example-plan.json`, regenerate with `python -m twin.plan.make_example`).
+
 ## Explorer output
 
 `python -m twin explore` writes an HTML report: fan charts of net worth, cash and income; work mode
