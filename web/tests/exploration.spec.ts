@@ -8,18 +8,27 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Hi Mia' })).toBeVisible();
+  // A clean landing: only the first actions, no chart or conversation yet.
+  await expect(page.getByRole('region', { name: 'Your paths' })).toHaveCount(0);
+  await expect(page.getByLabel('Ask about your financial future')).toHaveCount(0);
+  await page.getByRole('button', { name: 'See an example' }).click();
   await expect(page.getByText('Example', { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Your paths' })).toBeVisible();
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
   await page.getByRole('button', { name: 'Net worth', exact: true }).click();
   const moments = page.getByRole('region', { name: 'Key moments' });
   await expect(moments.getByText('Cuts back to part-time')).toBeVisible();
   await expect(moments.getByText('every life')).toBeVisible();
-  await moments.getByRole('button', { name: 'Current path', exact: true }).click();
+  await page.getByRole('region', { name: 'Paths' }).getByRole('button', { name: /^Current path/ }).click();
   await expect(moments.getByText('Cuts back to part-time')).toBeHidden();
   const year = page.getByLabel('Explore a year');
   await year.focus(); await year.press('ArrowRight');
   await expect(year).toHaveValue('72');
-  await page.getByRole('button', { name: 'Build my persona', exact: true }).click();
+  // The example has decision points too; growing a branch needs a connected workspace.
+  await page.getByRole('button', { name: 'Decide in January 2028' }).click();
+  await expect(page.getByRole('region', { name: 'Decision in January 2028' })).toContainText('Connect your workspace');
+  await page.getByRole('button', { name: 'Close', exact: true }).click();
+  await page.getByRole('button', { name: 'Edit your persona' }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('What should we call you?').fill('Alex');
   await dialog.getByLabel('Where do you live?').selectOption('Zurich');
@@ -29,12 +38,13 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   await dialog.getByLabel('Your main money goal').selectOption('Housing deposit');
   await dialog.getByLabel('Target by December 2029').fill('70000');
   await dialog.getByRole('button', { name: 'Save my persona' }).click();
-  await expect(page.getByRole('heading', { name: 'Hi Alex' })).toBeVisible();
   await expect(page.getByText('Your choices have changed.', { exact: false })).toBeVisible();
   // Results must remain explicitly attached to the old fictional persona until explored.
   await expect(page.getByRole('heading', { name: /Mia’s outlook/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: `/tmp/parallel-${test.info().project.name}.png`, fullPage: true });
+  await page.getByRole('button', { name: 'parallel, home' }).click();
+  await expect(page.getByRole('heading', { name: 'Hi Alex' })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -58,7 +68,7 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Connect my workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -123,7 +133,7 @@ test('a student can keep studying alongside the part-time offer', async ({ page 
   for (const step of ['Continue', 'Continue']) await dialog.getByRole('button', { name: step, exact: true }).click();
   await dialog.getByRole('button', { name: 'Save my persona' }).click();
   await expect(keepStudying).toHaveAttribute('aria-checked', 'true');
-  await page.getByRole('button', { name: 'Connect my workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
   await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
@@ -134,4 +144,95 @@ test('a student can keep studying alongside the part-time offer', async ({ page 
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
   await page.getByRole('button', { name: 'Stay on my path', exact: true }).click();
   await expect(keepStudying).toHaveCount(0);                     // only for the part-time offer
+});
+
+test('grow a tree of branches from decision points on the chart', async ({ page }) => {
+  const bodies: { root: string; decisions: { month: number; choice: string }[] }[] = [];
+  await page.route('http://127.0.0.1:8000/**', async route => {
+    const request = route.request();
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization,content-type', 'access-control-allow-methods': 'GET,POST,DELETE' } });
+    let json: unknown = {};
+    if (request.url().endsWith('/health')) json = { status: 'ok', llm_ready: true };
+    else if (request.url().endsWith('/branches')) {
+      const body = request.postDataJSON();
+      bodies.push(body);
+      const depth = body.parent === 'b1' ? 2 : 1;
+      const label = { full_time: 'Work full-time', spend_less: 'Spend less', lose_job: 'Lose my job' }[body.choice as string] + ` · ${2025 + body.month / 12}`;
+      const decisions = [...(depth === 2 ? [{ month: bodies[0].month, choice: bodies[0].choice }] : []), { month: body.month, choice: body.choice }];
+      json = { id: `b${bodies.length}`, parent: body.parent, root: 'alternative', from: body.month, label, applied: depth === 1 ? 0.6 : 1,
+               decisions, summary: { ...example.alternative, final_net_worth: { ...example.alternative.final_net_worth, p50: example.alternative.final_net_worth.p50 + 100000 * depth } } };
+    } else if (request.method() === 'POST') json = { session_id: 'tree', evidence: example, answer: 'Ready.' };
+    await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Connect', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
+  await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
+  await expect(page.getByText('Ready.')).toBeVisible();
+
+  const tree = page.getByRole('region', { name: 'Paths' });
+  await page.getByRole('button', { name: 'Decide in January 2027' }).click();
+  await page.getByRole('region', { name: 'Decision in January 2027' }).getByRole('button', { name: 'Work full-time' }).click();
+  const first = tree.getByRole('button', { name: /^Work full-time · 2027/ });
+  await expect(first).toHaveAttribute('aria-pressed', 'true');
+  await expect(first).toContainText('possible in 60% of lives');
+  await expect(page.getByRole('region', { name: 'Key moments' })).toContainText('Work full-time · 2027');
+  expect(bodies[0]).toEqual({ parent: 'alternative', month: 24, choice: 'full_time' });
+
+  // Branch from the branch: only later reviews are offered, and the decisions stack.
+  await expect(page.getByRole('button', { name: 'Decide in January 2026' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Decide in January 2029' }).click();
+  await page.getByRole('region', { name: 'Decision in January 2029' }).getByRole('button', { name: 'Spend less' }).click();
+  await expect(tree.getByRole('button', { name: /^Spend less · 2029/ })).toHaveAttribute('aria-pressed', 'true');
+  expect(bodies[1]).toEqual({ parent: 'b1', month: 48, choice: 'spend_less' });
+
+  // "Now" (January 2025) takes life events only.
+  await tree.getByRole('button', { name: /^Current path/ }).click();
+  await page.getByRole('button', { name: 'Decide in January 2025' }).click();
+  const now = page.getByRole('region', { name: 'Decision in January 2025' });
+  await expect(now).toContainText('Now, in January 2025');
+  await expect(now.getByRole('button', { name: 'Work full-time' })).toHaveCount(0);
+  await now.getByRole('button', { name: 'Lose my job' }).click();
+  expect(bodies[2]).toEqual({ parent: 'baseline', month: 0, choice: 'lose_job' });
+
+  // Removing a branch removes what grew from it.
+  await tree.getByRole('button', { name: 'Remove Work full-time · 2027' }).click();
+  await expect(tree.getByRole('button', { name: /^Spend less · 2029/ })).toHaveCount(0);
+  await expect(tree.getByRole('button', { name: /^Part-time/ })).toHaveAttribute('aria-pressed', 'false');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+});
+
+test('the assistant changes the persona and grows branches from a chat message', async ({ page }) => {
+  await page.route('http://127.0.0.1:8000/**', async route => {
+    const request = route.request();
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization,content-type', 'access-control-allow-methods': 'GET,POST,DELETE' } });
+    let json: unknown = {};
+    if (request.url().endsWith('/health')) json = { status: 'ok', llm_ready: true };
+    else if (request.url().endsWith('/messages')) {
+      const rerun = { ...example, person: { ...example.person, age: 31, income: 7000 } };
+      const branch = { id: 'b1', parent: 'alternative', root: 'alternative', from: 36, label: 'Work full-time · 2028', applied: 0.95, decisions: [{ month: 36, choice: 'full_time' }],
+                       summary: { ...example.alternative, high_goal_odds: 0.96 } };
+      json = { answer: 'Done: you are now 31 on CHF 7,000, and the full-time branch is on the chart.',
+               notes: ['Updated age 31; income CHF 7,000 · re-ran 500 lives', 'Grew a branch: Work full-time · 2028'],
+               actions: [{ type: 'rerun', evidence: rerun }, { type: 'branch', branch }, { type: 'highlight', path_id: 'b1', measure: 'net_worth' }] };
+    } else if (request.method() === 'POST') json = { session_id: 'chat', evidence: example, answer: 'Ready.' };
+    await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Connect', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
+  await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
+  await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
+  await expect(page.getByText('Ready.')).toBeVisible();
+  await page.getByLabel('Ask about your financial future').fill('I am 31 and take home 7k. What if I go full-time in 2028?');
+  await page.getByRole('button', { name: 'Send message' }).click();
+  await expect(page.getByRole('list', { name: 'Changes made' })).toContainText('Updated age 31; income CHF 7,000');
+  const tree = page.getByRole('region', { name: 'Paths' });
+  await expect(tree.getByRole('button', { name: /^Work full-time · 2028/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Net worth', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('Your choices have changed', { exact: false })).toHaveCount(0);   // controls follow the new run
+  await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
+  await page.getByRole('button', { name: 'Edit your persona' }).click();
+  await expect(page.getByRole('dialog').getByLabel('Age at the start of 2025')).toHaveValue('31');
 });

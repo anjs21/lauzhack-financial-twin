@@ -18,6 +18,7 @@ test('the example plan shows its steps, how often they happen and what a nudge c
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
+  await page.getByRole('button', { name: 'See an example' }).click();
   const plan = page.getByRole('region', { name: 'Your plan' });
   await expect(plan.getByRole('heading', { name: 'Mia’s plan' })).toBeVisible();
   await expect(plan.getByText(/^Example · Version 2 · /)).toBeVisible();
@@ -69,7 +70,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
   await page.goto('/');
   await connect(page);
   const plan = page.getByRole('region', { name: 'Your plan' });
-  await plan.getByRole('button', { name: 'Make my own plan' }).click();
+  await page.getByRole('button', { name: 'Make my own plan' }).click();      // from the landing screen
   await plan.getByLabel('In your own words, what are your plans?').fill(draft.said);
   await plan.getByRole('button', { name: 'Make my plan' }).click();
   await expect(plan.getByText('Round 2 of up to 4: testing it in 300 lives')).toBeVisible();
@@ -124,7 +125,7 @@ test('a failed planning job reports the error and keeps the form', async ({ page
   await page.goto('/');
   await connect(page);
   const plan = page.getByRole('region', { name: 'Your plan' });
-  await plan.getByRole('button', { name: 'Make my own plan' }).click();
+  await page.getByRole('button', { name: 'Make my own plan' }).click();      // from the landing screen
   await plan.getByRole('button', { name: 'Make my plan' }).click();
   await expect(page.getByRole('alert')).toContainText('did not produce a usable plan');
   await expect(plan.getByRole('button', { name: 'Make my plan' })).toBeEnabled();

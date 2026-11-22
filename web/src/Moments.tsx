@@ -1,22 +1,13 @@
-import { useState } from 'react';
-import type { Evidence } from './types';
+import type { Moment } from './types';
 import { percent } from './types';
 
 const lives = (share: number) => share >= 0.995 ? 'every life' : `${percent(share)} of lives`;
 
-export default function Moments({ evidence }: { evidence: Evidence }) {
-  const [which, setWhich] = useState<'alternative' | 'baseline'>('alternative');
-  if (!evidence.baseline.key_moments) return null;           // evidence from before key moments existed
-  const hasAlt = !!evidence.alternative;
-  const path = hasAlt && which === 'alternative' ? evidence.alternative! : evidence.baseline;
-  const moments = path.key_moments ?? [];
+/** Key moments of the highlighted path: when its big decisions and life events usually happen. */
+export default function Moments({ moments, label, color }: { moments?: Moment[]; label: string; color: string }) {
+  if (!moments) return null;                                 // evidence from before key moments existed
   return <section className="moments" aria-label="Key moments">
-    <div className="moments-head">
-      <h3>Key moments</h3>
-      {hasAlt && <div className="toggle" role="group" aria-label="Key moments for">{(['alternative', 'baseline'] as const).map(key =>
-        <button key={key} aria-pressed={which === key} onClick={() => setWhich(key)}>{key === 'alternative' ? 'Your choice' : 'Current path'}</button>)}
-      </div>}
-    </div>
+    <div className="moments-head"><h3>Key moments · <span style={{ color }}>{label}</span></h3></div>
     {moments.length
       ? <ol>{moments.map(m => <li key={m.moment} className={m.kind}>
           <span className="year">{m.typical_year}</span>
