@@ -126,12 +126,16 @@ reconsidered at the January review; spending and assets every month.
 ```bash
 export OPENAI_API_KEY=sk-...             # read from the environment only; never written to files
 export OPENAI_MODEL=gpt-4o-mini          # optional (default gpt-4o-mini)
-python -m twin llm-demos --dry-run       # see one prompt, no call
-python -m twin llm-demos --calls 300     # ~0.3M tokens; answers in twin/artifacts/llm_demos.json
+python -m twin llm-demos --dry-run       # preview a January 2026 ledger prompt, no call
+python -m twin llm-demos --calls 300     # 300 simulated reviews + 60 January 2026 ledger snapshots
 python -m twin clone --llm               # retrain the neural persona with the LLM answers
 python -m twin foresight                # ~5 min: look ahead, distil the foresight knob into the (new) clone
 python -m twin explore P00001 --policy foresight --foresight 0.5
 ```
+
+Set `--jan-2026-calls 0` to collect only simulated reviews, or `--calls 0` to collect only ledger snapshots.
+The ledger examples use opening cash through January 2026, with opening profile assumptions for work,
+housing, investments, and debt. The clone receives the cash history and is supervised at the January 2026 review.
 
 Retrain `foresight` after every `clone`, since foresight starts from the clone and keeps it as its reference.
 

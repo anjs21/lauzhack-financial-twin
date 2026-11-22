@@ -11,9 +11,10 @@
       --custom person.json    a person who is not in the data (see twin/examples)
       --out report.html --json result.json --no-what-ifs --no-spread --no-foresight
   llm-demos                   ask an LLM (OpenAI; needs OPENAI_API_KEY) to role-play personas at decision points
-      --calls 300 --model gpt-4o-mini --workers 8 --dry-run
+      --calls 300 --jan-2026-calls 60 --model gpt-4o-mini --workers 8 --dry-run
   replay                      score monthly updates on the held-out 2026 ledger
   clone [--llm] [--llm-sharpen 1,2,2,1]  train the neural persona on the rule persona (plus the LLM answers) and compare
+  clone-snapshots             train and evaluate a GRU on January 2026 vLLM labels
   foresight                   train the foresight knob on top of the neural persona and compare
       --points 2000           decision points to look ahead from (each: 11 options x 6 rollouts x 60 months)
 """
@@ -54,6 +55,8 @@ def main(argv=None):
                     help="job offers, admission and flats: learned market model or the fixed rates in priors.yaml")
     ld = sub.add_parser("llm-demos")
     ld.add_argument("--calls", type=int, default=300)
+    ld.add_argument("--jan-2026-calls", type=int, default=None,
+                    help="additional January 2026 ledger snapshots (default: 60, 0 disables)")
     ld.add_argument("--model")
     ld.add_argument("--workers", type=int, default=8)
     ld.add_argument("--dry-run", action="store_true")
@@ -62,6 +65,8 @@ def main(argv=None):
     cl.add_argument("--llm", action="store_true", help="use twin/artifacts/llm_demos.json from `llm-demos`")
     cl.add_argument("--llm-weight", type=float, default=10.0)
     cl.add_argument("--llm-sharpen", default="1,2,2,1", help="power on LLM probabilities per head: status,housing,spending,assets (1 = as answered)")
+    snapshots = sub.add_parser("clone-snapshots")
+    snapshots.add_argument("--labels", type=Path, default=C.ARTIFACTS / "jan_2026_vllm_responses.json")
     fs = sub.add_parser("foresight")
     fs.add_argument("--points", type=int, default=2000)
     a = ap.parse_args(argv)
@@ -124,11 +129,15 @@ def main(argv=None):
         if a.json:
             a.json.write_text(json.dumps(res, indent=1))
     elif a.cmd == "llm-demos":
-        from .policy.llm import collect
-        collect(calls=a.calls, model=a.model, workers=a.workers, dry_run=a.dry_run)
+        from .policy.llm import DEFAULT_JAN_2026_CALLS, collect
+        jan_calls = DEFAULT_JAN_2026_CALLS if a.jan_2026_calls is None else a.jan_2026_calls
+        collect(calls=a.calls, model=a.model, workers=a.workers, dry_run=a.dry_run, jan_2026_calls=jan_calls)
     elif a.cmd == "clone":
         from .policy.net import main as clone_main
         clone_main(n_profiles=a.profiles, use_llm=a.llm, llm_weight=a.llm_weight, llm_sharpen=tuple(float(x) for x in a.llm_sharpen.split(",")))
+    elif a.cmd == "clone-snapshots":
+        from .policy.net import train_snapshot_proxy
+        train_snapshot_proxy(a.labels)
     elif a.cmd == "foresight":
         from .policy.foresight import main as foresight_main
         foresight_main(n_points=a.points)
