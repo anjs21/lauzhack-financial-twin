@@ -237,6 +237,13 @@ Twin policy π(s) → Action  ──►  TransitionModel.sample(s, a) → s', le
 
 To plug in the twin: write any function `State -> Action`, then use it in place of `policy_factory(...)` in section 6 of the notebook and pass it to `rollout(policy)`.
 
+**In the team pipeline (`twin/`).** The learned markets are wired into `twin/world/env.py` through
+[`twin/world/market.py`](../twin/world/market.py), which reads `world/world_model.json`. Job offers,
+master's admission and flat moves in the explorer, desk and API now come from this model. `Config(markets=False)`
+or `--markets priors` switches it off. `tests/test_market.py` checks that the pipeline's adapter
+gives exactly the same probabilities as `TransitionModel`. Rebuilding `world_model.json` updates the
+pipeline with no other change.
+
 ## 8. Known limitations and next steps
 
 | Issue | Likely cause | Next step |

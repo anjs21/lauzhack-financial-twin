@@ -205,7 +205,8 @@ def test_actions_respect_masks(world):
     assert not ((status == 4) & ~np.isin(mode, [C.PART_TIME, C.FULL_TIME])).any()
     # Opening students can enroll at the first review.
     assert not ((status[:, 1:] == 1) & (mode[:, 1:] == C.STUDENT)).any()
-    assert ((status == 1).sum(1) <= 1).all()                    # one master's per life
+    started = (status == 1) & (paths.mode[:, 1:] == C.STUDENT)   # a refused application can be retried
+    assert (started.sum(1) <= 1).all()                          # one master's per life
     assert not ((paths.household[:, 1:] == C.FAMILY) & (paths.tier[:, 1:] == 0)).any()
 
 

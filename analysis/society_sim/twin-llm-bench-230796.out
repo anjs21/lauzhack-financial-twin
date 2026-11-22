@@ -1,0 +1,249 @@
+name, memory.total [MiB], driver_version
+NVIDIA B200, 183359 MiB, 580.178.04
+W1121 20:24:09.621000 1632137 torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1121 20:24:09.622000 1632137 torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1121 20:24:09.623000 1632137 torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+(EngineCore pid=1632535) WARNING 11-21 20:24:55 [flashinfer.py:151] FlashInfer's precompiled kernels are missing or do not match flashinfer-python 0.7.3 (flashinfer-cubin not installed, flashinfer-jit-cache not installed). FlashInfer then downloads and compiles kernels at startup, which can take several minutes, or fails to import mismatched ones. Run `vllm download-kernels` in this Python environment to install them.
+Loading safetensors checkpoint shards:   0% Completed | 0/2 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  50% Completed | 1/2 [00:00<00:00,  2.12it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:00<00:00,  3.67it/s]
+Loading safetensors checkpoint shards: 100% Completed | 2/2 [00:00<00:00,  3.30it/s]
+
+2026-11-21 20:25:29,628 - INFO - autotuner.py:1121 - flashinfer.jit: [Autotuner]: Autotuning process starts ...
+2026-11-21 20:25:30,148 - INFO - autotune_cache.py:582 - flashinfer.jit: [Autotuner]: Managed autotune cache attached for this process: ManagedAutotuneCache(env_dir='/shared/home/guillem.masdemont.serra/.cache/flashinfer/autotune/v2/432e4b9dff8dc2c8', hits=0, misses=0)
+2026-11-21 20:25:31,010 - INFO - autotuner.py:1146 - flashinfer.jit: [Autotuner]: Autotuning process ends
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/54 [00:00<?, ?it/s]Capturing CUDA graphs (PIECEWISE):   4%|▎         | 2/54 [00:00<00:02, 19.94it/s]Capturing CUDA graphs (PIECEWISE):   9%|▉         | 5/54 [00:00<00:02, 23.84it/s]Capturing CUDA graphs (PIECEWISE):  15%|█▍        | 8/54 [00:00<00:01, 25.38it/s]Capturing CUDA graphs (PIECEWISE):  20%|██        | 11/54 [00:00<00:01, 25.97it/s]Capturing CUDA graphs (PIECEWISE):  28%|██▊       | 15/54 [00:00<00:01, 27.76it/s]Capturing CUDA graphs (PIECEWISE):  35%|███▌      | 19/54 [00:00<00:01, 29.12it/s]Capturing CUDA graphs (PIECEWISE):  43%|████▎     | 23/54 [00:00<00:01, 30.72it/s]Capturing CUDA graphs (PIECEWISE):  50%|█████     | 27/54 [00:00<00:00, 31.75it/s]Capturing CUDA graphs (PIECEWISE):  57%|█████▋    | 31/54 [00:01<00:00, 32.29it/s]Capturing CUDA graphs (PIECEWISE):  65%|██████▍   | 35/54 [00:01<00:00, 22.97it/s]Capturing CUDA graphs (PIECEWISE):  72%|███████▏  | 39/54 [00:01<00:00, 24.97it/s]Capturing CUDA graphs (PIECEWISE):  78%|███████▊  | 42/54 [00:01<00:00, 24.34it/s]Capturing CUDA graphs (PIECEWISE):  85%|████████▌ | 46/54 [00:01<00:00, 26.42it/s]Capturing CUDA graphs (PIECEWISE):  93%|█████████▎| 50/54 [00:02<00:00, 11.33it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 54/54 [00:02<00:00, 14.27it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 54/54 [00:02<00:00, 20.55it/s]
+Capturing CUDA graphs (FULL):   0%|          | 0/64 [00:00<?, ?it/s]Capturing CUDA graphs (FULL):   8%|▊         | 5/64 [00:00<00:01, 47.46it/s]Capturing CUDA graphs (FULL):  16%|█▌        | 10/64 [00:00<00:01, 45.63it/s]Capturing CUDA graphs (FULL):  23%|██▎       | 15/64 [00:00<00:01, 46.78it/s]Capturing CUDA graphs (FULL):  33%|███▎      | 21/64 [00:00<00:00, 48.55it/s]Capturing CUDA graphs (FULL):  42%|████▏     | 27/64 [00:00<00:00, 49.93it/s]Capturing CUDA graphs (FULL):  52%|█████▏    | 33/64 [00:00<00:00, 51.24it/s]Capturing CUDA graphs (FULL):  61%|██████    | 39/64 [00:00<00:00, 52.03it/s]Capturing CUDA graphs (FULL):  70%|███████   | 45/64 [00:00<00:00, 52.55it/s]Capturing CUDA graphs (FULL):  80%|███████▉  | 51/64 [00:00<00:00, 54.02it/s]Capturing CUDA graphs (FULL):  89%|████████▉ | 57/64 [00:01<00:00, 53.69it/s]Capturing CUDA graphs (FULL):  98%|█████████▊| 63/64 [00:01<00:00, 53.46it/s]Capturing CUDA graphs (FULL): 100%|██████████| 64/64 [00:01<00:00, 51.68it/s]
+(EngineCore pid=1632535) WARNING 11-21 20:25:51 [extensible_kv_cache.py:662] gpu_memory_utilization=0.85 caps this instance at 151.6 GiB, keeping 24.95 GiB of free device memory out of the KV cache. The extensible KV cache is sized from the memory measured after warmup and CUDA graph capture, so vLLM's own use needs no headroom below 1.0. Leave gpu_memory_utilization unset unless it leaves room for memory vLLM does not measure: other processes sharing the GPU (including ones that allocate on it later), the CPU on a unified-memory device, weight transfer buffers for weight updates, or a KV connector's own device buffers.
+(EngineCore pid=1632535) WARNING 11-21 20:25:53 [jit_monitor.py:143] Triton kernel JIT compilation during inference: kernel_unified_attention. This causes a latency spike; consider extending warmup to cover this shape/config.
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "gpu_load_seconds": 63.4,
+  "prompt_tokens_mean": 179,
+  "choice_mode": {
+    "prompts": 4096,
+    "seconds": 2.67,
+    "decisions_per_s": 1532,
+    "mean_prob_mass_on_valid_letters": 0.999,
+    "mean_policy": [
+      0.247,
+      0.305,
+      0.003,
+      0.445
+    ]
+  },
+  "reason_mode": {
+    "prompts": 1024,
+    "seconds": 0.9,
+    "decisions_per_s": 1144,
+    "answer_parse_rate": 1.0,
+    "example": "B) Apply to a few jobs (low effort\n\nI would apply to a few jobs to keep my options open without wasting too much time and energy."
+  },
+  "probe_runway_P_accept_low_offer": {
+    "driven": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "relaxed": {
+      "searching_1m": {
+        "0.5": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "6": 0.0,
+        "12": 0.0
+      },
+      "searching_6m": {
+        "0.5": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "6": 0.0,
+        "12": 0.0
+      }
+    },
+    "anxious": {
+      "searching_1m": {
+        "0.5": 0.002,
+        "1": 0.003,
+        "2": 0.001,
+        "3": 0.004,
+        "6": 0.0,
+        "12": 0.002
+      },
+      "searching_6m": {
+        "0.5": 0.002,
+        "1": 0.009,
+        "2": 0.002,
+        "3": 0.003,
+        "6": 0.001,
+        "12": 0.002
+      }
+    },
+    "balanced": {
+      "searching_1m": {
+        "0.5": 0.245,
+        "1": 0.223,
+        "2": 0.223,
+        "3": 0.349,
+        "6": 0.029,
+        "12": 0.223
+      },
+      "searching_6m": {
+        "0.5": 0.245,
+        "1": 0.165,
+        "2": 0.182,
+        "3": 0.438,
+        "6": 0.085,
+        "12": 0.068
+      }
+    }
+  },
+  "probe_runway_rank_corr_mean": 0.307,
+  "probe_runway_note": "rank correlation of P(accept) with runway; sensible behaviour is negative",
+  "probe_persona_P_high_effort": {
+    "driven": 1.0,
+    "relaxed": 0.0,
+    "anxious": 0.0,
+    "balanced": 0.0
+  }
+}
+W1121 20:26:02.245000 1634034 torch/_opaque_base.py:6] torch._opaque_base is deprecated, use torch._custom_class_base instead
+W1121 20:26:02.246000 1634034 torch/_library/opaque_object.py:288] register_opaque_type is deprecated, use register_custom_class instead
+W1121 20:26:02.246000 1634034 torch/_library/opaque_object.py:211] typ='value' is deprecated, use typ='constant' instead
+(EngineCore pid=1635389) WARNING 11-21 20:26:46 [flashinfer.py:151] FlashInfer's precompiled kernels are missing or do not match flashinfer-python 0.7.3 (flashinfer-cubin not installed, flashinfer-jit-cache not installed). FlashInfer then downloads and compiles kernels at startup, which can take several minutes, or fails to import mismatched ones. Run `vllm download-kernels` in this Python environment to install them.
+Loading safetensors checkpoint shards:   0% Completed | 0/5 [00:00<?, ?it/s]
+Loading safetensors checkpoint shards:  20% Completed | 1/5 [00:08<00:35,  8.78s/it]
+Loading safetensors checkpoint shards:  40% Completed | 2/5 [00:16<00:24,  8.25s/it]
+Loading safetensors checkpoint shards:  60% Completed | 3/5 [00:24<00:16,  8.16s/it]
+Loading safetensors checkpoint shards:  80% Completed | 4/5 [00:30<00:07,  7.09s/it]
+Loading safetensors checkpoint shards: 100% Completed | 5/5 [00:32<00:00,  5.35s/it]
+Loading safetensors checkpoint shards: 100% Completed | 5/5 [00:32<00:00,  6.48s/it]
+
+2026-11-21 20:27:53,732 - INFO - autotuner.py:1121 - flashinfer.jit: [Autotuner]: Autotuning process starts ...
+2026-11-21 20:27:54,108 - INFO - autotune_cache.py:582 - flashinfer.jit: [Autotuner]: Managed autotune cache attached for this process: ManagedAutotuneCache(env_dir='/shared/home/guillem.masdemont.serra/.cache/flashinfer/autotune/v2/432e4b9dff8dc2c8', hits=0, misses=0)
+2026-11-21 20:27:54,804 - INFO - autotuner.py:1146 - flashinfer.jit: [Autotuner]: Autotuning process ends
+Capturing CUDA graphs (PIECEWISE):   0%|          | 0/54 [00:00<?, ?it/s]Capturing CUDA graphs (PIECEWISE):   2%|▏         | 1/54 [00:00<00:06,  8.44it/s]Capturing CUDA graphs (PIECEWISE):   6%|▌         | 3/54 [00:00<00:05, 10.02it/s]Capturing CUDA graphs (PIECEWISE):   9%|▉         | 5/54 [00:00<00:04, 10.47it/s]Capturing CUDA graphs (PIECEWISE):  13%|█▎        | 7/54 [00:00<00:04, 10.97it/s]Capturing CUDA graphs (PIECEWISE):  17%|█▋        | 9/54 [00:00<00:03, 11.51it/s]Capturing CUDA graphs (PIECEWISE):  20%|██        | 11/54 [00:00<00:03, 11.89it/s]Capturing CUDA graphs (PIECEWISE):  24%|██▍       | 13/54 [00:01<00:03, 12.41it/s]Capturing CUDA graphs (PIECEWISE):  28%|██▊       | 15/54 [00:01<00:02, 13.10it/s]Capturing CUDA graphs (PIECEWISE):  31%|███▏      | 17/54 [00:01<00:02, 13.90it/s]Capturing CUDA graphs (PIECEWISE):  35%|███▌      | 19/54 [00:01<00:02, 14.70it/s]Capturing CUDA graphs (PIECEWISE):  39%|███▉      | 21/54 [00:01<00:02, 15.34it/s]Capturing CUDA graphs (PIECEWISE):  43%|████▎     | 23/54 [00:01<00:01, 16.21it/s]Capturing CUDA graphs (PIECEWISE):  48%|████▊     | 26/54 [00:01<00:01, 17.89it/s]Capturing CUDA graphs (PIECEWISE):  54%|█████▎    | 29/54 [00:01<00:01, 19.50it/s]Capturing CUDA graphs (PIECEWISE):  59%|█████▉    | 32/54 [00:02<00:01, 21.38it/s]Capturing CUDA graphs (PIECEWISE):  65%|██████▍   | 35/54 [00:02<00:00, 22.54it/s]Capturing CUDA graphs (PIECEWISE):  70%|███████   | 38/54 [00:02<00:00, 23.15it/s]Capturing CUDA graphs (PIECEWISE):  76%|███████▌  | 41/54 [00:02<00:00, 23.39it/s]Capturing CUDA graphs (PIECEWISE):  81%|████████▏ | 44/54 [00:02<00:00, 23.44it/s]Capturing CUDA graphs (PIECEWISE):  87%|████████▋ | 47/54 [00:02<00:00, 23.45it/s]Capturing CUDA graphs (PIECEWISE):  93%|█████████▎| 50/54 [00:03<00:00,  9.10it/s]Capturing CUDA graphs (PIECEWISE):  98%|█████████▊| 53/54 [00:03<00:00, 11.22it/s]Capturing CUDA graphs (PIECEWISE): 100%|██████████| 54/54 [00:03<00:00, 14.65it/s]
+Capturing CUDA graphs (FULL):   0%|          | 0/64 [00:00<?, ?it/s]Capturing CUDA graphs (FULL):   6%|▋         | 4/64 [00:00<00:01, 35.99it/s]Capturing CUDA graphs (FULL):  12%|█▎        | 8/64 [00:00<00:01, 34.86it/s]Capturing CUDA graphs (FULL):  19%|█▉        | 12/64 [00:00<00:01, 36.59it/s]Capturing CUDA graphs (FULL):  25%|██▌       | 16/64 [00:00<00:01, 37.80it/s]Capturing CUDA graphs (FULL):  33%|███▎      | 21/64 [00:00<00:01, 39.11it/s]Capturing CUDA graphs (FULL):  39%|███▉      | 25/64 [00:00<00:00, 39.12it/s]Capturing CUDA graphs (FULL):  47%|████▋     | 30/64 [00:00<00:00, 40.29it/s]Capturing CUDA graphs (FULL):  55%|█████▍    | 35/64 [00:00<00:00, 40.06it/s]Capturing CUDA graphs (FULL):  62%|██████▎   | 40/64 [00:01<00:00, 40.54it/s]Capturing CUDA graphs (FULL):  70%|███████   | 45/64 [00:01<00:00, 40.38it/s]Capturing CUDA graphs (FULL):  78%|███████▊  | 50/64 [00:01<00:00, 41.29it/s]Capturing CUDA graphs (FULL):  86%|████████▌ | 55/64 [00:01<00:00, 41.42it/s]Capturing CUDA graphs (FULL):  94%|█████████▍| 60/64 [00:01<00:00, 41.23it/s]Capturing CUDA graphs (FULL): 100%|██████████| 64/64 [00:01<00:00, 40.05it/s]
+(EngineCore pid=1635389) WARNING 11-21 20:28:14 [extensible_kv_cache.py:662] gpu_memory_utilization=0.85 caps this instance at 151.6 GiB, keeping 24.83 GiB of free device memory out of the KV cache. The extensible KV cache is sized from the memory measured after warmup and CUDA graph capture, so vLLM's own use needs no headroom below 1.0. Leave gpu_memory_utilization unset unless it leaves room for memory vLLM does not measure: other processes sharing the GPU (including ones that allocate on it later), the CPU on a unified-memory device, weight transfer buffers for weight updates, or a KV connector's own device buffers.
+(EngineCore pid=1635389) WARNING 11-21 20:28:15 [jit_monitor.py:143] Triton kernel JIT compilation during inference: kernel_unified_attention. This causes a latency spike; consider extending warmup to cover this shape/config.
+{
+  "model": "Qwen/Qwen3-8B",
+  "gpu_load_seconds": 94.7,
+  "prompt_tokens_mean": 179,
+  "choice_mode": {
+    "prompts": 4096,
+    "seconds": 5.93,
+    "decisions_per_s": 690,
+    "mean_prob_mass_on_valid_letters": 0.526,
+    "mean_policy": [
+      0.573,
+      0.037,
+      0.002,
+      0.388
+    ]
+  },
+  "reason_mode": {
+    "prompts": 1024,
+    "seconds": 1.78,
+    "decisions_per_s": 574,
+    "answer_parse_rate": 1.0,
+    "example": "A) Apply to many jobs (high effort)  \nI need to make progress in my job search before my savings run out, and I don't want to delay my career goals any longer."
+  },
+  "probe_runway_P_accept_low_offer": {
+    "driven": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "relaxed": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "anxious": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    },
+    "balanced": {
+      "searching_1m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      },
+      "searching_6m": {
+        "0.5": 1.0,
+        "1": 1.0,
+        "2": 1.0,
+        "3": 1.0,
+        "6": 1.0,
+        "12": 1.0
+      }
+    }
+  },
+  "probe_runway_rank_corr_mean": 1.0,
+  "probe_runway_note": "rank correlation of P(accept) with runway; sensible behaviour is negative",
+  "probe_persona_P_high_effort": {
+    "driven": 1.0,
+    "relaxed": 0.0,
+    "anxious": 0.633,
+    "balanced": 0.983
+  }
+}

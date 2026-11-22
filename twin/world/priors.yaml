@@ -41,7 +41,7 @@ economy:
 
 jobs:
   loss_per_month: {normal: 0.003, inflation: 0.003, recession: 0.010}
-  offer_per_month: {normal: 0.20, inflation: 0.20, recession: 0.10}
+  offer_per_month: {normal: 0.20, inflation: 0.20, recession: 0.10}   # used only with Config(markets=False)
   promotion_per_month: {normal: 0.007, inflation: 0.007, recession: 0.003}
   promotion_rank_step: 0.25             # normal-score units of the pay rank
   rank_noise_on_change: 0.30            # how loosely the pay rank carries across work modes
@@ -82,3 +82,11 @@ windfall:
 
 loans:
   term_months: 60                       # the data gives principal and rate only
+
+markets:                                # learned: twin_game_theory/world (simulated Swiss society, SECO/BFS targets)
+  model: twin_game_theory/world/world_model.json   # P(job offer), P(admitted to a master's), P(flat)
+  applications_per_month: 2             # assumption: job applications a month while searching
+  grades: 0.0                           # assumption: grades in SDs from the average; a custom person can set it
+  education_unknown:                    # assumption, drawn per path when the person's degree is not given
+    tertiary_share_by_pay_quintile: [0.25, 0.40, 0.55, 0.70, 0.80]
+    degree_mix: [0.45, 0.45, 0.10]      # bachelor, master, PhD

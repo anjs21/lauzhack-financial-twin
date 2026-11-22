@@ -50,6 +50,8 @@ def main(argv=None):
     ex.add_argument("--no-foresight", action="store_true")
     ex.add_argument("--policy", choices=["rules", "neural", "foresight"], default="rules")
     ex.add_argument("--foresight", type=float, default=0.5)
+    ex.add_argument("--markets", choices=["learned", "priors"], default="learned",
+                    help="job offers, admission and flats: learned market model or the fixed rates in priors.yaml")
     ld = sub.add_parser("llm-demos")
     ld.add_argument("--calls", type=int, default=300)
     ld.add_argument("--model")
@@ -103,7 +105,9 @@ def main(argv=None):
             from .policy.rules import RulePolicy as policy_cls
         from .policy.foresight import PATH as FORESIGHT_NET
         levels = None if (a.no_foresight or not FORESIGHT_NET.exists()) else (0.0, 0.5, 1.0)
-        res, _ = explore(a.profile_id, custom, persona, a.paths, a.seed, what_ifs=what_ifs,
+        from .world.env import Config, World
+        world = World.load(config=Config(markets=a.markets == "learned"))
+        res, _ = explore(a.profile_id, custom, persona, a.paths, a.seed, world=world, what_ifs=what_ifs,
                          with_spread=not a.no_spread, policy_cls=policy_cls, foresight_levels=levels)
         res = to_json(res)
         print(f"{res['person']['name']} ({res['persona']['policy']}): high goal {res['high_goal_odds']:.0%}, "
