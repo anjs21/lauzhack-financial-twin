@@ -1,12 +1,20 @@
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 const example = JSON.parse(readFileSync(new URL('../src/example.json', import.meta.url), 'utf8'));
 
+
+/** The landing page opens on the person alone; the cue (or any scroll down) brings in the choices. */
+async function open(page: Page) {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Choose what to explore' }).click();
+}
+
 test('example, persona creation, and keyboard-accessible chart', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/');
+  await open(page);
   await expect(page.getByRole('heading', { name: 'Hi P0067' })).toBeVisible();
   // The landing explains who this is before any numbers.
   const who = page.getByRole('region', { name: 'Who this is' });
@@ -77,7 +85,7 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
     }
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
@@ -103,7 +111,7 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
 
 test('unreachable workspace has a recoverable error', async ({ page }) => {
   await page.route('http://127.0.0.1:8000/**', route => route.abort());
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
@@ -128,7 +136,7 @@ test('a student can keep studying alongside the part-time offer', async ({ page 
     }
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   const keepStudying = page.getByRole('switch', { name: 'Keep studying' });
   await expect(keepStudying).toHaveAttribute('aria-checked', 'true');   // P0067 is a master's student
   const situation = async (status: string) => {
@@ -174,7 +182,7 @@ test('grow a tree of branches from decision points on the chart', async ({ page 
     } else if (request.method() === 'POST') json = { session_id: 'tree', evidence: example, answer: 'Ready.' };
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
@@ -229,7 +237,7 @@ test('the assistant changes the persona and grows branches from a chat message',
     } else if (request.method() === 'POST') json = { session_id: 'chat', evidence: example, answer: 'Ready.' };
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
@@ -250,7 +258,7 @@ test('the assistant changes the persona and grows branches from a chat message',
 test('assumptions dialog and the plan-explained tab', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'Assumptions', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Assumptions' });
   await dialog.getByText('1. Time, scope and runs').click();
@@ -286,7 +294,7 @@ test('compare taking the job alongside the studies or instead of them', async ({
     }
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   // Offline, the example already holds both choices.
   await page.getByRole('button', { name: /^Compare both choices/ }).click();
   const tree = page.getByRole('region', { name: 'Paths' });
@@ -321,7 +329,7 @@ test('exploring keeps the page where it is; only a chat question scrolls to the 
     else if (request.method() === 'POST') { await new Promise(r => setTimeout(r, 400)); json = { session_id: 'scroll', evidence: example, answer: 'Explored.' }; }
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
   await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
@@ -339,4 +347,16 @@ test('exploring keeps the page where it is; only a chat question scrolls to the 
   await expect(page.getByText('Answered.')).toBeVisible();
   await page.waitForTimeout(600);
   expect(await scrolled()).toBeGreaterThan(0);
+});
+
+test('the landing page shows the person first; scrolling down brings in the choices below', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('region', { name: 'Who this is' })).toBeVisible();
+  const explore = page.getByRole('button', { name: 'Explore this path', exact: true });
+  await expect(explore).toBeHidden();                                    // collapsed, and out of the tab order
+  await page.getByRole('region', { name: 'Who this is' }).hover();
+  await page.mouse.wheel(0, 300);
+  await expect(explore).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Choose what to explore' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Compare both choices/ })).toBeInViewport();
 });

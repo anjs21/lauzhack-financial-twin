@@ -15,10 +15,17 @@ async function connect(page: Page) {
   await expect(page.getByRole('dialog')).not.toBeVisible();
 }
 
+
+/** The landing page opens on the person alone; the cue (or any scroll down) brings in the choices. */
+async function open(page: Page) {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Choose what to explore' }).click();
+}
+
 test('the example plan shows its steps, how often they happen and what a nudge changed', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/');
+  await open(page);
   await page.getByRole('button', { name: 'See an example' }).click();
   const plan = page.getByRole('region', { name: 'Your plan' });
   await expect(plan.getByRole('heading', { name: 'P0067’s plan' })).toBeVisible();
@@ -80,7 +87,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
     }
     await route.fulfill({ status, json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await connect(page);
   const plan = page.getByRole('region', { name: 'Your plan' });
   await page.getByRole('button', { name: 'Make my own plan' }).click();      // from the landing screen
@@ -142,7 +149,7 @@ test('a failed planning job reports the error and keeps the form', async ({ page
       : { status: 'failed', progress: '', error: 'The planner did not produce a usable plan. Try again, or say more about your plans.', latest: null, versions: [] };
     await route.fulfill({ status: url.endsWith('/plans') ? 202 : 200, json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await connect(page);
   const plan = page.getByRole('region', { name: 'Your plan' });
   await page.getByRole('button', { name: 'Make my own plan' }).click();      // from the landing screen

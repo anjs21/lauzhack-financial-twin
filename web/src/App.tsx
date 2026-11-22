@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ArrowUp, ChartSpline, GitCompareArrows, Check, Compass, Home, Leaf, LoaderCircle, PenLine, RefreshCw, Sparkles, Wallet, X } from 'lucide-react';
+import { ArrowRight, ArrowUp, ChartSpline, ChevronDown, GitCompareArrows, Check, Compass, Home, Leaf, LoaderCircle, PenLine, RefreshCw, Sparkles, Wallet, X } from 'lucide-react';
 import Answer from './Answer';
 import Chart from './Chart';
 import Dialog from './Dialog';
@@ -116,6 +116,8 @@ export default function App() {
   const [measure, setMeasure] = useState<Measure>('fan_net_worth');
   const chatEnd = useRef<HTMLDivElement>(null);
   const followChat = useRef(false);   // only a chat question scrolls the page to its answer
+  // Landing: first only the person; the first scroll down (wheel, swipe, key or the cue) brings in the choices below it.
+  const [revealed, setRevealed] = useState(false);
   const current = evidence.alternative ?? evidence.baseline;
   // Working alongside studies only applies to a student choosing the part-time offer.
   const canKeepStudying = person.status === 'student' && scenario.kind === 'part_time';
@@ -136,9 +138,31 @@ export default function App() {
   const decisionMonths = stale || active.decisions.length >= MAX_DECISIONS ? []
     : [0, ...REVIEW_MONTHS].filter(m => active.decisions.length ? m > lastDecision : true);
   const canBranch = !exampleMode && !!session && !stale;
+  const homeShown = revealed || composing || !!error;
   const salaryInvalid = scenario.kind === 'part_time' && (!Number.isFinite(scenario.salary) || scenario.salary <= 0 || scenario.salary > 100000);
 
   useEffect(() => { if (followChat.current) chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages.length, busy]);
+
+  useEffect(() => {
+    if (started || revealed) return;
+    const reveal = () => setRevealed(true);
+    let touchY: number | null = null;
+    const onWheel = (e: WheelEvent) => { if (e.deltaY > 0) reveal(); };
+    const onTouchStart = (e: TouchEvent) => { touchY = e.touches[0]?.clientY ?? null; };
+    const onTouchMove = (e: TouchEvent) => { if (touchY !== null && touchY - (e.touches[0]?.clientY ?? touchY) > 12) reveal(); };
+    const onKey = (e: KeyboardEvent) => {
+      const typing = e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]');
+      if (!typing && ['ArrowDown', 'PageDown', 'End', ' '].includes(e.key)) reveal();
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('wheel', onWheel); window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove); window.removeEventListener('keydown', onKey);
+    };
+  }, [started, revealed]);
 
   // Open the "Plan explained" tab on your own results: the laptop runs the analysis once per session (a few seconds).
   const explainable = !exampleMode && !!session && !stale && !!evidence.plan;
@@ -347,6 +371,10 @@ export default function App() {
       <PersonaSummary person={person} traits={traits} example={exampleMode && !edited}
         story={JSON.stringify({ person, traits }) === JSON.stringify({ person: example.person, traits: example.traits }) ? exampleStory : undefined}
         onEdit={() => setModal('persona')} />
+      {!homeShown && <button type="button" className="scroll-cue" onClick={() => setRevealed(true)}>
+        Choose what to explore<ChevronDown size={18} aria-hidden="true" />
+      </button>}
+      <div className={`home-rest ${homeShown ? 'in' : ''}`} inert={!homeShown}><div className="home-rest-inner">
       {person.status === 'student' && <button className="compare-cta" disabled={!!busy} onClick={compareStudyChoices}>
         <GitCompareArrows size={20} aria-hidden="true" />
         <span><b>Compare both choices</b><small>Take the job alongside the studies, or instead of them: the same CHF {money(scenario.kind === 'part_time' ? scenario.salary : 3200)} offer, side by side</small></span>
@@ -363,6 +391,7 @@ export default function App() {
       </section>}
       {errorBox}
       {fine}
+      </div></div>
     </main>
 
     : <main id="main" className="workspace">
