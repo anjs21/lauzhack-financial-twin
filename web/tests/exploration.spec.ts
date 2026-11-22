@@ -63,7 +63,7 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
     } else {
       requests.push(request.postDataJSON());
       const body = request.postDataJSON();
-      json = { session_id: 'test-session', evidence: { ...example, deliberate: body.deliberate }, answer: 'Your simulation is ready. The goal estimate comes from 500 paths.' };
+      json = { session_id: 'test-session', evidence: example, answer: 'Your simulation is ready. The goal estimate comes from 500 paths.' };
     }
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });
@@ -79,21 +79,13 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
   await page.getByRole('button', { name: 'Send message' }).click();
   await expect(page.getByText('This explanation uses the same stored simulation.', { exact: false })).toBeVisible();
   expect(requests).toHaveLength(2);
-  expect((requests[0] as { deliberate: boolean }).deliberate).toBe(false);
+  expect(requests[0]).not.toHaveProperty('deliberate');
   expect(requests[1]).toEqual({ message: 'What matters most?' });
   await page.getByRole('button', { name: 'Spend less', exact: true }).click();
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
   await page.getByRole('button', { name: 'Go part-time', exact: true }).click();
   await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
-  // Switching to deliberate decisions makes the run stale until explored again, then is sent to the API.
-  const toggle = page.getByRole('switch', { name: 'Decide deliberately' });
-  await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-checked', 'true');
-  await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
-  await page.getByRole('button', { name: 'Explore this path', exact: true }).click();
-  await expect(page.getByText('· deliberate', { exact: false })).toBeVisible();
-  await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
-  expect((requests[2] as { deliberate: boolean }).deliberate).toBe(true);
+  await expect(page.getByRole('switch', { name: 'Decide deliberately' })).toHaveCount(0);   // removed
 });
 
 test('unreachable workspace has a recoverable error', async ({ page }) => {
@@ -119,7 +111,7 @@ test('a student can keep studying alongside the part-time offer', async ({ page 
     else if (request.method() === 'POST') {
       const body = request.postDataJSON();
       sessions.push(body);
-      json = { session_id: 'student', evidence: { ...example, person: body.person, scenario: body.scenario, deliberate: body.deliberate }, answer: 'Ready.' };
+      json = { session_id: 'student', evidence: { ...example, person: body.person, scenario: body.scenario }, answer: 'Ready.' };
     }
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
   });

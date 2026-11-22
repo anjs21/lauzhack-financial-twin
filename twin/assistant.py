@@ -3,7 +3,7 @@
 The model turns what the user says into the simulator's variables; the laptop API (twin/api.py)
 validates them, runs the simulation and sends the client the updates for its chart:
 
-    update_simulation   new facts about the person, their preferences, the scenario or the decision style
+    update_simulation   new facts about the person, their preferences or the scenario
                         -> re-run every life (branches are cleared)
     explore_decision    a what-if at a later January review, from any path -> a new branch in the tree
     highlight_path      what the chart shows: which path, and cash or net worth
@@ -61,8 +61,8 @@ def tools(choices: dict) -> list:
     return [
         {"type": "function", "function": {
             "name": "update_simulation",
-            "description": ("Change facts about the person, their preferences, the scenario explored at the January 2025 "
-                            "review, or the decision style, then re-run every simulated life (the chart updates; "
+            "description": ("Change facts about the person, their preferences or the scenario explored at the January 2025 "
+                            "review, then re-run every simulated life (the chart updates; "
                             "branches are cleared). Use it when the user states new facts about themselves ('I earn 7k "
                             "now', 'I'm 31', 'I moved to Zurich', 'I'm doing a master's with 18 months left', 'I care "
                             "more about free time') or asks to change what is explored ('try part-time at 3,500'). "
@@ -71,8 +71,6 @@ def tools(choices: dict) -> list:
                 "person": {"type": "object", "additionalProperties": False, "properties": person},
                 "traits": {"type": "object", "additionalProperties": False, "properties": traits},
                 "scenario": {"type": "object", "additionalProperties": False, "properties": scenario},
-                "deliberate": {"type": "boolean", "description": "true: decide deliberately (weigh each yearly choice "
-                                                                 "by its five-year value); false: as the person usually does"},
             }}}},
         {"type": "function", "function": {
             "name": "explore_decision",

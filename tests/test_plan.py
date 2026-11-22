@@ -365,3 +365,15 @@ def test_plan_endpoint_errors(client, monkeypatch):
     assert client.post("/plans", json={**body(), "traits": {"x": 1}}, headers=AUTH).status_code == 422
     monkeypatch.delenv("TOGETHER_API_KEY")
     assert client.post("/plans", json=body(), headers=AUTH).status_code == 503
+
+
+def test_step_why_is_kept_and_rewording_is_no_change():
+    from twin.plan.schema import LifePlan, diff
+    raw = {"narrative": "I save first.", "steps": [{"id": "cut", "label": "Spend less", "head": "spending", "option": "cut",
+                                                   "why": "  Rent is most of my costs.  "}]}
+    plan, errors = LifePlan.from_dict(raw)
+    assert not errors and plan.steps[0].why == "Rent is most of my costs."
+    assert LifePlan.from_dict(plan.to_dict())[0].steps[0].why == plan.steps[0].why
+    reworded, _ = LifePlan.from_dict({**raw, "steps": [{**raw["steps"][0], "why": "Other words."}]})
+    assert diff(plan, reworded)["changed"] == []
+    assert LifePlan.from_dict({**raw, "steps": [{**raw["steps"][0], "why": 3}]})[1]

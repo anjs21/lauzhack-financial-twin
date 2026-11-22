@@ -49,16 +49,20 @@ DRAFT_SHAPE = """Reply with exactly this JSON shape:
  "plan": {
    "narrative": "the plan in this person's own voice, 2-4 sentences",
    "spontaneity": 0.3,
-   "notes": ["assumptions you make, if any"],
+   "notes": ["what you assumed, or chose not to do, and why"],
    "steps": [
      {"id": "masters", "label": "Start a master's in 2026", "head": "status", "option": "start_masters",
-      "start": "2026-01", "until": "2027-12", "commitment": 0.8},
+      "start": "2026-01", "until": "2027-12", "commitment": 0.8,
+      "why": "I want the degree before I settle into a career, and 2026 leaves a year to save for the fees."},
      {"id": "bigger_flat", "label": "Bigger flat once settled in the new job", "head": "housing", "option": "bigger",
-      "after": "masters", "after_months": 36, "commitment": 0.6},
+      "after": "masters", "after_months": 36, "commitment": 0.6,
+      "why": "More space matters to me, but only once a steady salary passes the landlord's income rule."},
      {"id": "cut_if_jobless", "label": "Cut back if I lose my job", "head": "spending", "option": "cut",
-      "event": "job_loss", "within_months": 12, "commitment": 0.7},
+      "event": "job_loss", "within_months": 12, "commitment": 0.7,
+      "why": "Without a salary my cash would last only a few months."},
      {"id": "cheaper_if_short", "label": "Cheaper flat if cash runs low", "head": "housing", "option": "cheaper",
-      "cash_months_below": 1, "commitment": 0.5}
+      "cash_months_below": 1, "commitment": 0.5,
+      "why": "Rent is my biggest cost; I'd rather move than run up debt."}
    ]}}
 """
 NUDGE_SHAPE = """Reply with edits to the current plan, in exactly this JSON shape:
@@ -69,14 +73,15 @@ NUDGE_SHAPE = """Reply with edits to the current plan, in exactly this JSON shap
    "remove": ["masters"],
    "set": [{"id": "bigger_flat", "start": "2027-01", "until": "2028-12", "after": null},
            {"id": "cheaper_if_short", "label": "Cheaper flat if cash runs low", "head": "housing", "option": "cheaper",
-            "cash_months_below": 1, "commitment": 0.5}],
+            "cash_months_below": 1, "commitment": 0.5, "why": "Rent is my biggest cost; I'd rather move than run up debt."}],
    "narrative": "the updated plan in this person's own voice, 2-4 sentences",
    "spontaneity": 0.3}}
 "remove" drops steps by id. "set" adds a new step (all fields) or changes an existing one: give its id and only the fields that change; null removes a field. Steps you do not mention stay exactly as they are.
 """
 RULES = """Step fields: id (snake_case), label, head, option, and optionally start / until (YYYY-MM, within %(first)s to %(last)s), \
 commitment (0-1), after (id of a step that must be done first) with after_months, event with within_months, \
-cash_months_below / cash_months_above (cash in months of outgoings), min_age / max_age, repeat (true = every year).
+cash_months_below / cash_months_above (cash in months of outgoings), min_age / max_age, repeat (true = every year), \
+why (one sentence in your own voice: the wish, trait or simulation result behind the step; the person reads it).
 Rules of this world:
 - Voluntary choices happen only at the January review each year; a step falls due at the first January in its window.
   A dated step without "until" gets one review; give a window if timing is flexible. A step with "after" or "event" \
@@ -95,6 +100,8 @@ Options per head:
 %(options)s
 Steps are actions you take, not goals (your goals are known already), and keeping things as they are needs no step.
 Think about the whole decade at your age: studies, work and hours, home, lifestyle, savings and, if it comes within reach, retirement (pension age 65). Use 2-10 steps: the big decisions and 1-3 fallbacks.
+Give every step a "why". When the simulation makes you add, move or drop a step, say so in its "why" or in "notes", \
+so the person can follow your reasoning.
 Set "ready": true only when you would sign this plan as it is."""
 
 

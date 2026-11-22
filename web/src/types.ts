@@ -63,15 +63,21 @@ export type PlanStep = {
   start?: string; until?: string; commitment: number; after?: string; after_months?: number;
   event?: string; within_months?: number; cash_months_below?: number; cash_months_above?: number;
   min_age?: number; max_age?: number; repeat?: boolean;
+  why?: string;                            // the planner's reason, in the person's voice
 };
 export type StepResult = {
   id: string; label: string; head: string; option: string; taken_share: number; typical_year: number | null;
   blocked_share: number; declined_share: number; turned_down_share: number; trigger_share: number; blocked_because?: string;
 };
+// One round of the planner: what it wrote or changed (thought), then what the simulation flagged.
+export type PlanRound = { round: number; thought: string; errors?: string[]; ready?: boolean; steps?: Record<string, number>; warnings?: string[] };
+export type MoneyTrouble = { share_of_lives: number; typical_year: number; while: Record<string, number>; income_then: number; home_then: string };
 export type PlanVersion = {
   version: number; kind: 'draft' | 'nudge'; said: string; as_of: string | null; signed: boolean;
   plan: { narrative: string; spontaneity: number; notes: string[]; steps: PlanStep[] };
-  evaluation: { n_lives: number; steps: StepResult[]; outcomes: { high_goal_odds: number; credit_breach_odds: number; final_net_worth: { p50: number } } };
+  evaluation: { n_lives: number; steps: StepResult[]; off_plan_changes_per_life?: number; money_trouble?: MoneyTrouble | null;
+                outcomes: { high_goal_odds: number; credit_breach_odds: number; final_net_worth: { p50: number } } };
+  rounds?: PlanRound[];
   changes: string;
   comparison: { high_goal_odds: number[]; credit_breach_odds: number[]; median_final_net_worth: number[] };
 };

@@ -539,8 +539,6 @@ def _changes_note(args: dict) -> str:
     parts += [f"{k.replace('_', ' ')} {v:g}" for k, v in (args.get("traits") or {}).items()]
     if args.get("scenario"):
         parts.append("scenario " + ", ".join(f"{k} {v}" for k, v in args["scenario"].items()))
-    if "deliberate" in args:
-        parts.append("deliberate decisions" if args["deliberate"] else "habitual decisions")
     return "Updated " + "; ".join(parts) if parts else "Re-ran the simulation"
 
 
@@ -549,7 +547,7 @@ def tool_update(session, args: dict):
     new = SessionRequest(person={**old["person"], **(args.get("person") or {})},
                          traits={**old["traits"], **(args.get("traits") or {})},
                          scenario={**old["scenario"], **(args.get("scenario") or {})},
-                         n_paths=old["n_paths"], deliberate=bool(args.get("deliberate", old["deliberate"])))
+                         n_paths=old["n_paths"], deliberate=old["deliberate"])
     before = {p["id"]: {k: v for k, v in p.items() if k in ("goal_odds", "credit_breach_odds", "median_net_worth_2034")}
               for p in paths_of(session)[:2]}
     evidence = run_projection(new, session.plan, session.plan_evaluation)

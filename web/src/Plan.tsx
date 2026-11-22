@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LoaderCircle, PenLine, RotateCcw } from 'lucide-react';
-import type { PlanStep, PlanVersion, StepResult } from './types';
-import { compact, percent } from './types';
+import type { PlanRound, PlanStep, PlanVersion, StepResult } from './types';
+import { compact, money, percent } from './types';
 
 const EVENTS: Record<string, string> = {
   job_loss: 'if I lose my job', offer: 'once I get a job offer', graduated: 'once I finish studying',
@@ -29,15 +29,6 @@ function when(step: PlanStep, steps: PlanStep[]) {
   return parts.join(', ');
 }
 
-function flag(step: PlanStep, r: StepResult) {
-  if (r.blocked_because && r.blocked_share >= 0.2) return `Not possible in ${percent(r.blocked_share)} of lives: ${r.blocked_because}`;
-  if (r.turned_down_share >= 0.2) {
-    const what = step.head === 'housing' ? 'no flat found' : step.option === 'start_masters' ? 'not admitted' : 'turned down';
-    return `Tried, but ${what} in ${percent(r.turned_down_share)} of lives`;
-  }
-  return '';
-}
-
 function changesBetween(before: PlanVersion, after: PlanVersion) {
   const old = new Map(before.plan.steps.map(s => [s.id, s]));
   const now = new Map(after.plan.steps.map(s => [s.id, s]));
@@ -55,13 +46,63 @@ function changesBetween(before: PlanVersion, after: PlanVersion) {
   return out;
 }
 
+/** What happened to a step across the simulated lives. The five parts don't overlap and add up to every life. */
+function outcomeParts(step: PlanStep, r: StepResult) {
+  const worldNo = step.head === 'housing' ? 'no flat found' : step.option === 'start_masters' ? 'not admitted' : 'no job offer came';
+  const notDue = contingent(step) ? 'never needed' : step.after ? 'the step before never happened' : 'never came up';
+  return [
+    { key: 'done', share: r.taken_share, text: 'did it' },
+    { key: 'declined', share: r.declined_share, text: 'chose not to' },
+    { key: 'refused', share: r.turned_down_share, text: `tried, ${worldNo}` },
+    { key: 'blocked', share: r.blocked_share, text: 'not possible' },
+    { key: 'idle', share: Math.max(0, 1 - r.trigger_share), text: notDue },
+  ].filter(p => p.share >= 0.005);
+}
+
+function Outcome({ step, result }: { step: PlanStep; result: StepResult }) {
+  const parts = outcomeParts(step, result);
+  return <div className="outcome">
+    <span className="outcome-bar" aria-hidden="true">{parts.map(p => <i key={p.key} className={p.key} style={{ flexGrow: p.share }} />)}</span>
+    <small>{parts.map(p => `${p.text} ${percent(p.share)}`).join(' · ')}</small>
+    {result.blocked_because && <small className="flag">Not possible in {percent(result.blocked_share)}: {result.blocked_because}</small>}
+  </div>;
+}
+
 function Step({ step, result, steps }: { step: PlanStep; result?: StepResult; steps: PlanStep[] }) {
-  const warning = result ? flag(step, result) : '';
   return <li className={contingent(step) ? 'fallback' : ''}>
     <span className="year">{result?.typical_year ?? '—'}</span>
-    <span className="what"><b>{step.label}</b><small>{when(step, steps)} · {firmness(step.commitment)}</small>{warning && <small className="flag">{warning}</small>}</span>
+    <span className="what">
+      <b>{step.label}</b>
+      <small>{when(step, steps)} · {firmness(step.commitment)}</small>
+      {step.why && <span className="why">{step.why}</span>}
+      {result && <Outcome step={step} result={result} />}
+    </span>
     <span className="share">{result ? lives(result.taken_share) : ''}</span>
   </li>;
+}
+
+/** The planner's text as the person reads it: step ids (snake_case, maybe quoted) become their labels. */
+function plain(text: string, labels: Map<string, string>) {
+  return text.replace(/'?\b([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\b'?/g, (_, id: string) => `“${labels.get(id) ?? id.replace(/_/g, ' ')}”`);
+}
+/** A simulator warning: its first sentence (the rest is advice to the planner). */
+const plainWarning = (text: string, labels: Map<string, string>) => plain(text.split(/(?<=[.?!])\s+(?=[A-Z])/)[0], labels);
+
+function Rounds({ rounds, signed, labels, lives: n }: { rounds: PlanRound[]; signed: boolean; labels: Map<string, string>; lives: number }) {
+  const last = rounds[rounds.length - 1];
+  return <details className="plan-rounds">
+    <summary>How your twin worked this out<span> · {rounds.length} round{rounds.length === 1 ? '' : 's'}, {signed ? `signed in round ${last.round}` : 'not signed'}</span></summary>
+    <ol>{rounds.map(r => <li key={r.round}>
+      <b>Round {r.round}</b>
+      {r.errors ? <p className="muted">Its reply could not be used as a plan, so it was asked to fix it.</p>
+        : <>
+          {r.thought && <p>{plain(r.thought, labels)}</p>}
+          <p className="muted">Tested in {n} lives: {r.warnings?.length ? 'the simulation flagged' : 'nothing flagged.'}</p>
+          {!!r.warnings?.length && <ul>{r.warnings.map(w => <li key={w}>{plainWarning(w, labels)}</li>)}</ul>}
+          {signed && r === last && <p className="muted">Your twin signed the plan.</p>}
+        </>}
+    </li>)}</ol>
+  </details>;
 }
 
 export function PlanCard({ version, previous, name, example }: { version: PlanVersion; previous?: PlanVersion; name: string; example: boolean }) {
@@ -71,6 +112,10 @@ export function PlanCard({ version, previous, name, example }: { version: PlanVe
   const fallbacks = version.plan.steps.filter(contingent).sort((a, b) => year(a) - year(b));
   const c = version.comparison;
   const changes = previous ? changesBetween(previous, version) : [];
+  const labels = new Map([...(previous?.plan.steps ?? []), ...version.plan.steps].map(s => [s.id, s.label]));
+  const trouble = version.evaluation.money_trouble;
+  const mostly = trouble && Object.entries(trouble.while).sort((a, b) => b[1] - a[1])[0];
+  const offPlan = version.evaluation.off_plan_changes_per_life;
   return <div className="plan-card">
     <div className="plan-head">
       <h2>{name}’s plan</h2>
@@ -82,18 +127,32 @@ export function PlanCard({ version, previous, name, example }: { version: PlanVe
       <span>Credit-limit risk<b>{percent(c.credit_breach_odds[1])}</b><span className="was">from {percent(c.credit_breach_odds[0])}</span></span>
       <span>Net worth 2034<b>CHF {compact(c.median_final_net_worth[1])}</b><span className="was">from {compact(c.median_final_net_worth[0])}</span></span>
     </div>
-    {steps.length > 0 && <><h3>Steps <span>· year it usually happens, in {version.evaluation.n_lives} simulated lives</span></h3>
+    {steps.length > 0 && <><h3>Steps <span>· why, and what happened in {version.evaluation.n_lives} simulated lives</span></h3>
       <ol className="plan-steps">{steps.map(s => <Step key={s.id} step={s} result={results.get(s.id)} steps={version.plan.steps} />)}</ol></>}
     {fallbacks.length > 0 && <><h3>If things go wrong</h3>
       <ol className="plan-steps">{fallbacks.map(s => <Step key={s.id} step={s} result={results.get(s.id)} steps={version.plan.steps} />)}</ol></>}
+    {version.plan.steps.length > 0 && <p className="outcome-key" aria-hidden="true">
+      <span><i className="done" />did it</span><span><i className="declined" />chose not to</span><span><i className="refused" />world said no</span>
+      <span><i className="blocked" />not possible</span><span><i className="idle" />never came up</span></p>}
+    {(trouble || offPlan != null) && <div className="plan-findings">
+      <h3>What the simulation showed</h3>
+      <ul>
+        {trouble && mostly && <li>In {percent(trouble.share_of_lives)} of lives cash runs past the credit limit, usually in {trouble.typical_year}, mostly while {mostly[0]} ({percent(mostly[1])}), on about CHF {money(trouble.income_then)} a month in {trouble.home_then}.</li>}
+        {offPlan != null && <li>The steps set the big choices; habits decide the rest. Unplanned changes of work or home: about {offPlan.toFixed(1)} per life.</li>}
+      </ul>
+    </div>}
+    {version.plan.notes.length > 0 && <div className="plan-findings">
+      <h3>Your twin’s reasoning</h3>
+      <ul>{version.plan.notes.map(n => <li key={n}>{plain(n, labels)}</li>)}</ul>
+    </div>}
     {version.kind === 'nudge' && <div className="plan-changes">
       <h3>What changed{version.as_of ? ` from ${version.as_of.slice(0, 4)}` : ''}</h3>
       <p className="said">“{version.said}”</p>
-      {version.changes && <p>{version.changes}</p>}
+      {version.changes && <p>{plain(version.changes, labels)}</p>}
       {changes.length > 0 && <ul>{changes.map(line => <li key={line}>{line}</li>)}</ul>}
     </div>}
+    {!!version.rounds?.length && <Rounds rounds={version.rounds} signed={version.signed} labels={labels} lives={version.evaluation.n_lives} />}
     {!version.signed && <p className="note">Your twin did not sign this plan within its rounds: some steps may still clash with what the simulation shows.</p>}
-    {version.plan.notes.length > 0 && <p className="note">Assumptions: {version.plan.notes.join(' ')}</p>}
   </div>;
 }
 

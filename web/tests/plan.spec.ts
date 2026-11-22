@@ -25,7 +25,15 @@ test('the example plan shows its steps, how often they happen and what a nudge c
   await expect(plan.getByText(nudged.plan.narrative)).toBeVisible();
   await expect(plan.getByRole('heading', { name: /What changed/ })).toBeVisible();
   await expect(plan.getByText(`“${nudged.said}”`)).toBeVisible();
-  for (const step of nudged.plan.steps) await expect(plan.getByText(step.label, { exact: true })).toBeVisible();
+  for (const step of nudged.plan.steps) {
+    await expect(plan.getByText(step.label, { exact: true })).toBeVisible();
+    if (step.why) await expect(plan.getByText(step.why, { exact: true })).toBeVisible();       // the planner's reason
+  }
+  await expect(plan.getByText(/^did it \d+%/).first()).toBeVisible();                        // what happened in the lives
+  await expect(plan.getByRole('heading', { name: 'Your twin’s reasoning' })).toBeVisible();
+  await expect(plan.getByText(/go_full_time|cheaper_if_short/)).toHaveCount(0);                // ids read as words
+  await plan.getByText('How your twin worked this out').click();
+  await expect(plan.getByText(`Round ${nudged.rounds.length}`, { exact: true })).toBeVisible();
   for (const step of draft.plan.steps.filter((s: { id: string }) => !nudged.plan.steps.some((n: { id: string }) => n.id === s.id)))
     await expect(plan.getByText(`Dropped: ${step.label}`)).toBeVisible();
   await plan.getByRole('button', { name: 'Make my own plan' }).click();
@@ -63,7 +71,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
       const body = request.postDataJSON();
       sessions.push(body);
       const plan = body.plan_id ? { narrative: version!.plan.narrative, spontaneity: .3, steps: [], carried_out: version!.evaluation.steps } : undefined;
-      json = { session_id: `s${sessions.length}`, evidence: { ...example, scenario: body.scenario, deliberate: body.deliberate, plan }, answer: `Explained run ${sessions.length}.` };
+      json = { session_id: `s${sessions.length}`, evidence: { ...example, scenario: body.scenario, plan }, answer: `Explained run ${sessions.length}.` };
     }
     await route.fulfill({ status, json, headers: { 'access-control-allow-origin': '*' } });
   });

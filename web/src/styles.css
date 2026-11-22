@@ -259,15 +259,39 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .plan h3 { margin-top: 20px; font-size: .875rem; font-weight: 500; color: var(--muted); }
 .plan h3 span { font-weight: 400; color: var(--faint); }
 .plan-steps { list-style: none; margin: 6px 0 0; padding: 0; }
-.plan-steps li { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) auto; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .9375rem; }
+.plan-steps li { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr) 5.75rem; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .9375rem; }
 .plan-steps li:last-child { border-bottom: 0; }
 .plan-steps .year { color: var(--muted); font-variant-numeric: tabular-nums; }
 .plan-steps .what { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .plan-steps .what b { font-weight: 500; }
 .plan-steps small { font-size: .8125rem; line-height: 1.45; color: var(--muted); }
 .plan-steps .flag { color: var(--warn); }
-.plan-steps .share { color: var(--muted); font-size: .875rem; white-space: nowrap; }
+.plan-steps .share { color: var(--muted); font-size: .875rem; white-space: nowrap; text-align: right; }
 .plan-steps .fallback .what b { font-weight: 400; }
+.plan-steps .why { display: block; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--line); font-size: .875rem; line-height: 1.5; color: var(--ink); }
+.outcome { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
+.outcome-bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--line); }
+.outcome-bar i, .outcome-key i { display: block; min-width: 2px; }
+:is(.outcome-bar, .outcome-key) .done { background: var(--accent); }
+:is(.outcome-bar, .outcome-key) .declined { background: var(--faint); }
+:is(.outcome-bar, .outcome-key) .refused { background: var(--warn); }
+:is(.outcome-bar, .outcome-key) .blocked { background: var(--err); }
+:is(.outcome-bar, .outcome-key) .idle { background: var(--surface-2); }
+.outcome-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-size: .75rem; color: var(--faint); }
+.outcome-key span { display: inline-flex; align-items: center; gap: 5px; }
+.outcome-key i { width: 10px; height: 6px; border-radius: 999px; }
+.plan-findings ul { margin: 6px 0 0; padding-left: 18px; font-size: .9375rem; line-height: 1.55; color: var(--muted); }
+.plan-findings li + li { margin-top: 4px; }
+.plan-rounds { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); font-size: .9375rem; line-height: 1.55; }
+.plan-rounds summary { cursor: pointer; font-size: .875rem; font-weight: 500; color: var(--muted); }
+.plan-rounds summary span { font-weight: 400; color: var(--faint); }
+.plan-rounds > ol { list-style: none; margin: 10px 0 0; padding: 0; }
+.plan-rounds > ol > li { padding: 8px 0 8px 12px; border-left: 2px solid var(--surface-2); }
+.plan-rounds > ol > li + li { margin-top: 6px; }
+.plan-rounds b { font-size: .8125rem; font-weight: 600; color: var(--muted); }
+.plan-rounds p { margin-top: 2px; }
+.plan-rounds .muted { color: var(--muted); font-size: .875rem; }
+.plan-rounds ul { margin: 4px 0 0; padding-left: 18px; color: var(--muted); font-size: .875rem; }
 .plan-changes { margin-top: 18px; padding-top: 4px; border-top: 1px solid var(--line); font-size: .9375rem; line-height: 1.55; }
 .plan-changes p { margin-top: 6px; }
 .plan-changes .said { color: var(--muted); font-style: italic; }

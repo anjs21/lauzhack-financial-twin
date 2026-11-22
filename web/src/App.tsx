@@ -71,7 +71,6 @@ export default function App() {
   const [person, setPerson] = useState<Person>(example.person);
   const [traits, setTraits] = useState(example.traits);
   const [scenario, setScenario] = useState<Scenario>({ ...example.scenario, alongside_studies: true });
-  const [deliberate, setDeliberate] = useState(false);
   const [evidence, setEvidence] = useState<Evidence>(example);
   const [messages, setMessages] = useState<Message[]>(starterMessages);
   const [session, setSession] = useState<string | null>(null);
@@ -105,7 +104,7 @@ export default function App() {
   // A plan belongs to the persona it was made for; after an edit it is shown but no longer used.
   const planMatches = !!ownPlan && JSON.stringify({ person, traits }) === JSON.stringify({ person: ownPlan.person, traits: ownPlan.traits });
   const planKey = ownPlan && latestPlan && planMatches && followPlan ? `${ownPlan.id}:${latestPlan.version}` : null;
-  const stale = changed || edited || deliberate !== (evidence.deliberate ?? false) || planKey !== evidencePlan;
+  const stale = changed || edited || planKey !== evidencePlan;
   const nodes = [...rootsOf(evidence), ...branches];
   const active = nodes.find(n => n.id === activeId) ?? nodes[0];
   const lastDecision = Math.max(0, ...active.decisions.map(d => d.month));
@@ -128,7 +127,7 @@ export default function App() {
     setBusy('run'); setError(''); setStarted(true); setPick(null);
     try {
       const result = await api<{ session_id: string; evidence: Evidence; answer: string }>(connection, '/sessions', {
-        person, traits, scenario: request, deliberate, n_paths: 500, question, ...(plan ? { plan_id: plan.id } : {}),
+        person, traits, scenario: request, n_paths: 500, question, ...(plan ? { plan_id: plan.id } : {}),
       });
       const previous = session;
       adopt(result.evidence); setSession(result.session_id); setExampleMode(false);
@@ -211,7 +210,7 @@ export default function App() {
   /** New results (an exploration or the assistant's re-run): the controls follow them, and the tree restarts. */
   function adopt(ev: Evidence) {
     const next = { ...ev, person: withStudyDefaults(ev.person), scenario: withScenarioDefaults(ev.scenario) };
-    setEvidence(next); setPerson(next.person); setTraits(next.traits); setDeliberate(!!next.deliberate);
+    setEvidence(next); setPerson(next.person); setTraits(next.traits);
     setScenario(s => ({ ...next.scenario, alongside_studies: next.scenario.alongside_studies || (next.person.status !== 'student' && s.alongside_studies) }));
     setBranches([]); setPick(null); setActiveId(next.alternative ? 'alternative' : 'baseline'); setEdited(false);
   }
@@ -255,10 +254,6 @@ export default function App() {
         title="On: your twin follows your plan and decides the rest from habit. Off: habit alone.">
         <span className="track" aria-hidden="true"><span /></span>Follow my plan
       </button>}
-      <button type="button" role="switch" aria-checked={deliberate} className="switch" disabled={!!busy} onClick={() => { setDeliberate(d => !d); setError(''); }}
-        title="Your persona weighs each yearly choice by what it is worth over the next five years, instead of following habit.">
-        <span className="track" aria-hidden="true"><span /></span>Decide deliberately
-      </button>
       <button className="primary" disabled={!!busy || salaryInvalid} onClick={() => void explore()}>{busy === 'run' ? <><LoaderCircle className="spin" size={16} />Exploring…</> : 'Explore this path'}</button>
     </div>
   </>;
@@ -302,7 +297,7 @@ export default function App() {
 
         {!loading && <>
           <section className={`summary ${stale ? 'dim' : ''}`} aria-label="Outlook">
-            <h2 className="results-label">{evidence.person.name}’s outlook <span>· {exampleMode ? 'example' : stale ? 'previous run' : `${evidence.n_paths} paths`}{evidence.deliberate ? ' · deliberate' : ''}{evidence.plan ? ' · following your plan' : ''}</span></h2>
+            <h2 className="results-label">{evidence.person.name}’s outlook <span>· {exampleMode ? 'example' : stale ? 'previous run' : `${evidence.n_paths} paths`}{evidence.plan ? ' · following your plan' : ''}</span></h2>
             <p className="headline"><b>{percent(current.high_goal_odds)}</b>chance of reaching {goal} by Dec 2029{evidence.alternative && <span className="was">{percent(evidence.baseline.high_goal_odds)} on your current path</span>}</p>
             <div className="stats">
               <span>Net worth 2034<b>CHF {compact(current.final_net_worth.p50)}</b>{evidence.alternative && <span className="was">from {compact(evidence.baseline.final_net_worth.p50)}</span>}</span>
@@ -378,7 +373,7 @@ export default function App() {
         <div><h3>Your laptop simulates 500 paths</h3><p>January 2025 to December 2034. Choices happen each January; events and cash flows evolve monthly. A fixed historical start, not a forecast from today.</p></div>
         <div><h3>An assistant explains the results</h3><p>It receives persona details (not your name), the results and your messages. Change your choices and explore again for a new comparison.</p></div>
         <div><h3>Your plan</h3><p>Tell your twin your plans in your own words. An AI planner writes them as yearly steps with fallbacks, tests them in 300 simulated lives, and revises until the steps are possible. When something changes, tell it: it updates only what the change affects. Explorations then follow your plan; your twin decides the rest from habit.</p></div>
-        <div><h3>Habit or deliberate</h3><p>By default your twin decides like people tend to: mostly sticking with what they do. “Decide deliberately” nudges every yearly choice toward what is worth more to you over the next five years.</p></div>
+        <div><h3>Habits</h3><p>Your twin decides like people tend to: mostly sticking with what they do. Your plan, if you make one, sets the big steps; habits decide the rest.</p></div>
         <div><h3>Branch at any January</h3><p>Tap a dot on the chart to try a new decision that year. The branch shares every life with its parent up to that January, then follows the decision wherever it is possible. Branch again from a branch to build a tree.</p></div>
         <div><h3>What “goal success” means</h3><p>Reaching the target by December 2029 without exceeding the credit limit before then. Emergency savings counts cash; other goals use net worth.</p></div>
       </div>
