@@ -1,0 +1,134 @@
+1. calibrating to Swiss targets
+  sweep 1, jobs: {'openings': 0.0088} loss 3.81
+  sweep 1, master: {'b_master': 16.0} loss 0.69
+  sweep 1, phd: {'phd_seats': 0.012, 'b_phd': 1.0} loss 0.17
+  sweep 2, jobs: {'openings': 0.0129} loss 10.05
+  sweep 2, master: {'b_master': 16.0} loss 0.05
+  sweep 2, phd: {'phd_seats': 0.012, 'b_phd': 1.0} loss 1.13
+   calibrated moments (1000 people): {'unemployment_rate': 0.0385, 'monthly_job_finding': 0.1803, 'median_unemployment_months': 3.4856, 'tier_moves_per_year': 0.071, 'bachelor_to_master_within_24m': 0.8423, 'n_bachelor_to_master_within_24m': 932, 'master_to_phd_within_24m': 0.1373, 'n_master_to_phd_within_24m': 1559, 'graduate_unemployment_1y_bachelor': 0.2559, 'graduate_unemployment_1y_master': 0.0603, 'phd_admit_rate': 0.4033}
+   same knobs, 200 people: {'unemployment_rate': 0.0369, 'median_unemployment_months': 3.3502, 'bachelor_to_master_within_24m': 0.8614, 'master_to_phd_within_24m': 0.0667}
+   same knobs, 1000 people: {'unemployment_rate': 0.0385, 'median_unemployment_months': 3.4856, 'bachelor_to_master_within_24m': 0.8423, 'master_to_phd_within_24m': 0.1373}
+   same knobs, 2000 people: {'unemployment_rate': 0.0324, 'median_unemployment_months': 2.9405, 'bachelor_to_master_within_24m': 0.833, 'master_to_phd_within_24m': 0.1664}
+2. simulating the calibrated world, 120 months, societies of [200, 1000, 2000] people (90,000 people in all)
+   logged rows: {'job': 289576, 'adm': 27000, 'flat': 205550}
+3. fitting market models
+4. validating on new societies
+   validation: {
+ "new_societies_200_people": {
+  "job_offer": {
+   "rows": 35358,
+   "mean_pred": 0.1597,
+   "mean_obs": 0.1661,
+   "ece_pts": 1.59,
+   "log_loss": 0.2511
+  },
+  "admission": {
+   "rows": 3375,
+   "mean_pred": 0.3908,
+   "mean_obs": 0.3914,
+   "ece_pts": 0.38,
+   "log_loss": 0.0474
+  },
+  "flat": {
+   "rows": 15742,
+   "mean_pred": 0.2588,
+   "mean_obs": 0.2592,
+   "ece_pts": 1.43,
+   "log_loss": 0.1654
+  }
+ },
+ "new_societies_1000_people": {
+  "job_offer": {
+   "rows": 33217,
+   "mean_pred": 0.171,
+   "mean_obs": 0.1788,
+   "ece_pts": 2.19,
+   "log_loss": 0.2844
+  },
+  "admission": {
+   "rows": 2765,
+   "mean_pred": 0.6027,
+   "mean_obs": 0.5989,
+   "ece_pts": 0.88,
+   "log_loss": 0.1364
+  },
+  "flat": {
+   "rows": 16116,
+   "mean_pred": 0.4038,
+   "mean_obs": 0.4062,
+   "ece_pts": 1.56,
+   "log_loss": 0.3847
+  }
+ },
+ "new_societies_2000_people": {
+  "job_offer": {
+   "rows": 27056,
+   "mean_pred": 0.22,
+   "mean_obs": 0.2226,
+   "ece_pts": 2.58,
+   "log_loss": 0.3317
+  },
+  "admission": {
+   "rows": 2728,
+   "mean_pred": 0.703,
+   "mean_obs": 0.7012,
+   "ece_pts": 1.51,
+   "log_loss": 0.1996
+  },
+  "flat": {
+   "rows": 16253,
+   "mean_pred": 0.4166,
+   "mean_obs": 0.4137,
+   "ece_pts": 1.31,
+   "log_loss": 0.427
+  }
+ },
+ "new_societies_5000_people": {
+  "job_offer": {
+   "rows": 23076,
+   "mean_pred": 0.2621,
+   "mean_obs": 0.2612,
+   "ece_pts": 3.01,
+   "log_loss": 0.3663
+  },
+  "admission": {
+   "rows": 2693,
+   "mean_pred": 0.7222,
+   "mean_obs": 0.7245,
+   "ece_pts": 1.76,
+   "log_loss": 0.2242
+  },
+  "flat": {
+   "rows": 16369,
+   "mean_pred": 0.411,
+   "mean_obs": 0.4133,
+   "ece_pts": 2.43,
+   "log_loss": 0.4365
+  }
+ },
+ "different_persona_mix_1000_people": {
+  "job_offer": {
+   "rows": 31034,
+   "mean_pred": 0.1895,
+   "mean_obs": 0.1872,
+   "ece_pts": 1.45,
+   "log_loss": 0.287
+  },
+  "admission": {
+   "rows": 3699,
+   "mean_pred": 0.4856,
+   "mean_obs": 0.4912,
+   "ece_pts": 0.73,
+   "log_loss": 0.1609
+  },
+  "flat": {
+   "rows": 18540,
+   "mean_pred": 0.3425,
+   "mean_obs": 0.344,
+   "ece_pts": 1.88,
+   "log_loss": 0.3851
+  }
+ }
+}
+   direction checks all pass: True
+done in 138s -> /shared/home/guillem.masdemont.serra/lauzhack-financial-twin/twin/world/world_model.json

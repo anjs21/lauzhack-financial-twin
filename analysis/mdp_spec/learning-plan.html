@@ -405,10 +405,10 @@ pre.code .c { color: var(--muted); }
     <div class="card">
       <div class="lbl2">Output</div>
       <p>Four heads in order: status (5) → housing (3) → spending (3) → assets (3), each masked to valid options.</p>
-      <p class="note">Status and housing are considered at a yearly review or right after an event; spending and assets every month.</p>
+      <p class="note">Status and housing are considered at the January review; spending and assets every month.</p>
     </div>
   </div>
-  <p class="callout"><b>The person can state intentions too</b>, each with a probability: "start a master's in September 2026, 60%" or "move somewhere cheaper if cash falls below two months". Each adds to the logit of the matching option.</p>
+  <p class="callout"><b>The person can state intentions too</b>, each with a probability: "start a master's in January 2026, 60%" or "move somewhere cheaper if cash falls below two months". An eligible plan overrides the sampled choice with its stated probability. An off-cycle work or housing plan waits for the next January review.</p>
   <div class="tablewrap">
     <table class="steps stack">
       <thead><tr><th></th><th>Stage</th><th>What</th><th>Why</th></tr></thead>

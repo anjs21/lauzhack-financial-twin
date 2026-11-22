@@ -1,0 +1,31 @@
+{
+  "profiles": 1200,
+  "months": 12,
+  "initially_negative": 33,
+  "first_new_shortfalls": 28,
+  "alert_threshold": 0.5,
+  "results": {
+    "frozen": {
+      "flow_crps": 409.61163895470025,
+      "closing_cash_mae": 1354.5023186287465,
+      "incident_brier": 0.0004540666136265008,
+      "alerts": 29,
+      "new_shortfalls_detected": 25
+    },
+    "balances": {
+      "flow_crps": 409.61163895470025,
+      "closing_cash_mae": 591.1167903760743,
+      "incident_brier": 0.00026137169101692466,
+      "alerts": 29,
+      "new_shortfalls_detected": 26
+    },
+    "balances_and_surplus": {
+      "flow_crps": 410.48575003177507,
+      "closing_cash_mae": 592.224969862201,
+      "incident_brier": 0.0002639121944163171,
+      "alerts": 29,
+      "new_shortfalls_detected": 26
+    }
+  },
+  "design": "2025-only model and offsets, flat drift, 200 paired draws. Incident alerts count at-risk person-months."
+}

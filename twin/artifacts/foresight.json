@@ -1,0 +1,351 @@
+{
+ "points": 2000,
+ "rollouts": 6,
+ "horizon": 60,
+ "scale_chf": 10000.0,
+ "mean_prob_change": {
+  "0.0": 8.423375885691087e-11,
+  "0.25": 0.10222084820270538,
+  "0.5": 0.1664416491985321,
+  "1.0": 0.24062897264957428
+ },
+ "median_option_value_range_chf": 133061.5987119045,
+ "levels": [
+  0.0,
+  0.25,
+  0.5,
+  1.0
+ ],
+ "held_out": [
+  {
+   "profile": "P01132",
+   "status": "self_employed",
+   "age": 23.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 0.018,
+     "shortfall_odds": 0.042,
+     "lasting_shortfall_odds": 0.034,
+     "median_final_net_worth": 715708.3708404878,
+     "mean_life_utility": 729011.0680583937,
+     "status_changes_per_year": 0.046,
+     "lifestyle_changes_per_year": 0.097,
+     "housing_moves_per_year": 0.011
+    },
+    "f=0": {
+     "high_goal_odds": 0.02,
+     "shortfall_odds": 0.032,
+     "lasting_shortfall_odds": 0.024,
+     "median_final_net_worth": 727575.8588596431,
+     "mean_life_utility": 750777.7105296914,
+     "status_changes_per_year": 0.0398,
+     "lifestyle_changes_per_year": 0.0986,
+     "housing_moves_per_year": 0.008799999999999999
+    },
+    "f=0.5": {
+     "high_goal_odds": 0.02,
+     "shortfall_odds": 0.028,
+     "lasting_shortfall_odds": 0.018,
+     "median_final_net_worth": 741614.3856973082,
+     "mean_life_utility": 758426.9977102793,
+     "status_changes_per_year": 0.0398,
+     "lifestyle_changes_per_year": 0.0984,
+     "housing_moves_per_year": 0.0112
+    },
+    "f=1": {
+     "high_goal_odds": 0.016,
+     "shortfall_odds": 0.014,
+     "lasting_shortfall_odds": 0.01,
+     "median_final_net_worth": 749044.3987444933,
+     "mean_life_utility": 768072.5221258579,
+     "status_changes_per_year": 0.0374,
+     "lifestyle_changes_per_year": 0.0978,
+     "housing_moves_per_year": 0.0208
+    }
+   }
+  },
+  {
+   "profile": "P00283",
+   "status": "retired",
+   "age": 69.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 1.0,
+     "shortfall_odds": 0.0,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 414901.6473407475,
+     "mean_life_utility": 679528.470514234,
+     "status_changes_per_year": 0.0,
+     "lifestyle_changes_per_year": 0.0972,
+     "housing_moves_per_year": 0.0154
+    },
+    "f=0": {
+     "high_goal_odds": 1.0,
+     "shortfall_odds": 0.0,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 415598.11132177216,
+     "mean_life_utility": 679452.5341862899,
+     "status_changes_per_year": 0.0012000000000000001,
+     "lifestyle_changes_per_year": 0.0958,
+     "housing_moves_per_year": 0.0152
+    },
+    "f=0.5": {
+     "high_goal_odds": 1.0,
+     "shortfall_odds": 0.0,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 415598.11132177216,
+     "mean_life_utility": 679671.5751009863,
+     "status_changes_per_year": 0.0012000000000000001,
+     "lifestyle_changes_per_year": 0.0954,
+     "housing_moves_per_year": 0.0154
+    },
+    "f=1": {
+     "high_goal_odds": 1.0,
+     "shortfall_odds": 0.0,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 417027.08465651656,
+     "mean_life_utility": 680779.9731423078,
+     "status_changes_per_year": 0.0038,
+     "lifestyle_changes_per_year": 0.096,
+     "housing_moves_per_year": 0.015
+    }
+   }
+  },
+  {
+   "profile": "P00514",
+   "status": "retired",
+   "age": 67.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 0.004,
+     "shortfall_odds": 0.986,
+     "lasting_shortfall_odds": 0.984,
+     "median_final_net_worth": -88675.51616494224,
+     "mean_life_utility": 17760.645259899855,
+     "status_changes_per_year": 0.0004,
+     "lifestyle_changes_per_year": 0.1526,
+     "housing_moves_per_year": 0.0762
+    },
+    "f=0": {
+     "high_goal_odds": 0.03,
+     "shortfall_odds": 0.946,
+     "lasting_shortfall_odds": 0.946,
+     "median_final_net_worth": -93697.61927394496,
+     "mean_life_utility": 30545.122770319627,
+     "status_changes_per_year": 0.0026,
+     "lifestyle_changes_per_year": 0.1498,
+     "housing_moves_per_year": 0.073
+    },
+    "f=0.5": {
+     "high_goal_odds": 0.044,
+     "shortfall_odds": 0.88,
+     "lasting_shortfall_odds": 0.876,
+     "median_final_net_worth": -69370.09346267713,
+     "mean_life_utility": 54303.72641551289,
+     "status_changes_per_year": 0.0034000000000000002,
+     "lifestyle_changes_per_year": 0.1482,
+     "housing_moves_per_year": 0.10200000000000001
+    },
+    "f=1": {
+     "high_goal_odds": 0.12,
+     "shortfall_odds": 0.768,
+     "lasting_shortfall_odds": 0.756,
+     "median_final_net_worth": -37443.78700461621,
+     "mean_life_utility": 97051.15558362406,
+     "status_changes_per_year": 0.008799999999999999,
+     "lifestyle_changes_per_year": 0.1396,
+     "housing_moves_per_year": 0.1246
+    }
+   }
+  },
+  {
+   "profile": "P00401",
+   "status": "unemployed",
+   "age": 34.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 0.002,
+     "shortfall_odds": 0.264,
+     "lasting_shortfall_odds": 0.226,
+     "median_final_net_worth": 216036.91153193428,
+     "mean_life_utility": 196091.81725700584,
+     "status_changes_per_year": 0.15960000000000002,
+     "lifestyle_changes_per_year": 0.1016,
+     "housing_moves_per_year": 0.0158
+    },
+    "f=0": {
+     "high_goal_odds": 0.002,
+     "shortfall_odds": 0.222,
+     "lasting_shortfall_odds": 0.182,
+     "median_final_net_worth": 248157.3794433115,
+     "mean_life_utility": 217198.4130294388,
+     "status_changes_per_year": 0.18180000000000002,
+     "lifestyle_changes_per_year": 0.10300000000000001,
+     "housing_moves_per_year": 0.0214
+    },
+    "f=0.5": {
+     "high_goal_odds": 0.002,
+     "shortfall_odds": 0.104,
+     "lasting_shortfall_odds": 0.082,
+     "median_final_net_worth": 286639.98315362865,
+     "mean_life_utility": 255815.93387500782,
+     "status_changes_per_year": 0.1716,
+     "lifestyle_changes_per_year": 0.0988,
+     "housing_moves_per_year": 0.0236
+    },
+    "f=1": {
+     "high_goal_odds": 0.002,
+     "shortfall_odds": 0.054,
+     "lasting_shortfall_odds": 0.046,
+     "median_final_net_worth": 313087.0888379962,
+     "mean_life_utility": 277091.77310036117,
+     "status_changes_per_year": 0.15860000000000002,
+     "lifestyle_changes_per_year": 0.0958,
+     "housing_moves_per_year": 0.024399999999999998
+    }
+   }
+  },
+  {
+   "profile": "P01130",
+   "status": "employed",
+   "age": 42.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 0.26,
+     "shortfall_odds": 0.038,
+     "lasting_shortfall_odds": 0.034,
+     "median_final_net_worth": 155381.73844236613,
+     "mean_life_utility": 221936.66234373374,
+     "status_changes_per_year": 0.0288,
+     "lifestyle_changes_per_year": 0.0972,
+     "housing_moves_per_year": 0.0086
+    },
+    "f=0": {
+     "high_goal_odds": 0.274,
+     "shortfall_odds": 0.036,
+     "lasting_shortfall_odds": 0.032,
+     "median_final_net_worth": 157498.15889369816,
+     "mean_life_utility": 224698.41745819506,
+     "status_changes_per_year": 0.033800000000000004,
+     "lifestyle_changes_per_year": 0.0968,
+     "housing_moves_per_year": 0.0154
+    },
+    "f=0.5": {
+     "high_goal_odds": 0.306,
+     "shortfall_odds": 0.02,
+     "lasting_shortfall_odds": 0.016,
+     "median_final_net_worth": 165708.27210236294,
+     "mean_life_utility": 236114.45585812783,
+     "status_changes_per_year": 0.0348,
+     "lifestyle_changes_per_year": 0.0986,
+     "housing_moves_per_year": 0.027200000000000002
+    },
+    "f=1": {
+     "high_goal_odds": 0.362,
+     "shortfall_odds": 0.014,
+     "lasting_shortfall_odds": 0.01,
+     "median_final_net_worth": 180085.6026717705,
+     "mean_life_utility": 253131.06600160082,
+     "status_changes_per_year": 0.0328,
+     "lifestyle_changes_per_year": 0.1022,
+     "housing_moves_per_year": 0.048799999999999996
+    }
+   }
+  },
+  {
+   "profile": "P00001",
+   "status": "student",
+   "age": 20.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 0.976,
+     "shortfall_odds": 0.824,
+     "lasting_shortfall_odds": 0.748,
+     "median_final_net_worth": 802024.8997425886,
+     "mean_life_utility": 788771.5078012038,
+     "status_changes_per_year": 0.11599999999999999,
+     "lifestyle_changes_per_year": 0.182,
+     "housing_moves_per_year": 0.08940000000000001
+    },
+    "f=0": {
+     "high_goal_odds": 0.984,
+     "shortfall_odds": 0.81,
+     "lasting_shortfall_odds": 0.73,
+     "median_final_net_worth": 833242.3423296262,
+     "mean_life_utility": 834694.2469533228,
+     "status_changes_per_year": 0.1082,
+     "lifestyle_changes_per_year": 0.1796,
+     "housing_moves_per_year": 0.0716
+    },
+    "f=0.5": {
+     "high_goal_odds": 0.988,
+     "shortfall_odds": 0.758,
+     "lasting_shortfall_odds": 0.664,
+     "median_final_net_worth": 874875.5197275166,
+     "mean_life_utility": 853751.0602576153,
+     "status_changes_per_year": 0.11839999999999999,
+     "lifestyle_changes_per_year": 0.1752,
+     "housing_moves_per_year": 0.0772
+    },
+    "f=1": {
+     "high_goal_odds": 0.992,
+     "shortfall_odds": 0.652,
+     "lasting_shortfall_odds": 0.55,
+     "median_final_net_worth": 863260.2048251198,
+     "mean_life_utility": 859386.2971054402,
+     "status_changes_per_year": 0.13040000000000002,
+     "lifestyle_changes_per_year": 0.162,
+     "housing_moves_per_year": 0.0738
+    }
+   }
+  },
+  {
+   "profile": "P00003",
+   "status": "employed",
+   "age": 58.0,
+   "levels": {
+    "rules": {
+     "high_goal_odds": 0.936,
+     "shortfall_odds": 0.014,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 1023965.5482403903,
+     "mean_life_utility": 1349381.6707227353,
+     "status_changes_per_year": 0.1782,
+     "lifestyle_changes_per_year": 0.0982,
+     "housing_moves_per_year": 0.0224
+    },
+    "f=0": {
+     "high_goal_odds": 0.968,
+     "shortfall_odds": 0.01,
+     "lasting_shortfall_odds": 0.002,
+     "median_final_net_worth": 1052509.037230147,
+     "mean_life_utility": 1392700.850489575,
+     "status_changes_per_year": 0.1754,
+     "lifestyle_changes_per_year": 0.0892,
+     "housing_moves_per_year": 0.022600000000000002
+    },
+    "f=0.5": {
+     "high_goal_odds": 0.992,
+     "shortfall_odds": 0.008,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 1161107.4540474159,
+     "mean_life_utility": 1500642.7865489302,
+     "status_changes_per_year": 0.1568,
+     "lifestyle_changes_per_year": 0.08940000000000001,
+     "housing_moves_per_year": 0.0216
+    },
+    "f=1": {
+     "high_goal_odds": 0.996,
+     "shortfall_odds": 0.004,
+     "lasting_shortfall_odds": 0.0,
+     "median_final_net_worth": 1271835.3599900273,
+     "mean_life_utility": 1570636.789933259,
+     "status_changes_per_year": 0.1264,
+     "lifestyle_changes_per_year": 0.0908,
+     "housing_moves_per_year": 0.024
+    }
+   }
+  }
+ ],
+ "seconds": 104.2
+}
