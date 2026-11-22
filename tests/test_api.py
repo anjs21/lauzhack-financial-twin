@@ -5,6 +5,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+pytest.importorskip("fastapi")
+pytest.importorskip("httpx")
 from fastapi.testclient import TestClient
 
 from twin import api
@@ -133,3 +135,14 @@ def test_busy_laptop_returns_retryable_error(client, payload):
     finally:
         api.capacity.release()
         api.capacity.release()
+
+
+def test_housing_intervention_respects_existing_model_limits(payload):
+    payload["scenario"] = {"kind": "cheaper_home"}
+    payload["person"]["household_type"] = "family"
+    result = api.run_projection(api.SessionRequest(**payload))
+    assert result["alternative"] is not None
+    payload["person"]["household_type"] = "shared_housing"
+    with pytest.raises(api.HTTPException) as error:
+        api.run_projection(api.SessionRequest(**payload))
+    assert error.value.status_code == 422

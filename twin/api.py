@@ -163,7 +163,7 @@ def run_projection(request: SessionRequest):
     kind = request.scenario.kind
     if kind == "part_time" and request.person.age >= model.pr["jobs"]["forced_retirement_age"]:
         raise HTTPException(422, "A part-time offer is unavailable at or beyond the model's retirement age.")
-    if kind == "cheaper_home" and request.person.household_type in ("shared_housing", "family"):
+    if kind == "cheaper_home" and request.person.household_type == "shared_housing":
         raise HTTPException(422, "This household is already at the model's minimum housing tier.")
     baseline = simulate(model, people, persona, request.n_paths, C.SEED)
     result = dict(person=request.person.model_dump(), traits=persona.traits, scenario=request.scenario.model_dump(),

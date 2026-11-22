@@ -4,6 +4,9 @@ React + TypeScript + Vite frontend for Vercel. All simulation and LLM work runs 
 `twin/api.py` on your laptop. The browser connects directly to FastAPI over HTTPS.
 No Python model, provider credentials, or private persona data is deployed to Vercel.
 
+Deployment destination is pending selection of the intended Vercel workspace.
+Do not deploy this project to Loki. Git-based automatic deployment is not configured.
+
 ## Run locally
 
 From the repository root:
@@ -53,6 +56,11 @@ Do not enter your provider API key into the website.
 
 3. Add the actual Vercel origin to `TWIN_ALLOWED_ORIGINS` in your laptop’s `.env`.
    Keep the localhost entries if you still use the local UI. Restart FastAPI after changes.
+
+   ```dotenv
+   TWIN_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://YOUR-APP.vercel.app
+   ```
+
 4. In the Vercel UI, choose **Connect workspace** and enter the HTTPS tunnel URL
    and `TWIN_API_KEY`. The key is held only in tab memory and cleared by a page reload.
 5. Build your persona, select a possibility, and choose **Explore this path**.
