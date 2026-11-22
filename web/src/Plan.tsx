@@ -118,7 +118,7 @@ export function NudgeForm({ busy, locked, outdated, onNudge, onReset }: { busy: 
   </form>;
 }
 
-export function WishesForm({ busy, disabled, onPlan, onCancel }: { busy: boolean; disabled: boolean; onPlan: (wishes: string) => void; onCancel?: () => void }) {
+export function WishesForm({ busy, disabled, onPlan, onCancel, cancelLabel = 'Back to the example' }: { busy: boolean; disabled: boolean; onPlan: (wishes: string) => void; onCancel?: () => void; cancelLabel?: string }) {
   const [wishes, setWishes] = useState('');
   return <form className="plan-form" onSubmit={e => { e.preventDefault(); onPlan(wishes.trim()); }}>
     <label htmlFor="wishes">In your own words, what are your plans?</label>
@@ -126,7 +126,7 @@ export function WishesForm({ busy, disabled, onPlan, onCancel }: { busy: boolean
       placeholder="For example: a master’s next year, then full-time work and a bigger flat. If money gets tight I’d cut back rather than sell investments." />
     <p className="note">Your twin writes this as yearly steps for 2025–2034, with fallbacks, and tests it in 300 simulated lives. Leave it empty to let your twin guess from your persona. Your words and persona (not your name) go to your LLM provider.</p>
     <div className="plan-actions">
-      {onCancel && <button type="button" className="text-button" disabled={disabled} onClick={onCancel}>Back to the example</button>}
+      {onCancel && <button type="button" className="text-button" disabled={disabled} onClick={onCancel}>{cancelLabel}</button>}
       <button className="primary small" disabled={disabled}>{busy ? <><LoaderCircle className="spin" size={15} />Planning…</> : <><PenLine size={15} />Make my plan</>}</button>
     </div>
   </form>;
