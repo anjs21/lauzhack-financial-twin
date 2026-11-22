@@ -12,6 +12,7 @@ from .world.flow import SCALE, features
 class Timeline:
     offers: dict = field(default_factory=dict)         # month -> (work mode, net CHF[, alongside studies])
     observations: dict = field(default_factory=dict)   # consecutive month ends
+    events: dict = field(default_factory=dict)         # month -> life events imposed then (what-if branches)
 
 
 def observed_month(world, s, observation, offer, count, bias):

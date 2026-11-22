@@ -85,6 +85,7 @@ class Step:
     min_age: float | None = None
     max_age: float | None = None
     repeat: bool = False               # act at every review where it applies, not just once
+    why: str | None = None             # the planner's reason, in the person's voice (shown to the user)
 
     @property
     def contingent(self):
@@ -253,10 +254,14 @@ def _parse_step(r, i) -> tuple[Step | None, list[str]]:
     repeat = r.get("repeat", False)
     if not isinstance(repeat, bool):
         errors.append(f"{where}: repeat must be true or false")
+    why = r.get("why")
+    if why is not None and not isinstance(why, str):
+        errors.append(f"{where}: why must be one sentence of text")
     if errors:
         return None, errors
     return Step(id=sid, label=str(label)[:80], head=head, option=option, start=start, until=until,
-                commitment=float(commitment), after=after, event=event, repeat=repeat, **nums), []
+                commitment=float(commitment), after=after, event=event, repeat=repeat,
+                why=why.strip()[:240] or None if why else None, **nums), []
 
 
 def _has_cycle(steps):
@@ -277,7 +282,7 @@ def diff(old: LifePlan, new: LifePlan) -> dict:
     changed = []
     for sid in o.keys() & n.keys():
         a, b = asdict(o[sid]), asdict(n[sid])
-        fields_changed = {k: [a[k], b[k]] for k in a if a[k] != b[k]}
+        fields_changed = {k: [a[k], b[k]] for k in a if a[k] != b[k] and k != "why"}   # rewording is no change
         if fields_changed:
             changed.append({"id": sid, "label": n[sid].label, "fields": fields_changed})
     return {"added": [n[s].describe() for s in n if s not in o],

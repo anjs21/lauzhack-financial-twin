@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const example = JSON.parse(readFileSync(new URL('../src/example.json', import.meta.url), 'utf8'));
 const examplePlan = JSON.parse(readFileSync(new URL('../src/example-plan.json', import.meta.url), 'utf8'));
+const exampleExplanation = JSON.parse(readFileSync(new URL('../src/example-explanation.json', import.meta.url), 'utf8'));
 const [draft, nudged] = examplePlan.history;
 const KEY = 'test-workspace-key-not-a-real-secret';
 
@@ -14,23 +15,41 @@ async function connect(page: Page) {
   await expect(page.getByRole('dialog')).not.toBeVisible();
 }
 
+
+/** The landing page opens on the person alone; the cue (or any scroll down) brings in the choices. */
+async function open(page: Page) {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Choose what to explore' }).click();
+}
+
 test('the example plan shows its steps, how often they happen and what a nudge changed', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('/');
+  await open(page);
+  await page.getByRole('button', { name: 'See an example' }).click();
   const plan = page.getByRole('region', { name: 'Your plan' });
-  await expect(plan.getByRole('heading', { name: 'Mia’s plan' })).toBeVisible();
+  await expect(plan.getByRole('heading', { name: 'P0067’s plan' })).toBeVisible();
   await expect(plan.getByText(/^Example · Version 2 · /)).toBeVisible();
   await expect(plan.getByText(nudged.plan.narrative)).toBeVisible();
   await expect(plan.getByRole('heading', { name: /What changed/ })).toBeVisible();
   await expect(plan.getByText(`“${nudged.said}”`)).toBeVisible();
   for (const step of nudged.plan.steps) await expect(plan.getByText(step.label, { exact: true })).toBeVisible();
+  // Reasons, outcomes and the planner's working are one tap away.
+  await expect(plan.getByText(/^did it \d+%/)).toHaveCount(0);
+  await plan.getByRole('button', { name: /^Show details/ }).click();
+  for (const step of nudged.plan.steps)
+    if (step.why) await expect(plan.getByText(step.why, { exact: true })).toBeVisible();       // the planner's reason
+  await expect(plan.getByText(/^did it \d+%/).first()).toBeVisible();                        // what happened in the lives
+  await expect(plan.getByRole('heading', { name: 'Your twin’s reasoning' })).toBeVisible();
+  await expect(plan.getByText(/go_full_time|cheaper_if_short/)).toHaveCount(0);                // ids read as words
+  await plan.getByText('How your twin worked this out').click();
+  await expect(plan.getByText(`Round ${nudged.rounds.length}`, { exact: true })).toBeVisible();
   for (const step of draft.plan.steps.filter((s: { id: string }) => !nudged.plan.steps.some((n: { id: string }) => n.id === s.id)))
     await expect(plan.getByText(`Dropped: ${step.label}`)).toBeVisible();
   await plan.getByRole('button', { name: 'Make my own plan' }).click();
   await expect(plan.getByLabel('In your own words, what are your plans?')).toBeVisible();
   await plan.getByRole('button', { name: 'Back to the example' }).click();
-  await expect(plan.getByRole('heading', { name: 'Mia’s plan' })).toBeVisible();
+  await expect(plan.getByRole('heading', { name: 'P0067’s plan' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: `/tmp/parallel-plan-${test.info().project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);
@@ -40,6 +59,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
   const sessions: Record<string, unknown>[] = [];
   const planRequests: { url: string; body: Record<string, unknown> }[] = [];
   let polls = 0, version: typeof draft | null = null;
+  const explanations: string[] = [];
   await page.route('http://127.0.0.1:8000/**', async route => {
     const request = route.request();
     const url = request.url();
@@ -48,6 +68,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
     let json: unknown = {};
     let status = 200;
     if (url.endsWith('/health')) json = { status: 'ok', llm_ready: true };
+    else if (url.endsWith('/explanation')) { explanations.push(url); json = { ...exampleExplanation, paths: 1000 }; }
     else if (request.method() === 'DELETE') json = { deleted: true };
     else if (url.endsWith('/plans') || url.endsWith('/nudges')) {
       planRequests.push({ url, body: request.postDataJSON() });
@@ -62,14 +83,14 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
       const body = request.postDataJSON();
       sessions.push(body);
       const plan = body.plan_id ? { narrative: version!.plan.narrative, spontaneity: .3, steps: [], carried_out: version!.evaluation.steps } : undefined;
-      json = { session_id: `s${sessions.length}`, evidence: { ...example, scenario: body.scenario, deliberate: body.deliberate, plan }, answer: `Explained run ${sessions.length}.` };
+      json = { session_id: `s${sessions.length}`, evidence: { ...example, scenario: body.scenario, plan }, answer: `Explained run ${sessions.length}.` };
     }
     await route.fulfill({ status, json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await connect(page);
   const plan = page.getByRole('region', { name: 'Your plan' });
-  await plan.getByRole('button', { name: 'Make my own plan' }).click();
+  await page.getByRole('button', { name: 'Make my own plan' }).click();      // from the landing screen
   await plan.getByLabel('In your own words, what are your plans?').fill(draft.said);
   await plan.getByRole('button', { name: 'Make my plan' }).click();
   await expect(plan.getByText('Round 2 of up to 4: testing it in 300 lives')).toBeVisible();
@@ -79,6 +100,13 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
   expect(sessions[0].plan_id).toBe('p1');
   expect(String(sessions[0].question)).toContain('my plan');
   await expect(page.getByText('· following your plan', { exact: false })).toBeVisible();
+  // The "Plan explained" tab runs the analysis on the laptop for this session, once.
+  await page.getByRole('tab', { name: 'Plan explained' }).click();
+  await expect(page.getByRole('heading', { name: 'From plan to outcomes' })).toBeVisible();
+  await page.getByRole('tab', { name: 'Paths' }).click();
+  await page.getByRole('tab', { name: 'Plan explained' }).click();
+  expect(explanations).toEqual(['http://127.0.0.1:8000/sessions/s1/explanation']);
+  await page.getByRole('tab', { name: 'Paths' }).click();
   const follow = page.getByRole('switch', { name: 'Follow my plan' });
   await expect(follow).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
@@ -121,10 +149,10 @@ test('a failed planning job reports the error and keeps the form', async ({ page
       : { status: 'failed', progress: '', error: 'The planner did not produce a usable plan. Try again, or say more about your plans.', latest: null, versions: [] };
     await route.fulfill({ status: url.endsWith('/plans') ? 202 : 200, json, headers: { 'access-control-allow-origin': '*' } });
   });
-  await page.goto('/');
+  await open(page);
   await connect(page);
   const plan = page.getByRole('region', { name: 'Your plan' });
-  await plan.getByRole('button', { name: 'Make my own plan' }).click();
+  await page.getByRole('button', { name: 'Make my own plan' }).click();      // from the landing screen
   await plan.getByRole('button', { name: 'Make my plan' }).click();
   await expect(page.getByRole('alert')).toContainText('did not produce a usable plan');
   await expect(plan.getByRole('button', { name: 'Make my plan' })).toBeEnabled();

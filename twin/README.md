@@ -209,7 +209,7 @@ planner's progress, and sees the plan as steps with the year each usually happen
 lives where it does, fallbacks, and warnings for steps the world blocks or turns down. "Something
 changed?" sends a nudge and shows what changed. A new plan or version is explored right away; the
 "Follow my plan" switch compares with habits alone. The example page shows a real planner run for
-Mia (`web/src/example-plan.json`, regenerate with `python -m twin.plan.make_example`).
+P0067 (`web/src/example-plan.json`, regenerate with `python -m twin.plan.make_example`).
 
 ## Explorer output
 

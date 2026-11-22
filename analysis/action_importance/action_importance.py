@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Forward-looking action-importance screen for the Financial Twin MDP.
 
-Complements ../analyze_mdp.py (descriptive replays of the recorded ledger) and
-../mdp_design.json (accounting contract). This script:
+Follows the accounting contract in ../mdp_design.json. This script:
 
 1. Decodes how the synthetic monthly cash flows were generated
    (income, rent, flat living costs, seasonal bills, December bonus, shocks).
@@ -54,7 +53,7 @@ SC = {s: i for i, s in enumerate(STATUS)}
 A = dict(
     invest_return=0.04,          # illustrative return used in docs/financial-concepts.md
     invest_vol=0.10,             # balanced-portfolio volatility
-    loan_term=60,                # same 60-month annuity as ../analyze_mdp.py
+    loan_term=60,                # 60-month annuity
     rate_floor=0.01,
     overdraft_rate=0.08,         # interest on negative cash; without it overdraft is free and exploitable
     job_search_months=3,

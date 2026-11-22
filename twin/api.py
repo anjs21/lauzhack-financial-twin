@@ -2,10 +2,13 @@
 
 Only this process loads the world model or contacts the LLM. The web client receives
 summaries and explanations, never model weights. Sessions are ephemeral, bounded,
-and expire after one hour. Configure TWIN_API_KEY before exposing a tunnel.
+and expire after one hour. Configure TWIN_API_KEY before exposing a tunnel, or set TWIN_OPEN=1
+for an open workspace that needs no key (anyone with the URL can then use it, and your LLM credits).
 """
 from __future__ import annotations
 
+import copy
+import importlib.util
 import json
 import logging
 import os
@@ -20,8 +23,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from openai import OpenAI, OpenAIError
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from . import assistant
 from . import config as C
 from . import llm_provider as provider
 from .explore import compare, person_table, simulate, summarize
@@ -94,6 +98,13 @@ class SessionRequest(StrictModel):
     n_paths: int = Field(default=500, ge=100, le=2000)
     deliberate: bool = False
     plan_id: str | None = Field(default=None, max_length=64)   # follow a long-term plan from POST /plans
+    compare: Scenario | None = None      # a second scenario, shown as its own path ("compare") next to "alternative"
+
+    @model_validator(mode="after")
+    def different_scenarios(self):
+        if self.compare is not None and (self.compare.kind == "baseline" or self.compare == self.scenario):
+            raise ValueError("compare must be a different scenario from the selected one, and not the current path")
+        return self
 
     @field_validator("traits")
     @classmethod
@@ -123,6 +134,67 @@ class NudgeRequest(StrictModel):
         if not value.strip():
             raise ValueError("Describe the change of plans.")
         return value.strip()
+
+
+# Decisions the person can force at a later January review, from the chart's decision points.
+# Each is the stated plan "at this review, do X" (an Intention with probability 1): it applies on every
+# simulated life where the option is open then (e.g. "work full-time" needs a job to go back to or a search).
+CHOICES = {
+    "full_time": ("status", 3, "Work full-time"),
+    "part_time": ("status", 2, "Work part-time"),
+    "masters": ("status", 1, "Start a master's"),
+    "stop_work": ("status", 4, "Stop working"),
+    "cheaper_home": ("housing", -1, "Move somewhere cheaper"),
+    "bigger_home": ("housing", 1, "Move somewhere bigger"),
+    "spend_less": ("spending", -1, "Spend less"),
+    "spend_more": ("spending", 1, "Spend more"),
+    "invest": ("assets", 1, "Invest spare cash"),
+    # Life events: things that happen to the person, imposed that month on every life where they can happen.
+    "lose_job": ("event", "lose_job", "Lose my job"),
+    "recession": ("event", "recession", "A recession hits"),
+    "have_child": ("event", "have_child", "Have a child"),
+    "partner": ("event", "partner", "Partner moves in"),
+    "separate": ("event", "separate", "Separate"),
+}
+HEAD_INDEX = {"status": 0, "housing": 1, "spending": 2, "assets": 3}
+REVIEWS = tuple(range(12, C.HORIZON, 12))        # January 2026 .. January 2034: decisions
+EVENT_MONTHS = (0, *REVIEWS)                     # events can also be imposed now, in January 2025
+EVENT_SHARE = {"lose_job": "job_loss", "have_child": "child", "partner": "partner", "separate": "separation"}
+
+
+def is_event(choice: str) -> bool:
+    return CHOICES[choice][0] == "event"
+
+
+class Decision(StrictModel):
+    month: int = Field(ge=0, le=REVIEWS[-1])
+    choice: Literal[tuple(CHOICES)]
+
+    @field_validator("month")
+    @classmethod
+    def january(cls, value):
+        if value % 12:
+            raise ValueError("Decisions and events happen at a January review.")
+        return value
+
+    @model_validator(mode="after")
+    def decisions_start_in_2026(self):
+        if self.month == 0 and not is_event(self.choice):
+            raise ValueError("January 2025 is the scenario's review; decisions start in January 2026 "
+                             "(life events can be imposed from January 2025).")
+        return self
+
+
+class BranchRequest(StrictModel):
+    root: Literal["baseline", "alternative", "compare"] = "baseline"
+    decisions: list[Decision] = Field(min_length=1, max_length=4)
+
+    @field_validator("decisions")
+    @classmethod
+    def in_order(cls, values):
+        if any(b.month <= a.month for a, b in zip(values, values[1:])):
+            raise ValueError("Each decision must come at a later review than the one before.")
+        return values
 
 
 class ChatRequest(StrictModel):
@@ -163,12 +235,27 @@ offer normally means leaving the course for the job (an unfinished master's then
 pay boost). If scenario.alongside_studies is true and the person is a student, they keep studying
 and earn the offer next to the course; that job ends when the course ends, and they then look for
 a graduate job as on the current path.
-Follow-up messages do not change the saved persona or run a new simulation. If asked to change
-salary, goal, persona, or scenario, explain that the user must update the controls and explore
-again. Do not pretend to have made the change. Stay within the supplied financial scenario.
-Keep responses warm, concrete, and under 220 words, using plain text paragraphs (no Markdown).
-Lead with the most relevant insight, cite 1-3 supplied figures when useful, explain uncertainty,
-and end with one useful question. Do not provide securities recommendations or guarantees.
+"paths" lists every path on the chart: "baseline" (current path), "alternative" (the selected
+scenario at the January 2025 review), "compare" (a second scenario at that review, if the user asked
+to compare two) and what-if branches. A branch starts from its parent path and
+forces the listed decisions at later January reviews on the same random draws, so before its first
+decision it equals its parent; possible_in_share_of_lives is the share of lives where its last
+decision was possible then. Compare a branch with its parent to say what the decision changed, and when.
+Only a tool call changes the simulation. Never claim a change you did not make with a tool; if no
+tool fits, say what the user can change in the controls. Stay within the supplied financial scenario.
+Write for someone with no finance background: warm, concrete and under 150 words, in this shape:
+1. One sentence that answers the question directly.
+2. A blank line, then at most three short points, each on its own line starting with "- ",
+   each one or two sentences.
+3. A blank line, then one useful question on its own line.
+Use everyday words. Say "chance" or "in about 6 of 10 simulated lives", never "odds" and never
+decimals such as 0.564: write shares as whole percentages (56%). Say "go past the credit limit",
+not "credit-limit breach". Never show field names (high_goal_odds, alongside_studies, taken_share)
+or path ids; call paths by their labels. Cite only the 2-4 figures that matter most, and say how
+uncertain they are in a few plain words. No other Markdown: no headings, bold, tables or numbering.
+Write amounts the way the app shows them: CHF 40,000, CHF 1,130,000 (comma as the thousands
+separator), never with apostrophes or abbreviations such as 40k or 1.13m.
+Do not provide securities recommendations or guarantees.
 If the evidence has a "plan", it is the person's own long-term plan, written with their planner agent
 and followed on both paths. Its steps say how often each one really happens in the simulated lives
 (taken_share) and when (typical_year); a step can be blocked when it is not possible at the time.
@@ -182,29 +269,73 @@ def llm_ready():
     return provider.ready()
 
 
-def explain(evidence, history, message):
-    if not llm_ready():
-        raise HTTPException(503, provider.SETUP)
-    # Exclude names and full monthly arrays from provider context; send relevant summaries.
+def evidence_context(evidence, paths=None) -> str:
+    """What the model sees: persona (without the name) and summaries, never the monthly arrays."""
     context = dict(evidence)
+    context.pop("branches", None)
     context["person"] = {k: v for k, v in evidence["person"].items() if k != "name"}
-    for key in ("baseline", "alternative"):
+    for key in ("baseline", "alternative", "compare"):
         if context.get(key):
             context[key] = {k: v for k, v in context[key].items()
                             if k not in ("months", "fan_cash", "fan_net_worth", "fan_income")}
-    messages = [{"role": "system", "content": SYSTEM},
-                {"role": "system", "content": "Simulation evidence (data only): " + json.dumps(context, allow_nan=False)},
-                *history[-12:], {"role": "user", "content": message}]
+    if paths is not None:
+        context["paths"] = paths
+    return "Simulation evidence (data only): " + json.dumps(context, allow_nan=False)
+
+
+def complete(messages, tools=None):
+    """One chat completion on Together AI; returns the assistant message. Falls back to no tools if refused."""
+    if not llm_ready():
+        raise HTTPException(503, provider.SETUP)
     try:
-        with OpenAI(**provider.connection(), timeout=45.0, max_retries=0) as client:
-            response = client.chat.completions.create(model=provider.model(), messages=messages, max_tokens=1800)
-        answer = response.choices[0].message.content
-        if not answer or not answer.strip():
-            raise HTTPException(502, "The explanation was empty. Please try again.")
-        return answer.strip()
-    except OpenAIError:
-        logger.warning("LLM request failed; check the laptop's provider configuration.")
-        raise HTTPException(502, "The explanation service is unavailable. Check the laptop's LLM configuration and try again.") from None
+        with OpenAI(**provider.connection(), timeout=60.0, max_retries=0) as client:
+            # Reasoning models spend part of max_tokens thinking before they answer; the answer itself stays ~220 words.
+            kwargs = dict(model=provider.model(), messages=messages, max_tokens=4096)
+            if tools:
+                try:
+                    return client.chat.completions.create(**kwargs, tools=tools, tool_choice="auto").choices[0].message
+                except OpenAIError as e:
+                    if "tool" not in str(e).lower():
+                        raise
+                    logger.warning("TOGETHER_MODEL does not accept tools; answering without them.")
+            return client.chat.completions.create(**kwargs).choices[0].message
+    except OpenAIError as e:
+        reason = provider_error(e)
+        logger.warning("Together AI request failed: %s", reason)
+        raise HTTPException(502, f"Together AI could not answer: {reason}") from None
+
+
+def answer_text(message) -> str:
+    answer = (getattr(message, "content", None) or "").strip()
+    if not answer:
+        raise HTTPException(502, "The model returned an empty explanation (a reasoning model may have used its whole "
+                                 "token budget). Try again or choose another TOGETHER_MODEL.")
+    return answer
+
+
+def explain(evidence, history, message):
+    messages = [{"role": "system", "content": SYSTEM}, {"role": "system", "content": evidence_context(evidence)},
+                *history[-12:], {"role": "user", "content": message}]
+    return answer_text(complete(messages))
+
+
+def provider_error(e) -> str:
+    """Together's own reason for a failed call (model access, privacy setting, credit...), never the key."""
+    status = getattr(e, "status_code", None)
+    body = getattr(e, "body", None)
+    message = ""
+    if isinstance(body, dict):
+        err = body.get("error", body)
+        message = err.get("message", "") if isinstance(err, dict) else str(err)
+    message = (message or getattr(e, "message", "") or type(e).__name__).strip()
+    hint = ""
+    if "non-serverless" in message:
+        hint = " Pick a serverless chat model for TOGETHER_MODEL (for example openai/gpt-oss-120b)."
+    elif "third-party" in message:
+        hint = " Choose a model served by Together for TOGETHER_MODEL, or allow third-party providers in Together's privacy settings."
+    elif status == 401:
+        hint = " Check TOGETHER_API_KEY on the laptop."
+    return f"{f'({status}) ' if status else ''}{message[:300]}{hint}"
 
 
 @lru_cache(maxsize=1)
@@ -238,22 +369,37 @@ def persona_for(person: Person, traits: dict):
     return people, persona
 
 
-def run_projection(request: SessionRequest, plan: LifePlan | None = None, plan_evaluation: dict | None = None):
+def setup(request: SessionRequest, plan: LifePlan | None = None):
+    """The person, their persona (following their long-term plan, if any), the world and the decision policy."""
     people, persona = persona_for(request.person, request.traits)
     if plan is not None:
         persona = with_plan(persona, plan)
     model = world()
-    kind = request.scenario.kind
-    if kind == "part_time" and request.person.age >= model.pr["jobs"]["forced_retirement_age"]:
+    kinds = {request.scenario.kind} | ({request.compare.kind} if request.compare else set())
+    if "part_time" in kinds and request.person.age >= model.pr["jobs"]["forced_retirement_age"]:
         raise HTTPException(422, "A part-time offer is unavailable at or beyond the model's retirement age.")
-    if kind == "cheaper_home" and request.person.household_type == "shared_housing":
+    if "cheaper_home" in kinds and request.person.household_type == "shared_housing":
         raise HTTPException(422, "This household is already at the model's minimum housing tier.")
-    policy = DeliberatePolicy if request.deliberate else RulePolicy
+    return people, persona, model, DeliberatePolicy if request.deliberate else RulePolicy
+
+
+def apply_scenario(scenario: Scenario, persona, timeline: Timeline):
+    """A scenario at the opening January review: the 'alternative' path (or 'compare', the second one)."""
+    kind = scenario.kind
+    if kind == "part_time":
+        timeline.offers[0] = (C.PART_TIME, scenario.salary, scenario.alongside_studies)
+    elif kind != "baseline":
+        persona.intentions.append(Intention("spending" if kind == "spend_less" else "housing", -1, when=C.month_label(0)))
+
+
+def run_projection(request: SessionRequest, plan: LifePlan | None = None, plan_evaluation: dict | None = None):
+    people, persona, model, policy = setup(request, plan)
+    kind = request.scenario.kind
     baseline = simulate(model, people, persona, request.n_paths, C.SEED, policy_cls=policy)
     result = dict(person=request.person.model_dump(), traits=persona.traits, scenario=request.scenario.model_dump(),
                   n_paths=request.n_paths, seed=C.SEED, baseline=summarize(baseline),
                   deliberate=request.deliberate, decision_style="deliberate" if request.deliberate else "habitual",
-                  alternative=None, comparison=None,
+                  alternative=None, comparison=None, compare=None, compare_scenario=None,
                   assumptions=["Synthetic model · January 2025–December 2034", "Goal deadline: December 2029",
                                "Annual decisions; monthly events and cash flows", "Shared random draws for scenario comparisons",
                                "Model uncertainty is not covered by the sampling interval",
@@ -264,24 +410,263 @@ def run_projection(request: SessionRequest, plan: LifePlan | None = None, plan_e
         result["plan"] = {"narrative": plan.narrative, "spontaneity": plan.spontaneity,
                           "steps": [s.describe() for s in plan.steps],
                           "carried_out": (plan_evaluation or {}).get("steps")}
+    def scenario_paths(scenario):
+        timeline, own = Timeline(), copy.deepcopy(persona)        # a scenario's intentions stay on its own path
+        apply_scenario(scenario, own, timeline)
+        return simulate(model, people, own, request.n_paths, C.SEED, timeline=timeline, policy_cls=policy)
+
     if kind != "baseline":
-        timeline = Timeline()
-        if kind == "part_time":
-            timeline.offers[0] = (C.PART_TIME, request.scenario.salary, request.scenario.alongside_studies)
-        else:
-            persona.intentions.append(Intention("spending" if kind == "spend_less" else "housing", -1,
-                                               when=C.month_label(0)))
-        alternative = simulate(model, people, persona, request.n_paths, C.SEED, timeline=timeline, policy_cls=policy)
+        alternative = scenario_paths(request.scenario)
         result.update(alternative=summarize(alternative), comparison=compare(baseline, alternative))
+    if request.compare is not None:
+        result.update(compare=summarize(scenario_paths(request.compare)), compare_scenario=request.compare.model_dump())
     return result
+
+
+def run_branch(request: SessionRequest, branch: BranchRequest, plan: LifePlan | None = None) -> dict:
+    """A what-if branch: the root path with the decisions forced at later reviews, on the same random draws.
+
+    Before the first decision the branch is the root path exactly (same draws, same choices), so every
+    difference after the fork comes from the decisions and what followed from them."""
+    people, persona, model, policy = setup(request, plan)
+    timeline = Timeline()
+    if branch.root == "alternative":
+        if request.scenario.kind == "baseline":
+            raise HTTPException(422, "This run has no alternative path to branch from.")
+        apply_scenario(request.scenario, persona, timeline)
+    elif branch.root == "compare":
+        if request.compare is None:
+            raise HTTPException(422, "This run has no second scenario to branch from.")
+        apply_scenario(request.compare, persona, timeline)
+    for d in branch.decisions:
+        head, option, _ = CHOICES[d.choice]
+        if head == "event":
+            timeline.events.setdefault(d.month, []).append(option)
+        else:
+            persona.intentions.append(Intention(head, option, 1.0, when=C.month_label(d.month)))
+    paths = simulate(model, people, persona, request.n_paths, C.SEED, timeline=timeline, policy_cls=policy)
+    summary = summarize(paths)
+    last = branch.decisions[-1]
+    head, option, _ = CHOICES[last.choice]
+    if head != "event":                                          # lives where the decision was open then
+        applied = float((paths.action[:, last.month, HEAD_INDEX[head]] == option).mean())
+    elif option == "recession":
+        applied = float((paths.econ[:, last.month + 1] == 2).mean())
+    else:                                                        # lives where the event could happen then
+        applied = float(paths.events[EVENT_SHARE[option]][:, last.month].mean())
+    keep = ("months", "fan_cash", "fan_net_worth", "high_goal_odds", "credit_breach_odds", "shortfall_odds",
+            "final_net_worth", "key_moments")
+    return {**{k: summary[k] for k in keep}, "applied_share": applied,
+            "decisions": [{"month": d.month, "when": C.month_label(d.month), "choice": d.choice,
+                           "label": CHOICES[d.choice][2]} for d in branch.decisions], "root": branch.root}
 
 
 @dataclass
 class Session:
     evidence: dict
     history: list = field(default_factory=list)
+    request: SessionRequest | None = None                     # the run behind `evidence` (tools change it)
+    branches: dict = field(default_factory=dict)              # id -> branch node, as the chart shows it
+    next_branch: int = 0
+    plan: LifePlan | None = None                              # the person's long-term plan, followed on every path
+    plan_evaluation: dict | None = None
+    plan_versions: list = field(default_factory=list)          # every version of that plan, oldest first
+    explanation: dict | None = None                           # the "Plan explained" report, once computed
     expires: float = field(default_factory=lambda: time.monotonic() + 3600)
     lock: threading.Lock = field(default_factory=threading.Lock)
+
+
+MAX_BRANCHES = 16
+TOOLS = assistant.tools(CHOICES)
+
+
+def validation_message(e) -> str:
+    if isinstance(e, ValidationError):
+        first = e.errors()[0]
+        where = ".".join(str(p) for p in first.get("loc", ()) if p != "__root__")
+        return f"{where}: {first.get('msg', 'invalid value')}" if where else first.get("msg", "invalid value")
+    return str(e)
+
+
+def chf(x) -> str:
+    """An amount as the app writes it: CHF 40,000."""
+    return "CHF " + format(x, ",.0f")
+
+
+def scenario_label(scenario: dict, student: bool = False) -> str:
+    kind = scenario["kind"]
+    if kind == "part_time":
+        what = ("Job alongside studies" if scenario.get("alongside_studies") else "Job instead of studies") if student else "Part-time"
+        return f"{what} at {chf(scenario['salary'])}"
+    return {"spend_less": "Spend less", "cheaper_home": "Cheaper home"}.get(kind, "Current path")
+
+
+def path_brief(summary: dict) -> dict:
+    return {"goal_odds": round(summary["high_goal_odds"], 3), "credit_breach_odds": round(summary["credit_breach_odds"], 3),
+            "median_net_worth_2034": round(summary["final_net_worth"]["p50"]), "key_moments": summary.get("key_moments", [])}
+
+
+def summary_of(session, path_id: str) -> dict | None:
+    if path_id in ("baseline", "alternative", "compare"):
+        return session.evidence.get(path_id)
+    node = session.branches.get(path_id)
+    return node["summary"] if node else None
+
+
+def paths_of(session) -> list:
+    """Every path on the chart, as the model refers to them."""
+    ev = session.evidence
+    out = [{"id": "baseline", "label": "Current path", **path_brief(ev["baseline"])}]
+    student = ev["person"]["status"] == "student"
+    if ev.get("alternative"):
+        out.append({"id": "alternative", "parent": "baseline", "label": scenario_label(ev["scenario"], student) + " (January 2025)",
+                    **path_brief(ev["alternative"])})
+    if ev.get("compare"):
+        out.append({"id": "compare", "parent": "baseline", "label": scenario_label(ev["compare_scenario"], student) + " (January 2025)",
+                    **path_brief(ev["compare"])})
+    for b in session.branches.values():
+        out.append({"id": b["id"], "parent": b["parent"], "label": b["label"],
+                    "decisions": [{"year": C.START_YEAR + d["month"] // 12, "choice": d["choice"]} for d in b["decisions"]],
+                    "possible_in_share_of_lives": round(b["applied"], 3), **path_brief(b["summary"])})
+    return out
+
+
+def grow_branch(session, parent: str, month: int, choice: str) -> dict:
+    """A new branch from any path: the parent's decisions plus one more at a later January review."""
+    if parent == "baseline":
+        root, prior = "baseline", []
+    elif parent == "alternative":
+        if not session.evidence.get("alternative"):
+            raise HTTPException(422, "This run has no alternative path to branch from.")
+        root, prior = "alternative", []
+    elif parent == "compare":
+        if not session.evidence.get("compare"):
+            raise HTTPException(422, "This run has no second scenario to branch from.")
+        root, prior = "compare", []
+    elif parent in session.branches:
+        root, prior = session.branches[parent]["root"], session.branches[parent]["decisions"]
+    else:
+        raise HTTPException(422, f"Unknown path '{parent}'.")
+    if len(session.branches) >= MAX_BRANCHES:
+        raise HTTPException(422, f"At most {MAX_BRANCHES} branches; remove some first.")
+    decisions = [*prior, {"month": month, "choice": choice}]
+    try:
+        request = BranchRequest(root=root, decisions=decisions)
+    except ValidationError as e:
+        raise HTTPException(422, validation_message(e)) from None
+    result = run_branch(session.request, request, session.plan)
+    session.next_branch += 1
+    node = {"id": f"b{session.next_branch}", "parent": parent, "root": root, "from": month, "decisions": decisions,
+            "label": f"{CHOICES[choice][2]} · {C.START_YEAR + month // 12}", "summary": result,
+            "applied": result["applied_share"]}
+    session.branches[node["id"]] = node
+    return node
+
+
+def remove_branch(session, branch_id: str) -> list:
+    gone = {branch_id} if branch_id in session.branches else set()
+    grew = True
+    while grew:
+        grew = False
+        for b in session.branches.values():
+            if b["parent"] in gone and b["id"] not in gone:
+                gone.add(b["id"]); grew = True
+    for b in gone:
+        session.branches.pop(b, None)
+    return sorted(gone)
+
+
+def _changes_note(args: dict) -> str:
+    parts = []
+    for k, v in (args.get("person") or {}).items():
+        money = k in ("income", "rent", "cash", "investments", "debt", "high_target")
+        parts.append(f"{k.replace('_', ' ')} {chf(v) if money else v}")
+    parts += [f"{k.replace('_', ' ')} {v:g}" for k, v in (args.get("traits") or {}).items()]
+    if args.get("scenario"):
+        parts.append("scenario " + ", ".join(f"{k} {v}" for k, v in args["scenario"].items()))
+    return "Updated " + "; ".join(parts) if parts else "Re-ran the simulation"
+
+
+def tool_update(session, args: dict):
+    old = session.request.model_dump()
+    scenario = {**old["scenario"], **(args.get("scenario") or {})}
+    keep = old["compare"] and old["compare"] != scenario        # the second scenario stays unless it is now the first
+    new = SessionRequest(person={**old["person"], **(args.get("person") or {})},
+                         traits={**old["traits"], **(args.get("traits") or {})},
+                         scenario=scenario, compare=old["compare"] if keep else None,
+                         n_paths=old["n_paths"], deliberate=old["deliberate"])
+    before = {p["id"]: {k: v for k, v in p.items() if k in ("goal_odds", "credit_breach_odds", "median_net_worth_2034")}
+              for p in paths_of(session) if p["id"] in ("baseline", "alternative", "compare")}
+    evidence = run_projection(new, session.plan, session.plan_evaluation)
+    session.request, session.evidence, session.branches, session.explanation = new, evidence, {}, None
+    after = {p["id"]: p for p in paths_of(session)}
+    result = {"changed": args, "before": before, "after": after, "branches_cleared": True}
+    return result, {"type": "rerun", "evidence": evidence}, _changes_note(args) + f" · re-ran {new.n_paths} lives"
+
+
+def tool_explore(session, args: dict):
+    year, choice, parent = int(args["year"]), args["choice"], args["from_path"]
+    if choice not in CHOICES:
+        raise HTTPException(422, f"Unknown choice '{choice}'.")
+    node = grow_branch(session, parent, (year - C.START_YEAR) * 12, choice)
+    before = summary_of(session, parent)
+    result = {"path_id": node["id"], "label": node["label"], "parent": parent,
+              "possible_in_share_of_lives": round(node["applied"], 3),
+              "parent_path": {k: v for k, v in path_brief(before).items() if k != "key_moments"},
+              "this_branch": path_brief(node["summary"])}
+    return result, {"type": "branch", "branch": node}, f"Grew a branch: {node['label']}"
+
+
+def tool_highlight(session, args: dict):
+    path_id, measure = args["path_id"], args.get("measure")
+    if summary_of(session, path_id) is None:
+        raise HTTPException(422, f"Unknown path '{path_id}'.")
+    if measure not in (None, "cash", "net_worth"):
+        raise HTTPException(422, "measure is cash or net_worth.")
+    return {"ok": True}, {"type": "highlight", "path_id": path_id, "measure": measure}, None
+
+
+def run_tool(session, name: str, raw_args: str | None):
+    """(result for the model, update for the client or None, note for the user or None)."""
+    try:
+        args = json.loads(raw_args or "{}")
+        if not isinstance(args, dict):
+            raise ValueError("Arguments must be an object.")
+        handler = {"update_simulation": tool_update, "explore_decision": tool_explore,
+                   "highlight_path": tool_highlight}.get(name)
+        if handler is None:
+            return {"error": f"Unknown tool '{name}'."}, None, None
+        return handler(session, args)
+    except HTTPException as e:
+        return {"error": e.detail}, None, None
+    except (ValidationError, ValueError, TypeError, KeyError) as e:
+        return {"error": validation_message(e) if isinstance(e, ValidationError) else f"Invalid arguments: {e}"}, None, None
+
+
+def converse(session, message: str):
+    """Answer a chat message; the model may call tools that change the simulation first.
+
+    Returns (answer, updates for the client's chart in order, short notes saying what was changed)."""
+    messages = [{"role": "system", "content": SYSTEM + "\n" + assistant.TOOL_RULES},
+                {"role": "system", "content": evidence_context(session.evidence, paths_of(session))},
+                *session.history[-12:], {"role": "user", "content": message}]
+    actions, notes = [], []
+    for _ in range(4):
+        reply = complete(messages, TOOLS)
+        calls = getattr(reply, "tool_calls", None) or []
+        if not calls:
+            return answer_text(reply), actions, notes
+        messages.append({"role": "assistant", "content": reply.content or "",
+                         "tool_calls": [{"id": c.id, "type": "function",
+                                         "function": {"name": c.function.name, "arguments": c.function.arguments or "{}"}}
+                                        for c in calls]})
+        for c in calls:
+            result, action, note = run_tool(session, c.function.name, c.function.arguments)
+            actions += [action] if action else []
+            notes += [note] if note else []
+            messages.append({"role": "tool", "tool_call_id": c.id, "content": json.dumps(result, allow_nan=False, default=float)})
+        messages[1] = {"role": "system", "content": evidence_context(session.evidence, paths_of(session))}
+    return answer_text(complete(messages)), actions, notes
 
 
 sessions: dict[str, Session] = {}
@@ -290,10 +675,17 @@ capacity = threading.BoundedSemaphore(2)
 bearer = HTTPBearer(auto_error=False)
 
 
+def open_workspace() -> bool:
+    """TWIN_OPEN=1: no access key. An explicit choice, so a forgotten key never opens the API by accident."""
+    return os.environ.get("TWIN_OPEN", "").strip().lower() in ("1", "true", "yes")
+
+
 def authorize(credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)]):
+    if open_workspace():
+        return
     expected = os.environ.get("TWIN_API_KEY", "")
     if len(expected) < 24:
-        raise HTTPException(503, "Configure a TWIN_API_KEY of at least 24 characters on the laptop.")
+        raise HTTPException(503, "Configure a TWIN_API_KEY of at least 24 characters on the laptop, or set TWIN_OPEN=1 for an open workspace.")
     if not credentials or not secrets.compare_digest(credentials.credentials.encode(), expected.encode()):
         raise HTTPException(401, "The workspace access key is incorrect.", headers={"WWW-Authenticate": "Bearer"})
 
@@ -310,7 +702,7 @@ def workload():
 app = FastAPI(title="Financial Twin · local API", version="0.1.0")
 app.add_middleware(CORSMiddleware,
                    allow_origins=[s.strip() for s in os.environ.get("TWIN_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if s.strip()],
-                   allow_methods=["GET", "POST", "DELETE"], allow_headers=["Authorization", "Content-Type"],
+                   allow_methods=["GET", "POST", "DELETE"], allow_headers=["Authorization", "Content-Type", "ngrok-skip-browser-warning"],
                    allow_credentials=False)
 
 
@@ -323,18 +715,20 @@ def health():
 def create_session(request: SessionRequest):
     if not llm_ready():
         raise HTTPException(503, provider.SETUP)
-    plan, plan_eval = None, None
+    plan, plan_eval, versions = None, None, []
     if request.plan_id is not None:
         record = live_plan(request.plan_id)
         if not record.versions:
             raise HTTPException(409, "The plan is not ready yet.")
         plan, plan_eval = LifePlan.from_dict(record.versions[-1]["plan"])[0], record.versions[-1]["evaluation"]
+        versions = list(record.versions)
     try:
         evidence = run_projection(request, plan, plan_eval)
     except FileNotFoundError:
         raise HTTPException(503, "The trained model artifacts are missing on the laptop.") from None
     answer = explain(evidence, [], request.question)
-    session = Session(evidence, [{"role": "user", "content": request.question}, {"role": "assistant", "content": answer}])
+    session = Session(evidence, [{"role": "user", "content": request.question}, {"role": "assistant", "content": answer}],
+                      request=request, plan=plan, plan_evaluation=plan_eval, plan_versions=versions)
     with sessions_lock:
         now = time.monotonic()
         for key in list(sessions):
@@ -357,12 +751,81 @@ def chat(session_id: str, request: ChatRequest):
     if not session.lock.acquire(blocking=False):
         raise HTTPException(409, "An answer is already being prepared for this conversation.")
     try:
-        answer = explain(session.evidence, session.history, request.message)
+        answer, actions, notes = converse(session, request.message)
         session.history.extend([{"role": "user", "content": request.message}, {"role": "assistant", "content": answer}])
         session.history = session.history[-12:]
-        return {"answer": answer}
+        return {"answer": answer, "actions": actions, "notes": notes}
     finally:
         session.lock.release()
+
+
+class GrowRequest(StrictModel):
+    parent: str = Field(min_length=1, max_length=40)       # "baseline", "alternative" or a branch id
+    month: int
+    choice: Literal[tuple(CHOICES)]
+
+
+def live_session(session_id: str) -> Session:
+    with sessions_lock:
+        session = sessions.get(session_id)
+        if not session or session.expires < time.monotonic():
+            sessions.pop(session_id, None)
+            raise HTTPException(404, "This exploration has expired. Explore the scenario again to start a new one.")
+    return session
+
+
+EXPLAIN_PATHS = 1000          # lives for the "Plan explained" report (a few seconds on a laptop)
+
+
+@lru_cache(maxsize=1)
+def explanations():
+    """analysis/policy-explanations/run_explanations.py: the three-level plan explanation, loaded as it is."""
+    path = C.ROOT / "analysis" / "policy-explanations" / "run_explanations.py"
+    spec = importlib.util.spec_from_file_location("twin_policy_explanations", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def run_explanation(session: Session, n_paths: int | None = None) -> dict:
+    """What the planner wrote, how the persona carries it out, and what follows: for this session's plan."""
+    request, versions = session.request, session.plan_versions
+    people, persona = persona_for(request.person, request.traits)        # the plan is applied inside the analysis
+    cash = float(request.person.cash)
+    low = min(3000.0, round(cash / 3, -2))                                  # the "less cash in January 2025" comparison
+    provenance = {"file": None, "description": "This session's plan, made by the planner on the laptop.",
+                  "model": provider.model(), "version": len(versions), "profile": "session",
+                  "as_of": versions[-1].get("as_of")}
+    return explanations().analyse(people, persona, session.plan, versions[-1], versions, provenance,
+                                  n_paths or EXPLAIN_PATHS, C.SEED, low, 0, "")
+
+
+@app.get("/sessions/{session_id}/explanation", dependencies=[Depends(authorize), Depends(workload)])
+def explanation(session_id: str):
+    session = live_session(session_id)
+    with session.lock:
+        if session.plan is None or not session.plan_versions:
+            raise HTTPException(409, "There is no plan to explain: make a long-term plan and explore with it first.")
+        if session.explanation is None:
+            try:
+                session.explanation = run_explanation(session)
+            except FileNotFoundError:
+                raise HTTPException(503, "The explanation analysis or the model artifacts are missing on the laptop.") from None
+        return session.explanation
+
+
+@app.post("/sessions/{session_id}/branches", dependencies=[Depends(authorize), Depends(workload)])
+def branch(session_id: str, request: GrowRequest):
+    session = live_session(session_id)
+    with session.lock:
+        return grow_branch(session, request.parent, request.month, request.choice)
+
+
+@app.delete("/sessions/{session_id}/branches/{branch_id}", dependencies=[Depends(authorize)])
+def delete_branch(session_id: str, branch_id: str):
+    session = live_session(session_id)
+    with session.lock:
+        return {"deleted": remove_branch(session, branch_id)}
 
 
 @app.delete("/sessions/{session_id}", dependencies=[Depends(authorize)])

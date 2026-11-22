@@ -59,7 +59,7 @@ def step_report(plan: LifePlan, paths: Paths) -> list[dict]:
                "declined_share": round(float((open_ & ~tried).mean()), 3),
                "turned_down_share": round(float((tried & ~taken).mean()), 3),
                "trigger_share": round(float(due.mean()), 3)}
-        if row["blocked_share"] >= 0.2:
+        if row["blocked_share"] >= 0.05:                         # the UI explains it; the agent is warned from 20%
             row["blocked_because"] = BLOCKED_WHY.get((s.head, s.option), "its option was not open")
         out.append(row)
     return out
@@ -116,7 +116,7 @@ def feedback(plan: LifePlan, ev: dict) -> list[str]:
     by_id = {s.id: s for s in plan.steps}
     for r in ev["steps"]:
         s = by_id[r["id"]]
-        if r.get("blocked_because"):
+        if r.get("blocked_because") and r["blocked_share"] >= 0.2:
             notes.append(f"'{s.id}' could not happen in {r['blocked_share']:.0%} of lives when due: "
                          f"{r['blocked_because']}. Move its window, add a step that makes it possible, or drop it.")
         elif r["turned_down_share"] >= 0.25:
