@@ -26,10 +26,12 @@ test('the example plan shows its steps, how often they happen and what a nudge c
   await expect(plan.getByText(nudged.plan.narrative)).toBeVisible();
   await expect(plan.getByRole('heading', { name: /What changed/ })).toBeVisible();
   await expect(plan.getByText(`“${nudged.said}”`)).toBeVisible();
-  for (const step of nudged.plan.steps) {
-    await expect(plan.getByText(step.label, { exact: true })).toBeVisible();
+  for (const step of nudged.plan.steps) await expect(plan.getByText(step.label, { exact: true })).toBeVisible();
+  // Reasons, outcomes and the planner's working are one tap away.
+  await expect(plan.getByText(/^did it \d+%/)).toHaveCount(0);
+  await plan.getByRole('button', { name: /^Show details/ }).click();
+  for (const step of nudged.plan.steps)
     if (step.why) await expect(plan.getByText(step.why, { exact: true })).toBeVisible();       // the planner's reason
-  }
   await expect(plan.getByText(/^did it \d+%/).first()).toBeVisible();                        // what happened in the lives
   await expect(plan.getByRole('heading', { name: 'Your twin’s reasoning' })).toBeVisible();
   await expect(plan.getByText(/go_full_time|cheaper_if_short/)).toHaveCount(0);                // ids read as words

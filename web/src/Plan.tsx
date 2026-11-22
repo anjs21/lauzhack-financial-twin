@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LoaderCircle, PenLine, RotateCcw } from 'lucide-react';
+import { ChevronDown, LoaderCircle, PenLine, RotateCcw } from 'lucide-react';
 import type { PlanRound, PlanStep, PlanVersion, StepResult } from './types';
 import { compact, money, percent, chfText, wholePercents } from './types';
 
@@ -70,14 +70,15 @@ export function Outcome({ step, result }: { step: PlanStep; result: StepResult }
   </div>;
 }
 
-function Step({ step, result, steps }: { step: PlanStep; result?: StepResult; steps: PlanStep[] }) {
+// detailed: also the planner's reason and how the step played out across the lives.
+function Step({ step, result, steps, detailed }: { step: PlanStep; result?: StepResult; steps: PlanStep[]; detailed: boolean }) {
   return <li className={contingent(step) ? 'fallback' : ''}>
     <span className="year">{result?.typical_year ?? '—'}</span>
     <span className="what">
       <b>{step.label}</b>
       <small>{when(step, steps)} · {firmness(step.commitment)}</small>
-      {step.why && <span className="why">{chfText(step.why)}</span>}
-      {result && <Outcome step={step} result={result} />}
+      {detailed && step.why && <span className="why">{chfText(step.why)}</span>}
+      {detailed && result && <Outcome step={step} result={result} />}
     </span>
     <span className="share">{result ? lives(result.taken_share) : ''}</span>
   </li>;
@@ -118,21 +119,35 @@ export function PlanCard({ version, previous, name, example }: { version: PlanVe
   const trouble = version.evaluation.money_trouble;
   const mostly = trouble && Object.entries(trouble.while).sort((a, b) => b[1] - a[1])[0];
   const offPlan = version.evaluation.off_plan_changes_per_life;
+  // The card shows the plan and how often each step happens; reasons and the planner's working are one tap away.
+  const [detailed, setDetailed] = useState(false);
+  const hasDetails = version.plan.steps.length > 0 || !!trouble || offPlan != null || version.plan.notes.length > 0 || !!version.rounds?.length;
   return <div className="plan-card">
     <div className="plan-head">
       <h2>{name}’s plan</h2>
       <span className="plan-meta">{`${example ? 'Example · ' : ''}Version ${version.version} · ${version.signed ? 'signed by your twin' : 'draft, not signed'}`}</span>
     </div>
-    <blockquote className="plan-narrative">{chfText(version.plan.narrative)}</blockquote>
+    <blockquote className={`plan-narrative ${detailed ? '' : 'clamped'}`}>{chfText(version.plan.narrative)}</blockquote>
     <div className="stats plan-compare">
       <span>Goal by 2029<b>{percent(c.high_goal_odds[1])}</b><span className="was">{percent(c.high_goal_odds[0])} on habits alone</span></span>
       <span>Credit-limit risk<b>{percent(c.credit_breach_odds[1])}</b><span className="was">from {percent(c.credit_breach_odds[0])}</span></span>
       <span>Net worth 2034<b>CHF {compact(c.median_final_net_worth[1])}</b><span className="was">from {compact(c.median_final_net_worth[0])}</span></span>
     </div>
-    {steps.length > 0 && <><h3>Steps <span>· why, and what happened in {version.evaluation.n_lives} simulated lives</span></h3>
-      <ol className="plan-steps">{steps.map(s => <Step key={s.id} step={s} result={results.get(s.id)} steps={version.plan.steps} />)}</ol></>}
+    {steps.length > 0 && <><h3>Steps <span>· in {version.evaluation.n_lives} simulated lives</span></h3>
+      <ol className="plan-steps">{steps.map(s => <Step key={s.id} step={s} result={results.get(s.id)} steps={version.plan.steps} detailed={detailed} />)}</ol></>}
     {fallbacks.length > 0 && <><h3>If things go wrong</h3>
-      <ol className="plan-steps">{fallbacks.map(s => <Step key={s.id} step={s} result={results.get(s.id)} steps={version.plan.steps} />)}</ol></>}
+      <ol className="plan-steps">{fallbacks.map(s => <Step key={s.id} step={s} result={results.get(s.id)} steps={version.plan.steps} detailed={detailed} />)}</ol></>}
+    {version.kind === 'nudge' && <div className="plan-changes">
+      <h3>What changed{version.as_of ? ` from ${version.as_of.slice(0, 4)}` : ''}</h3>
+      <p className="said">“{version.said}”</p>
+      {version.changes && <p>{plain(version.changes, labels)}</p>}
+      {changes.length > 0 && <ul>{changes.map(line => <li key={line}>{line}</li>)}</ul>}
+    </div>}
+    {!version.signed && <p className="note">Your twin did not sign this plan within its rounds: some steps may still clash with what the simulation shows.</p>}
+    {hasDetails && <button type="button" className="text-button plan-more" aria-expanded={detailed} onClick={() => setDetailed(d => !d)}>
+      <ChevronDown size={16} aria-hidden="true" />{detailed ? 'Hide details' : 'Show details: the full plan, reasons, and how each step played out'}
+    </button>}
+    {detailed && <>
     {version.plan.steps.length > 0 && <p className="outcome-key" aria-hidden="true">
       <span><i className="done" />did it</span><span><i className="declined" />chose not to</span><span><i className="refused" />world said no</span>
       <span><i className="blocked" />not possible</span><span><i className="idle" />never came up</span></p>}
@@ -147,14 +162,8 @@ export function PlanCard({ version, previous, name, example }: { version: PlanVe
       <h3>Your twin’s reasoning</h3>
       <ul>{version.plan.notes.map(n => <li key={n}>{plain(n, labels)}</li>)}</ul>
     </div>}
-    {version.kind === 'nudge' && <div className="plan-changes">
-      <h3>What changed{version.as_of ? ` from ${version.as_of.slice(0, 4)}` : ''}</h3>
-      <p className="said">“{version.said}”</p>
-      {version.changes && <p>{plain(version.changes, labels)}</p>}
-      {changes.length > 0 && <ul>{changes.map(line => <li key={line}>{line}</li>)}</ul>}
-    </div>}
     {!!version.rounds?.length && <Rounds rounds={version.rounds} signed={version.signed} labels={labels} lives={version.evaluation.n_lives} />}
-    {!version.signed && <p className="note">Your twin did not sign this plan within its rounds: some steps may still clash with what the simulation shows.</p>}
+    </>}
   </div>;
 }
 

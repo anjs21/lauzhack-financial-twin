@@ -216,13 +216,6 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .readout .vs { color: var(--faint); }
 
 /* The paths side by side (when comparing two scenarios) */
-.paths-compare { width: 100%; margin-top: 16px; border-collapse: collapse; font-size: .875rem; }
-.paths-compare th { padding: 6px 8px; font-weight: 500; color: var(--muted); text-align: left; border-bottom: 1px solid var(--line); }
-.paths-compare td { padding: 7px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; cursor: pointer; }
-.paths-compare td:first-child { display: flex; align-items: center; gap: 8px; }
-.paths-compare i { flex: none; width: 10px; height: 10px; border-radius: 50%; }
-.paths-compare tr.active td { background: var(--surface); }
-.paths-compare tr:hover td { background: var(--surface); }
 
 /* Right pane: Paths / Plan explained */
 .canvas-tabs { width: fit-content; margin-bottom: 16px; }
@@ -344,6 +337,10 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .plan-steps .flag { color: var(--warn); }
 .plan-steps .share { color: var(--muted); font-size: .875rem; white-space: nowrap; text-align: right; }
 .plan-steps .fallback .what b { font-weight: 400; }
+.plan-more { margin-top: 14px; font-size: .875rem; }
+.plan-narrative.clamped { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.plan-more svg { transition: transform .15s; }
+.plan-more[aria-expanded="true"] svg { transform: rotate(180deg); }
 .plan-steps .why { display: block; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--line); font-size: .875rem; line-height: 1.5; color: var(--ink); }
 .outcome { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
 .outcome-bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--line); }
@@ -390,7 +387,12 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 /* Conversation */
 .thread { margin-top: 52px; display: flex; flex-direction: column; gap: 24px; padding-bottom: 8px; }
 .msg { display: flex; gap: 14px; font-size: 1rem; line-height: 1.7; overflow-wrap: anywhere; }
-.msg p + p { margin-top: 12px; }
+.msg-body > * + * { margin-top: 12px; }
+.msg .lead { font-size: 1.0625rem; color: var(--ink); }
+.msg b { font-weight: 600; color: var(--ink); }
+.answer-list { margin: 8px 0 0; padding-left: 1.15em; display: flex; flex-direction: column; gap: 8px; }
+.answer-list li { padding-left: 2px; }
+.answer-list li::marker { color: var(--accent); }
 .spark { flex: none; width: 28px; height: 28px; display: grid; place-items: center; color: var(--accent); margin-top: 1px; }
 .msg.user { align-self: flex-end; max-width: 80%; padding: 10px 16px; border-radius: 20px 20px 6px 20px; background: var(--surface); }
 .msg-notes { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }

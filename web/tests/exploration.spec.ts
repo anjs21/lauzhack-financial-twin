@@ -291,10 +291,10 @@ test('compare taking the job alongside the studies or instead of them', async ({
   await page.getByRole('button', { name: /^Compare both choices/ }).click();
   const tree = page.getByRole('region', { name: 'Paths' });
   for (const path of [/^Studies only/, /^Job alongside studies/, /^Job instead of studies/]) await expect(tree.getByRole('button', { name: path })).toBeVisible();
-  const table = page.getByRole('table', { name: 'The paths side by side' });
-  await expect(table).toContainText(`${Math.round(example.compare.high_goal_odds * 100)}%`);
-  await table.getByText(/^Job instead of studies/).click();
-  await expect(tree.getByRole('button', { name: /^Job instead of studies/ })).toHaveAttribute('aria-pressed', 'true');
+  const instead = tree.getByRole('button', { name: /^Job instead of studies/ });
+  await expect(instead).toContainText(`${Math.round(example.compare.high_goal_odds * 100)}%`);
+  await instead.click();
+  await expect(instead).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('switch', { name: 'Compare both' })).toHaveAttribute('aria-checked', 'true');
 
   // Connected, the button runs both scenarios in one exploration.

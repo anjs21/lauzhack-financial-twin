@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUp, ChartSpline, GitCompareArrows, Check, Compass, Home, Leaf, LoaderCircle, PenLine, RefreshCw, Sparkles, Wallet, X } from 'lucide-react';
+import Answer from './Answer';
 import Chart from './Chart';
 import Dialog from './Dialog';
 import Moments from './Moments';
@@ -13,7 +14,7 @@ import exampleExplanationData from './example-explanation.json';
 import { NudgeForm, PlanCard, WishesForm } from './Plan';
 import exampleData from './example.json';
 import examplePlanData from './example-plan.json';
-import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, chfText, withScenarioDefaults, withStudyDefaults } from './types';
+import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, withScenarioDefaults, withStudyDefaults } from './types';
 import type { BranchNode, ChatResult, ChoiceKey, Connection, Evidence, Measure, Message, PathNode, Person, PlanState, PlanVersion, Scenario } from './types';
 
 const PALETTE = ['#10b981', '#a855f7', '#ec4899', '#06b6d4', '#eab308', '#6366f1', '#f97316', '#14b8a6'];
@@ -38,9 +39,10 @@ const exampleStory = `The decision, January 2025: a fintech start-up offers a 60
 const exampleMoment = (name: string) => exampleAlt.key_moments?.find(m => m.moment === name);
 const finishes = exampleMoment('Finishes studies'), fullTime = exampleMoment('Starts a full-time job');
 const starterMessages: Message[] = [{ role: 'assistant', content: [
-  `In this example, ${percent(example.baseline.high_goal_odds)} of simulated lives reach ${example.person.name}’s CHF ${money(example.person.high_target)} ${example.person.high_goal.toLowerCase()} by December 2029 on studies alone, and ${percent(exampleAlt.high_goal_odds)} with the part-time offer alongside the master’s.`,
-  ...(finishes && fullTime ? [`The big decision comes first: every life takes the job in January 2025. Most then finish the master’s (${percent(finishes.share)}) and start full-time work (${percent(fullTime.share)}), usually in ${fullTime.typical_year}.`] : []),
-  `Studying on CHF ${money(example.person.income)} a month is tight: ${percent(example.baseline.credit_breach_odds)} of lives hit the credit limit before 2029, against ${percent(exampleAlt.credit_breach_odds)} with the job. Would you keep studying, or take the job full-time and leave the course?`,
+  `With the job alongside the master’s, ${percent(exampleAlt.high_goal_odds)} of simulated lives reach ${example.person.name}’s CHF ${money(example.person.high_target)} ${example.person.high_goal.toLowerCase()} by December 2029. On studies alone it is ${percent(example.baseline.high_goal_odds)}${example.compare ? `, and ${percent(example.compare.high_goal_odds)} if the job replaces the course` : ''}.`,
+  [`- Money is tight while studying: on CHF ${money(example.person.income)} a month, ${percent(example.baseline.credit_breach_odds)} of lives go past the credit limit before 2029. With the job, ${percent(exampleAlt.credit_breach_odds)} do.`,
+   ...(finishes && fullTime ? [`- The job comes first: every life takes it in January 2025. Most then finish the master’s (${percent(finishes.share)}) and start full-time work (${percent(fullTime.share)}), usually in ${fullTime.typical_year}.`] : [])].join('\n'),
+  'Would you keep studying alongside the job, or take it full-time and leave the course?',
 ].join('\n\n') }];
 const choices = [
   { kind: 'baseline', icon: Compass, title: 'Stay on my path' },
@@ -299,7 +301,7 @@ export default function App() {
   const progress = busy === 'plan' && <p className="plan-progress" role="status"><LoaderCircle className="spin" size={16} />{planProgress || 'Working'}<span>· usually one to three minutes</span></p>;
   const errorBox = error && <div className="error" role="alert"><span>{error}</span><button className="icon-button" onClick={() => setError('')} aria-label="Dismiss error"><X size={16} /></button></div>;
   const fine = <p className="fine">Simulated possibilities, not financial advice. <button onClick={() => setModal('method')}>How it works</button> · <button onClick={() => setModal('assumptions')}>Assumptions</button></p>;
-  const controls = <>
+  const controls = (home: boolean) => <>
     <div className="chips" role="group" aria-label="Possibilities">{choices.map(({ kind, icon: Icon, title }) =>
       <button key={kind} className="chip" aria-pressed={scenario.kind === kind} disabled={!!busy} onClick={() => { setScenario(s => ({ ...s, kind })); setError(''); }}>
         {scenario.kind === kind ? <Check size={16} /> : <Icon size={16} />}{title}
@@ -311,7 +313,7 @@ export default function App() {
         title="On: work the part-time job next to your course, then look for a graduate job when it ends. Off: leave the course for the job.">
         <span className="track" aria-hidden="true"><span /></span>Keep studying
       </button>}
-      {canKeepStudying && <button type="button" role="switch" aria-checked={comparing} className="switch" disabled={!!busy} onClick={() => { setComparing(c => !c); setError(''); }}
+      {canKeepStudying && !home && <button type="button" role="switch" aria-checked={comparing} className="switch" disabled={!!busy} onClick={() => { setComparing(c => !c); setError(''); }}
         title="Also run the same job with the other study choice, as a third path.">
         <span className="track" aria-hidden="true"><span /></span>Compare both
       </button>}
@@ -345,7 +347,7 @@ export default function App() {
         <GitCompareArrows size={20} aria-hidden="true" />
         <span><b>Compare both choices</b><small>Take the job alongside the studies, or instead of them: the same CHF {money(scenario.kind === 'part_time' ? scenario.salary : 3200)} offer, side by side</small></span>
       </button>}
-      {controls}
+      {controls(true)}
       <div className="home-links">
         {!ownPlan && !composing && <button className="text-button" disabled={!!busy} onClick={() => setComposing(true)}><PenLine size={16} />Make my own plan</button>}
         {exampleMode ? <button className="text-button" disabled={!!busy} onClick={() => setStarted(true)}><ChartSpline size={16} />See an example</button>
@@ -362,7 +364,7 @@ export default function App() {
     : <main id="main" className="workspace">
       <div className="pane text-pane">
         <section className="controls" aria-label="Your choices">
-          {controls}
+          {controls(false)}
           {stale && <p className="stale" role="status">Your choices have changed. Explore again to update.</p>}
         </section>
 
@@ -374,13 +376,6 @@ export default function App() {
               <span>Net worth 2034<b>CHF {compact(current.final_net_worth.p50)}</b>{evidence.alternative && <span className="was">from {compact(evidence.baseline.final_net_worth.p50)}</span>}</span>
               <span>Credit-limit risk<b>{percent(current.credit_breach_odds)}</b>{evidence.alternative && <span className="was">from {percent(evidence.baseline.credit_breach_odds)}</span>}</span>
             </div>
-            {evidence.compare && <div className="table"><table className="paths-compare" aria-label="The paths side by side">
-              <thead><tr><th>Path</th><th>Goal by 2029</th><th>Credit-limit risk</th><th>Net worth 2034</th></tr></thead>
-              <tbody>{rootsOf(evidence).map(n => <tr key={n.id} className={n.id === active.id ? 'active' : ''} onClick={() => { setActiveId(n.id); setPick(null); setView('paths'); }}>
-                <td><i style={{ background: n.color }} aria-hidden="true" />{n.label}</td>
-                <td>{percent(n.summary.high_goal_odds)}</td><td>{percent(n.summary.credit_breach_odds)}</td><td>CHF {compact(n.summary.final_net_worth.p50)}</td>
-              </tr>)}</tbody>
-            </table></div>}
           </section>
 
           <section className="plan" aria-label="Your plan">
@@ -406,7 +401,7 @@ export default function App() {
             {m.role === 'assistant' && <span className="spark" aria-hidden="true"><Sparkles size={18} /></span>}
             <div className="msg-body">
               {!!m.notes?.length && <ul className="msg-notes" aria-label="Changes made">{m.notes.map(n => <li key={n}><RefreshCw size={13} aria-hidden="true" />{n}</li>)}</ul>}
-              {chfText(m.content).split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}
+              {m.role === 'assistant' ? <Answer text={m.content} /> : <p>{m.content}</p>}
             </div>
           </div>)}
           {busy && busy !== 'plan' && <div className="thinking" role="status"><LoaderCircle size={17} className="spin" />{busy === 'run' ? 'Exploring 500 paths…' : 'Thinking…'}</div>}
