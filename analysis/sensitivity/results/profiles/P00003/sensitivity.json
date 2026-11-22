@@ -1,0 +1,2393 @@
+{
+  "profile": "P00003",
+  "profile_name": "Samir",
+  "goal_name": "Long-term financial resilience",
+  "goal_target_chf": 230340.08,
+  "seed": 20261122,
+  "paths": 1000,
+  "grid_paths": 300,
+  "horizon_months": 120,
+  "markets": "learned, job offer probability multiplied and clipped",
+  "plans": {
+    "study": "January 2025 intention to start a master\u2019s, subject to mask and admission",
+    "work": "January 2025 intention to seek full-time work, subject to mask and job offers"
+  },
+  "assumptions": {
+    "baseline_tuition_chf": 8000,
+    "baseline_degree_rank_shift": 0.2,
+    "baseline_credit_rate": 0.08,
+    "baseline_delay_probability": 0.1,
+    "baseline_moving_cost_chf": 2000,
+    "offer_probability_multipliers": [
+      0.5,
+      1.0,
+      1.5
+    ]
+  },
+  "baseline_study": {
+    "shortfall_pct": 0.3,
+    "breach_pct": 0.3,
+    "goal_pct": 96.1,
+    "median_min_cash_chf": 13378.472958950966,
+    "median_final_wealth_chf": 989724.5793778866,
+    "mean_final_wealth_chf": 1009223.4590028869,
+    "first_review_masters_pct": 0.0,
+    "first_review_work_search_pct": 0.0
+  },
+  "baseline_work": {
+    "shortfall_pct": 0.3,
+    "breach_pct": 0.3,
+    "goal_pct": 96.1,
+    "median_min_cash_chf": 13378.472958950966,
+    "median_final_wealth_chf": 989724.5793778866,
+    "mean_final_wealth_chf": 1009223.4590028869,
+    "first_review_masters_pct": 0.0,
+    "first_review_work_search_pct": 0.0
+  },
+  "study_minus_work": {
+    "shortfall": {
+      "change_pp": 0.0,
+      "lower_pp": -0.4998772921083142,
+      "upper_pp": 0.4998772921083142,
+      "discordant_plus": 0,
+      "discordant_minus": 0
+    },
+    "breach": {
+      "change_pp": 0.0,
+      "lower_pp": -0.4998772921083142,
+      "upper_pp": 0.4998772921083142,
+      "discordant_plus": 0,
+      "discordant_minus": 0
+    },
+    "goal": {
+      "change_pp": 0.0,
+      "lower_pp": -0.4998772921083142,
+      "upper_pp": 0.4998772921083142,
+      "discordant_plus": 0,
+      "discordant_minus": 0
+    },
+    "mean_wealth_chf": {
+      "mean": 0.0,
+      "lower": 0.0,
+      "upper": 0.0,
+      "se": 0.0
+    }
+  },
+  "one_at_a_time": [
+    {
+      "name": "Tuition CHF 2,500",
+      "setting": {
+        "tuition": 2500
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "name": "Tuition CHF 12,000",
+      "setting": {
+        "tuition": 12000
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "name": "Degree pay-rank shift 0.00",
+      "setting": {
+        "degree_shift": 0.0
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "name": "Degree pay-rank shift 0.10",
+      "setting": {
+        "degree_shift": 0.1
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "name": "Job-offer probability \u00d70.5",
+      "setting": {
+        "offer_factor": 0.5
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 95.5,
+        "median_min_cash_chf": 12813.681685847398,
+        "median_final_wealth_chf": 966874.5427792176,
+        "mean_final_wealth_chf": 986180.0839749554,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": -0.6,
+          "lower_pp": -1.446193815363832,
+          "upper_pp": 0.25219234286913206,
+          "discordant_plus": 0,
+          "discordant_minus": 6
+        },
+        "mean_wealth_chf": {
+          "mean": -23043.375027931565,
+          "lower": -27973.39024447583,
+          "upper": -18113.359811387298,
+          "se": 2512.3126194850356
+        }
+      }
+    },
+    {
+      "name": "Job-offer probability \u00d71.5",
+      "setting": {
+        "offer_factor": 1.5
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.6,
+        "median_min_cash_chf": 13501.682861854304,
+        "median_final_wealth_chf": 993070.3801772511,
+        "mean_final_wealth_chf": 1015507.3763558622,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.5,
+          "lower_pp": -0.30913825706299447,
+          "upper_pp": 1.3041394841419114,
+          "discordant_plus": 5,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 6283.917352975369,
+          "lower": 3745.386035504628,
+          "upper": 8822.448670446109,
+          "se": 1293.6236469286466
+        }
+      }
+    },
+    {
+      "name": "Study-delay probability 0%",
+      "setting": {
+        "delay": 0.0
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "name": "Study-delay probability 25%",
+      "setting": {
+        "delay": 0.25
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "name": "Credit rate 4%",
+      "setting": {
+        "credit_rate": 0.04
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009229.307796565,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 5.848793678141709,
+          "lower": -2.281052742573136,
+          "upper": 13.978640098856554,
+          "se": 4.142931585422979
+        }
+      }
+    },
+    {
+      "name": "Credit rate 12%",
+      "setting": {
+        "credit_rate": 0.12
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009216.7366810899,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": -6.722321797037664,
+          "lower": -16.19659564071599,
+          "upper": 2.751952046640663,
+          "se": 4.828045491229639
+        }
+      }
+    },
+    {
+      "name": "Moving cost CHF 1,000",
+      "setting": {
+        "moving": 1000
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13390.067124111212,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009432.0713470216,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 208.61234413469384,
+          "lower": 174.6925744496841,
+          "upper": 242.5321138197036,
+          "se": 17.285355457667237
+        }
+      }
+    },
+    {
+      "name": "Moving cost CHF 4,000",
+      "setting": {
+        "moving": 4000
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13294.892916906141,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1008788.1325969908,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": -435.326405896049,
+          "lower": -502.67600073149845,
+          "upper": -367.9768110605995,
+          "se": 34.32103747965879
+        }
+      }
+    },
+    {
+      "name": "All-regime price growth 0%",
+      "setting": {
+        "inflation": 0.0
+      },
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.0,
+        "median_min_cash_chf": 12677.965714500484,
+        "median_final_wealth_chf": 1019375.1468792162,
+        "mean_final_wealth_chf": 1035232.982308233,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": -0.1,
+          "lower_pp": -0.6843379190194769,
+          "upper_pp": 0.48533767360369356,
+          "discordant_plus": 0,
+          "discordant_minus": 1
+        },
+        "mean_wealth_chf": {
+          "mean": 26009.523305346163,
+          "lower": 24562.486090164515,
+          "upper": 27456.56052052781,
+          "se": 737.4033744085691
+        }
+      }
+    },
+    {
+      "name": "All-regime price growth 3%",
+      "setting": {
+        "inflation": 0.03
+      },
+      "summary": {
+        "shortfall_pct": 0.5,
+        "breach_pct": 0.5,
+        "goal_pct": 95.89999999999999,
+        "median_min_cash_chf": 14246.310307574677,
+        "median_final_wealth_chf": 950498.2065909195,
+        "mean_final_wealth_chf": 968966.9607537107,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_study_baseline": {
+        "shortfall": {
+          "change_pp": 0.2,
+          "lower_pp": -0.4531150772260426,
+          "upper_pp": 0.8511155680576091,
+          "discordant_plus": 2,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.2,
+          "lower_pp": -0.4531150772260426,
+          "upper_pp": 0.8511155680576091,
+          "discordant_plus": 2,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": -0.2,
+          "lower_pp": -0.8511155680576091,
+          "upper_pp": 0.4531150772260426,
+          "discordant_plus": 0,
+          "discordant_minus": 2
+        },
+        "mean_wealth_chf": {
+          "mean": -40256.49824917619,
+          "lower": -42791.69996894177,
+          "upper": -37721.29652941061,
+          "se": 1291.9268995627547
+        }
+      }
+    }
+  ],
+  "grid": [
+    {
+      "tuition": 2500,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 2500,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 8000,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 0.5,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 95.33333333333334,
+        "median_min_cash_chf": 11899.000377395969,
+        "median_final_wealth_chf": 923331.2977208813,
+        "mean_final_wealth_chf": 956668.9072907022,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 1.0,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 96.66666666666667,
+        "median_min_cash_chf": 12611.0027096796,
+        "median_final_wealth_chf": 966034.8616985246,
+        "mean_final_wealth_chf": 984820.040736043,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.0,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.1,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "tuition": 12000,
+      "offer_factor": 1.5,
+      "degree_rank_shift": 0.2,
+      "study": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "work": {
+        "shortfall_pct": 0.0,
+        "breach_pct": 0.0,
+        "goal_pct": 97.66666666666667,
+        "median_min_cash_chf": 13357.212530328728,
+        "median_final_wealth_chf": 979826.5104883602,
+        "mean_final_wealth_chf": 998924.8250859557,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "study_minus_work": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -1.647046810042192,
+          "upper_pp": 1.647046810042192,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    }
+  ],
+  "funding": [
+    {
+      "extra_initial_cash_chf": 0,
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 989724.5793778866,
+        "mean_final_wealth_chf": 1009223.4590028869,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 0.0,
+          "lower": 0.0,
+          "upper": 0.0,
+          "se": 0.0
+        }
+      }
+    },
+    {
+      "extra_initial_cash_chf": 5000,
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.1,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 997392.5482771477,
+        "mean_final_wealth_chf": 1016873.5367400455,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 7650.077737158705,
+          "lower": 7460.708076624458,
+          "upper": 7839.447397692951,
+          "se": 96.50189036156164
+        }
+      }
+    },
+    {
+      "extra_initial_cash_chf": 10000,
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.2,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 1003738.450720744,
+        "mean_final_wealth_chf": 1024533.0065011964,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.1,
+          "lower_pp": -0.48533767360369356,
+          "upper_pp": 0.6843379190194769,
+          "discordant_plus": 1,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 15309.547498309612,
+          "lower": 14933.250859626052,
+          "upper": 15685.844136993172,
+          "se": 191.7590012424295
+        }
+      }
+    },
+    {
+      "extra_initial_cash_chf": 20000,
+      "summary": {
+        "shortfall_pct": 0.3,
+        "breach_pct": 0.3,
+        "goal_pct": 96.5,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 1016887.7158015512,
+        "mean_final_wealth_chf": 1039795.0228883981,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_baseline": {
+        "shortfall": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "breach": {
+          "change_pp": 0.0,
+          "lower_pp": -0.4998772921083142,
+          "upper_pp": 0.4998772921083142,
+          "discordant_plus": 0,
+          "discordant_minus": 0
+        },
+        "goal": {
+          "change_pp": 0.4,
+          "lower_pp": -0.36245253188165194,
+          "upper_pp": 1.1584535135447855,
+          "discordant_plus": 4,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 30571.563885511256,
+          "lower": 29806.631857890945,
+          "upper": 31336.495913131566,
+          "se": 389.8057717123727
+        }
+      }
+    },
+    {
+      "extra_initial_cash_chf": 40000,
+      "summary": {
+        "shortfall_pct": 0.2,
+        "breach_pct": 0.2,
+        "goal_pct": 97.39999999999999,
+        "median_min_cash_chf": 13378.472958950966,
+        "median_final_wealth_chf": 1047125.5595831646,
+        "mean_final_wealth_chf": 1070171.8684902245,
+        "first_review_masters_pct": 0.0,
+        "first_review_work_search_pct": 0.0
+      },
+      "difference_from_baseline": {
+        "shortfall": {
+          "change_pp": -0.1,
+          "lower_pp": -0.6843379190194769,
+          "upper_pp": 0.48533767360369356,
+          "discordant_plus": 0,
+          "discordant_minus": 1
+        },
+        "breach": {
+          "change_pp": -0.1,
+          "lower_pp": -0.6843379190194769,
+          "upper_pp": 0.48533767360369356,
+          "discordant_plus": 0,
+          "discordant_minus": 1
+        },
+        "goal": {
+          "change_pp": 1.3,
+          "lower_pp": 0.20651115590782418,
+          "upper_pp": 2.38049203449736,
+          "discordant_plus": 13,
+          "discordant_minus": 0
+        },
+        "mean_wealth_chf": {
+          "mean": 60948.40948733757,
+          "lower": 59373.821434242804,
+          "upper": 62522.99754043234,
+          "se": 802.4026828568814
+        }
+      }
+    }
+  ],
+  "caveats": [
+    "Actions are intentions at the January review, not guaranteed admission or employment; actions may be unavailable or redundant for this profile, and later behaviour remains adaptive.",
+    "Tuition baseline is the fixed stress-test assumption CHF 8,000, not necessarily the profile-specific tuition.",
+    "The goal evaluation uses the simulator deadline of December 2029 for all profiles, regardless of the date in the source data.",
+    "Tuition input applies to all months the model treats the person as a student, including any initial pre-master study. The flow model already includes typical fees; only the excess is charged separately.",
+    "Offer factor multiplies the learned model probability and is clipped to [0,1]; it is an illustrative stress, not a calibrated economic scenario.",
+    "Money is nominal CHF and recorded negative cash uses the model credit and automatic investment-top-up rules; credit approval is not modelled.",
+    "Goal uses the current goal_met definition, including its credit-breach condition. Mean paired changes and percentile-based summaries are distinct.",
+    "Personal residual offsets were fit on available history and may include information after the January 2025 start; not an out-of-time backtest.",
+    "Output intervals describe Monte Carlo error conditional on model and assumptions, not causal effects or real-world confidence bounds.",
+    "The funding grid re-simulates adaptive behaviour and is not a guaranteed minimum; probability may not be monotonic.",
+    "With only a few hundred grid paths, small differences can be Monte Carlo noise; do not optimise based on them."
+  ]
+}

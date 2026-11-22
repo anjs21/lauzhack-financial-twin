@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Flow explanation: Alexia</title>
+<style>body{font:16px/1.6 system-ui;margin:40px auto;padding:0 20px;max-width:960px;color:#172535}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}td,th{padding:10px;text-align:left;border-bottom:1px solid #ddd}pre{white-space:pre-wrap;background:#f3f5f8;padding:16px}h2{margin-top:32px}.scroll{overflow:auto}</style>
+<h1>Why this predicted cash flow?</h1><p>Alexia · P00001 · student · Lausanne</p>
+<pre>Flow explanation — Alexia (P00001)
+Expected monthly flow: CHF -1,070.33; 5–95%: CHF -2,037.15 to -539.68
+Negative flow: 100.0%; closing cash below reserve: 0.0%
+Reference expected flow: CHF -2,032.01 (38 peers; January)
+Contributions to expected flow difference:
+  income: CHF -16.94
+  rent: CHF +1,137.68
+  calendar_month: CHF -159.07
+  Reconciliation error: CHF 0.000000
+Rent CHF 700.00: predicted flow changes CHF +206.93; reserve-breach change -0.00 percentage points
+Scope: Population flow kernel in base-price CHF; not a full world transition or a dated historical forecast.
+Personal history offsets and full-world costs are excluded.
+Model associations and assumptions; not established causal effects.
+Note: rent lies outside the reference cohort range.
+Note: Alternative rent lies outside the reference cohort range.</pre><h2>Reference and attribution</h2>
+<p>Exact baseline-replacement Shapley over income, rent, and calendar month; recomputes mode-month features for each coalition. Reference: same employment status; city held fixed, excluding this profile. Reference income CHF 1,220.51, rent CHF 1,958.11, calendar month January. Employment and city stay fixed.</p>
+<div class="scroll"><table><tr><th>Input group</th><th>Flow contribution (CHF)</th><th>Negative-flow contribution (pp)</th><th>Reserve-breach contribution (pp)</th></tr><tr><td>income</td><td>-16.94</td><td>+0.00</td><td>-0.00</td></tr><tr><td>rent</td><td>+1,137.68</td><td>-0.01</td><td>-0.00</td></tr><tr><td>calendar_month</td><td>-159.07</td><td>-0.00</td><td>-0.00</td></tr></table></div>
+<p>Reference flow CHF -2,032.01 + contributions = predicted flow CHF -1,070.33. Contributions share interactions; they are not standalone causal effects.</p>
+<h2>Uncertainty</h2><p>Average within-member variance: 190,697.12 CHF². Between-member mean variance: 4,422.52 CHF². These describe the fitted ensemble and do not include all uncertainty in the world model.</p>
+<h2>Rent what-if</h2><p>Rent CHF 700.00: predicted flow changes CHF +206.93; reserve-breach probability changes -0.00 percentage points.</p><p>Model response with rent changed and other inputs fixed; not an identified moving effect. Excludes moving costs and deposits.</p><h2>Scope and limitations</h2><p>Excluded: Per-person residual offset and offset uncertainty, Pay/price drift, Tuition and event costs, Investments, debt, and credit, Persona choices.</p><ul><li>Attributions explain a prediction relative to this explicit reference; they are not causal effects.</li><li>Hybrid reference/input combinations may be weakly supported even when individual features are in range.</li><li>Intervals describe the ensemble mixture, not a guarantee of calibrated coverage for this profile.</li><li>Between-member disagreement is not proof of out-of-distribution detection; agreement is not proof of support.</li><li>The reference month is January, with employment flags and city held fixed. Changing this reference changes attributions.</li><li>This is a saved final model explanation, not a held-out evaluation. Cohort exclusion does not remove the profile from model training.</li><li>Age and household are not direct features of the fitted flow network; their policy or redraw effects are outside this explanation.</li><li>rent lies outside the reference cohort range.</li><li>Alternative rent lies outside the reference cohort range.</li></ul></html>

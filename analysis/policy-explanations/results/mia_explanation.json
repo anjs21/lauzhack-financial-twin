@@ -1,0 +1,1853 @@
+{
+  "provenance": {
+    "file": "/home/plabon/Documents/EMAI-3rd semester/LauzHack/lauzhack-financial-twin/web/src/example-plan.json",
+    "description": "Bundled Mia example; LLM-generated plan, matched to web/src/example.json.",
+    "model": "Qwen/Qwen3-8B",
+    "version": 2,
+    "profile": "example",
+    "as_of": "2026-01"
+  },
+  "person": {
+    "name": "Mia",
+    "initial_cash_chf": 12000.0,
+    "high_goal": "Emergency savings",
+    "high_target_chf": 15000.0
+  },
+  "paths": 1000,
+  "seed": 20261122,
+  "plan": {
+    "narrative": "I've accepted the promotion and decided not to pursue the master's. I still want to move to a bigger flat by 2027 once I'm settled in my new role. If cash runs low, I'll move to a cheaper flat to protect my emergency savings.",
+    "steps": [
+      {
+        "id": "bigger_flat",
+        "label": "Bigger flat once settled in the new job",
+        "head": "housing",
+        "option": "bigger",
+        "start": "2027-01",
+        "until": "2028-12",
+        "commitment": 0.6,
+        "after_months": 36
+      },
+      {
+        "id": "cut_if_jobless",
+        "label": "Cut back if I lose my job",
+        "head": "spending",
+        "option": "cut",
+        "commitment": 0.7,
+        "event": "job_loss"
+      },
+      {
+        "id": "cheaper_if_short",
+        "label": "Cheaper flat if cash runs low",
+        "head": "housing",
+        "option": "cheaper",
+        "commitment": 0.5,
+        "cash_months_below": 1.0
+      }
+    ],
+    "spontaneity": 0.3,
+    "notes": [
+      "Staying in Lausanne; no plans to move to another city.",
+      "Landlords require rent at most a third of income or 12 months' rent saved.",
+      "Master's ends automatically leading to job search.",
+      "Added fallback for cash shortages and adjusted timing for bigger flat move."
+    ]
+  },
+  "planner_history": [
+    {
+      "version": 1,
+      "kind": "draft",
+      "said": "I'd like to start a master's in data science next year, then go back to full-time work and move somewhere bigger. If money gets tight I'd rather cut back than touch my investments.",
+      "signed": true,
+      "steps": [
+        {
+          "id": "masters",
+          "head": "status",
+          "option": "start_masters"
+        },
+        {
+          "id": "bigger_flat",
+          "head": "housing",
+          "option": "bigger"
+        },
+        {
+          "id": "cut_if_jobless",
+          "head": "spending",
+          "option": "cut"
+        },
+        {
+          "id": "cheaper_if_short",
+          "head": "housing",
+          "option": "cheaper"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "kind": "nudge",
+      "said": "Change of plans: my employer offered me a promotion if I stay, so no master's. I'd still like a bigger flat, around 2027.",
+      "signed": true,
+      "steps": [
+        {
+          "id": "bigger_flat",
+          "head": "housing",
+          "option": "bigger"
+        },
+        {
+          "id": "cut_if_jobless",
+          "head": "spending",
+          "option": "cut"
+        },
+        {
+          "id": "cheaper_if_short",
+          "head": "housing",
+          "option": "cheaper"
+        }
+      ]
+    }
+  ],
+  "planner_claims": {
+    "signed": true,
+    "rounds": [
+      {
+        "round": 1,
+        "thought": "I updated the plan to reflect the promotion offer and the decision to forgo the master's. The bigger flat move is now scheduled for 2027, and I've adjusted the cheaper flat fallback to ensure emergency savings are protected.",
+        "ready": false,
+        "steps": {
+          "bigger_flat": 0.613,
+          "cut_if_jobless": 0.2,
+          "cheaper_if_short": 0.033
+        },
+        "warnings": []
+      },
+      {
+        "round": 2,
+        "thought": "The plan now reflects the decision to forgo the master's and focus on the promotion. The bigger flat move is scheduled for 2027, and the cheaper flat fallback remains in place to protect emergency savings.",
+        "ready": true,
+        "steps": {
+          "bigger_flat": 0.613,
+          "cut_if_jobless": 0.2,
+          "cheaper_if_short": 0.033
+        },
+        "warnings": []
+      }
+    ],
+    "changes": "The plan now aligns with the promotion decision and the updated timeline for the bigger flat move. The cheaper flat fallback remains unchanged."
+  },
+  "live_planner_experiment": {
+    "model": "deepseek-ai/DeepSeek-V4.1-Flash",
+    "samples_per_setting": 10,
+    "wishes": "I want to keep my job, move to a bigger home when practical, and protect my emergency savings.",
+    "simulation_paths_per_draft": 300,
+    "simulation_seed": 20261122,
+    "groups": [
+      {
+        "setting": "low_cash",
+        "cash_chf": 3000,
+        "plans": [
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first: I want CHF 15'000 in cash by the end of 2029, so I'll trim my living costs for the first few years and leave the investments alone until the fund is comfortably past its target. Once the emergency fund is solid and my pay has grown, I'll look for a bigger flat, since a landlord will want the rent to stay within a third of my income. If I lose my job I cut back straight away, and only if cash gets really thin will I sell investments or take a cheaper place \u2014 the emergency fund is the last thing I touch.",
+              "steps": [
+                {
+                  "id": "trim_costs",
+                  "label": "Trim living costs to build the emergency fund",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2027-12",
+                  "commitment": 0.8
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once pay and savings allow",
+                  "head": "housing",
+                  "option": "bigger",
+                  "until": "2034-12",
+                  "commitment": 0.6,
+                  "after": "trim_costs",
+                  "after_months": 24
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move cash well above the buffer into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.4,
+                  "cash_months_above": 8.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss",
+                  "within_months": 6
+                },
+                {
+                  "id": "sell_if_thin",
+                  "label": "Sell investments if cash runs thin",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.5,
+                  "cash_months_below": 1.0
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash really runs out",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 0.5
+                }
+              ],
+              "spontaneity": 0.25,
+              "notes": [
+                "I stay in Lausanne; I'm not planning to move city.",
+                "I keep working full-time rather than doing a full-time master's \u2014 career growth comes from the job, not from leaving it.",
+                "Rent of CHF 1'500 is already close to a third of my take-home pay, so a bigger flat waits until my income rises.",
+                "The emergency fund counts cash only, so investments are separate and only sold as a last resort.",
+                "Cash starts at CHF 3'000, under one month of outgoings, so the early months are tight by design \u2014 that is not a crisis."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first \u2014 I want CHF 15'000 in cash by 2029, so I'll trim my living costs for a couple of years to get there faster. Once that buffer is solid I'll look for a bigger flat, and only money well above the buffer goes into investments. If I lose my job I cut back right away, and if cash ever gets really thin I sell investments and then move somewhere cheaper.",
+              "steps": [
+                {
+                  "id": "save_buffer",
+                  "label": "Trim living costs to build the CHF 15'000 cash buffer",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2026-12",
+                  "commitment": 0.7
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once the buffer is built",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "after": "save_buffer",
+                  "after_months": 18
+                },
+                {
+                  "id": "invest_excess",
+                  "label": "Move cash well above the buffer into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.5,
+                  "after": "save_buffer",
+                  "cash_months_above": 8.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "sell_if_short",
+                  "label": "Sell investments if cash runs really low",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.6,
+                  "cash_months_below": 1.0
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs really low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "cash_months_below": 0.5
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "I stay in Lausanne; no move to another city.",
+                "No full-time master's: it would mean quitting the job I want to keep, so I aim to move up in my current work instead.",
+                "Emergency savings counted in cash only, so investing only happens once cash is well above the buffer.",
+                "A bigger flat has to pass the landlord's rent-to-income test, so it waits until the buffer is built and my income has grown.",
+                "The low-cash fallbacks are set to fire only at real distress (under a month of outgoings), not at the thin start."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my full-time job and keep saving first \u2014 the CHF 15'000 emergency fund in cash is the first thing I want finished, and with my rent at 1'500 it should come together well before 2029. Once that cushion is clearly there I'll look for a bigger flat, and only money well above the buffer goes into investments. If I lose my job I cut back straight away, and if cash ever gets really thin I sell investments or take a cheaper flat rather than let the buffer drain.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once I have a real cushion",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "cash_months_above": 5.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move cash well above the buffer into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.5,
+                  "cash_months_above": 9.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "sell_to_buffer",
+                  "label": "Sell investments if cash gets truly thin",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.7,
+                  "cash_months_below": 0.5
+                },
+                {
+                  "id": "cheaper_if_jobless",
+                  "label": "Cheaper flat if I lose my job and cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "event": "job_loss"
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "I looked at a master's but the only route here is full-time study, which means leaving the job I want to keep; I'd rather move up inside the job.",
+                "I stay in Lausanne \u2014 no move to another city.",
+                "Assumes rent stays CHF 1'500 until the bigger flat, and I keep saving roughly CHF 1'000\u20131'500 a month.",
+                "A bigger flat will likely cost more than a third of my current income, so I expect to wait for a raise or a bigger cushion before a landlord accepts me.",
+                "The emergency fund counts cash only, so I deliberately wait until cash is well past it before investing any surplus."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first \u2014 I'll trim my living costs from the start so the CHF 15'000 emergency fund is done well before 2029, and I won't move any cash into investments until that fund is safely built. Once cash is comfortable I'll look for a bigger flat, and only from 2030 will I push the surplus above my buffer into investments. If I lose my job I cut back straight away, and only if cash really runs out do I move somewhere cheaper rather than touch the emergency fund.",
+              "steps": [
+                {
+                  "id": "save_cut",
+                  "label": "Trim living costs to build the emergency fund",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2029-12",
+                  "commitment": 0.8
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once cash is comfortable",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "cash_months_above": 4.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move cash above the buffer into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "commitment": 0.5,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash really runs out",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 0.5
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "No master's: I said I want to keep my job, and full-time study would mean giving up the income I'm saving from.",
+                "Staying in Lausanne \u2014 the simulator can't move me elsewhere and I don't want to.",
+                "A landlord wants rent at most a third of income (about CHF 1'730) or 12 months' rent saved, so a bigger flat waits until my cash is around 4 months of outgoings.",
+                "Outgoings assumed around CHF 4'000 a month (rent 1'500 plus living costs), so 4 months' cash is roughly the CHF 15'000 goal.",
+                "Investing the surplus starts only in 2030, after the cash-only emergency fund deadline, so it can't undermine the goal."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first: the CHF 15'000 emergency fund in cash comes before anything else, and on my income I should reach it well before 2029. Once that is solid and I have several months of costs sitting in the bank, I look for a bigger flat, and only well after that do I start moving cash above the buffer into investments. If I lose my job I cut back straight away, and if cash ever gets really thin I move somewhere cheaper.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once the emergency fund is solid",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2026-01",
+                  "until": "2033-12",
+                  "commitment": 0.6,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move surplus cash into investments well after the move",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.5,
+                  "after": "bigger_flat",
+                  "after_months": 24
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs really low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 1.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "Staying in Lausanne; no move to another city.",
+                "No master's: I want to keep my job and move up where I am, so I stay full-time.",
+                "Emergency fund counts cash only, so investments are not part of it and surplus investing waits until the fund is well established.",
+                "Bigger flat only once cash covers several months of outgoings, since a landlord will want rent within a third of my income or a year's rent saved.",
+                "The cheaper-flat fallback is a genuine last resort, not a reaction to a thin first year."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I'll keep working full-time and save first. I'll cut my lifestyle a bit until the CHF 15k emergency fund is done in 2029, then look for a bigger flat when my income and savings make a landlord say yes. If I lose my job, I'll cut spending and look for full-time work; if cash really runs low, I'll move somewhere cheaper or sell investments to refill the buffer.",
+              "steps": [
+                {
+                  "id": "save_cut",
+                  "label": "Cut lifestyle to build emergency cash",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2029-12",
+                  "commitment": 0.8
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat after the emergency fund is done",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "after": "save_cut",
+                  "after_months": 6
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 0.5
+                },
+                {
+                  "id": "sell_if_short",
+                  "label": "Sell investments to refill cash buffer",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.5,
+                  "cash_months_below": 0.5
+                }
+              ],
+              "spontaneity": 0.3,
+              "notes": [
+                "I stay in Lausanne; I am not planning to move city.",
+                "The emergency fund counts cash only, so I do not count investments toward the CHF 15k.",
+                "I assume my rent stays CHF 1'500 until I move.",
+                "A bigger flat needs rent at most a third of income or 12 months' rent saved, so I wait until after the emergency fund is built.",
+                "The cheaper-flat and sell-investments fallbacks only fire when cash is under half a month of outgoings, not at the start when cash is naturally thin."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I'll keep my full-time job and save first, cutting a little each year to build CHF 15k cash by 2029. Once the emergency fund is roughly in place I'll look for a bigger flat, since I'd rather move when it's practical than stretch myself early. If I lose my job I'll cut back and look for work; if cash ever gets really tight I'll move somewhere cheaper. I'll only move cash into investments well above my emergency buffer.",
+              "steps": [
+                {
+                  "id": "save_cut",
+                  "label": "Cut lifestyle a little to build emergency cash",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2029-12",
+                  "commitment": 0.7
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once emergency savings are roughly set",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "cash_months_above": 4.0
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs really low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 0.5
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Invest cash well above the emergency buffer",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.4,
+                  "cash_months_above": 9.0
+                }
+              ],
+              "spontaneity": 0.25,
+              "notes": [
+                "I stay in Lausanne; no relocation is planned.",
+                "Emergency savings counts cash only, so investments are not part of the CHF 15k target.",
+                "No master's is planned because keeping full-time income and protecting savings matters more right now.",
+                "A bigger flat depends on the emergency fund being roughly in place and on a landlord accepting my income or savings.",
+                "I dropped the job-loss 'find full-time work' step because I'm already full-time and it was almost always blocked; I'd look for work anyway."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my full-time job and keep saving first \u2014 the CHF 15'000 emergency fund in cash is the thing I protect, and I want it done by 2029. Once I have enough put aside I'll look for a bigger flat, because a landlord will want either rent under a third of my pay or a year's rent saved, and I'm not moving until that works. If I lose my job I cut back straight away, and only if cash gets genuinely thin \u2014 not just because I started with little \u2014 will I sell some investments or take a cheaper place rather than touch the fund.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once I have enough saved",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2027-01",
+                  "until": "2034-12",
+                  "commitment": 0.6,
+                  "cash_months_above": 7.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "sell_if_thin",
+                  "label": "Sell some investments if cash gets really thin",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.6,
+                  "cash_months_below": 0.5
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 0.5
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "I stay in Lausanne; no move to another city.",
+                "No master's planned \u2014 keeping my job matters more to me than going back to study.",
+                "A bigger flat in Lausanne will likely cost more than CHF 1'733 (a third of my pay), so I treat roughly 7 months of outgoings in cash (about CHF 24'000) as the practical trigger, on top of the CHF 15'000 emergency fund.",
+                "The emergency fund stays in cash; investments are only touched as a last resort.",
+                "Fallback triggers set below half a month of outgoings so they mean real trouble, not my normal starting cash level."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I'll keep my full-time job and save first: I'll cut my spending a bit until my emergency fund reaches CHF 15,000 in cash by the end of 2029, and I won't move cash into investments until that's done and I still have plenty spare. Once the fund is built, I'll look for a bigger flat if my income allows. If I lose my job I'll cut back right away, and only if cash gets genuinely low will I move somewhere cheaper. I'm not planning a master's, because I want to keep working.",
+              "steps": [
+                {
+                  "id": "save_hard",
+                  "label": "Cut spending to build the emergency fund",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2029-12",
+                  "commitment": 0.8
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once the emergency fund is done",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "after": "save_hard",
+                  "after_months": 6
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss",
+                  "within_months": 3
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs really low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "cash_months_below": 0.5
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Invest the surplus only once the fund is built and cash is well above the buffer",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.4,
+                  "after": "save_hard",
+                  "after_months": 12,
+                  "cash_months_above": 8.0
+                }
+              ],
+              "spontaneity": 0.25,
+              "notes": [
+                "No master's: it would mean leaving the job I want to keep.",
+                "Emergency fund counts cash only, so investing waits until the fund is built and cash is still well above the buffer.",
+                "Bigger flat only after the emergency fund is done, so from around 2030.",
+                "A bigger flat's rent must stay within a third of income, or have 12 months' rent saved.",
+                "Cheaper flat is a genuine emergency fallback, not an early move.",
+                "I stay in Lausanne."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, spending what's left, until I have CHF 15'000 in cash put aside by 2029. Only after that buffer is solid do I move anything above it into investments, and around the same time I start looking for a bigger flat. If I lose my job I cut back straight away and, if it drags on, sell investments to refill cash; only if cash gets truly thin do I take a cheaper place rather than eat into the emergency fund.",
+              "steps": [
+                {
+                  "id": "save_hard",
+                  "label": "Cut living costs to build the cash buffer",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "commitment": 0.8
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Look for a bigger flat once the buffer is built and pay has grown",
+                  "head": "housing",
+                  "option": "bigger",
+                  "until": "2034-12",
+                  "commitment": 0.6,
+                  "after": "save_hard",
+                  "after_months": 36
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Once the buffer is done, move cash above it into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "commitment": 0.6,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back right away if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "sell_if_jobless",
+                  "label": "Sell investments to refill cash if I'm out of work",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.5,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Take a cheaper flat only if cash gets truly thin",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "cash_months_below": 0.5
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "I stay in Lausanne; no move to another city.",
+                "No master's: a full-time course would mean leaving the job I want to keep, and career progress comes from staying and moving up.",
+                "The CHF 15'000 buffer counts cash only, so nothing goes into investments until that is reached.",
+                "Outgoings assumed around CHF 3'500 a month (rent 1'500 plus living costs), so the buffer is roughly four to five months of costs.",
+                "The cheaper-flat fallback is a last resort, not a starting move: it only triggers if cash falls below about half a month of costs."
+              ]
+            }
+          }
+        ],
+        "step_presence_frequency": {
+          "assets:invest_surplus": {
+            "count": 8,
+            "frequency": 0.8,
+            "lower": 0.49016247153664183,
+            "upper": 0.9433178485456247
+          },
+          "assets:sell_to_buffer": {
+            "count": 6,
+            "frequency": 0.6,
+            "lower": 0.31267376973365824,
+            "upper": 0.8318196702937638
+          },
+          "housing:bigger": {
+            "count": 10,
+            "frequency": 1.0,
+            "lower": 0.7224672001371107,
+            "upper": 0.9999999999999999
+          },
+          "housing:cheaper": {
+            "count": 10,
+            "frequency": 1.0,
+            "lower": 0.7224672001371107,
+            "upper": 0.9999999999999999
+          },
+          "spending:cut": {
+            "count": 10,
+            "frequency": 1.0,
+            "lower": 0.7224672001371107,
+            "upper": 0.9999999999999999
+          }
+        }
+      },
+      {
+        "setting": "baseline_cash",
+        "cash_chf": 12000.0,
+        "plans": [
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, so my emergency fund stays safe. Once my cash is well above that buffer I'll look for a bigger flat, and only much later, when cash is really comfortable, do I move the surplus into investments. If I lose my job I cut back, and if cash ever gets thin I move somewhere cheaper.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once cash is comfortable",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "cash_months_above": 5.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Invest what's well above the buffer",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.4,
+                  "after": "bigger_flat",
+                  "after_months": 24,
+                  "cash_months_above": 12.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 1.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "I'm not going back to full-time study - I want to keep my job and my income.",
+                "I stay in Lausanne.",
+                "Emergency fund is counted as cash only: CHF 15'000 by December 2029, so investing only starts well after that.",
+                "Bigger flat depends on the landlord accepting my income or my savings, so I wait until cash is comfortable."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, trimming living costs for the first couple of years so the CHF 15'000 emergency fund is actually there in cash, not on paper. Once that buffer is solid I look for a bigger flat, but only if the rent still fits my income and I still have months of cash behind me. If I lose my job I cut back straight away, and if cash ever gets thin I move somewhere cheaper rather than touch the emergency fund. Only money well above the buffer goes into investments, since I can live with those moving up and down but not with a thin emergency fund.",
+              "steps": [
+                {
+                  "id": "save_first",
+                  "label": "Trim living costs to build the emergency fund",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2026-12",
+                  "commitment": 0.7
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once the buffer is solid",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.5,
+                  "cash_months_above": 5.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "cash_months_below": 2.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move cash well above the buffer into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.5,
+                  "cash_months_above": 9.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "Assumes I stay in Lausanne and in the same line of work; I am not planning a master's or a career break, since keeping the job is the priority.",
+                "Emergency fund counts cash only, so I do not count investments toward the CHF 15'000.",
+                "Bigger flat means roughly CHF 2'000 rent, which is above a third of my current income, so I only move if my income has risen or my savings satisfy the landlord; if landlords keep saying no I simply stay put and try again next year.",
+                "Outgoings assumed around CHF 3'500-4'000 a month, so the CHF 15'000 buffer is about four months of costs and the investing trigger of nine months keeps a comfortable cushion above it."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, so the CHF 15'000 emergency fund is done well before 2029 and stays in cash. I only start moving surplus into investments once that goal is behind me, and I keep a bigger cash buffer than before so a landlord will actually take me for a bigger flat. If I lose my job I cut back right away, and if cash ever gets thin I sell investments back into cash or take a cheaper flat rather than touching the emergency fund.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once I can afford it",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2028-01",
+                  "until": "2034-12",
+                  "commitment": 0.6,
+                  "cash_months_above": 7.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Invest what sits above the buffer, once the emergency fund is done",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "until": "2034-12",
+                  "commitment": 0.5,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "sell_to_buffer",
+                  "label": "Sell investments if cash runs low",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.6,
+                  "cash_months_below": 2.0
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs very low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 1.0
+                }
+              ],
+              "spontaneity": 0.25,
+              "notes": [
+                "I stay in Lausanne; no move to another city.",
+                "No master's planned - I want to keep working and move up in my current job, so promotions arrive through work rather than study.",
+                "Emergency savings counted in cash only, so investing surplus waits until after the December 2029 deadline.",
+                "Living costs assumed around CHF 1'800 a month on top of rent."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first \u2014 the emergency fund is cash only and I watch it closely, so CHF 15'000 is the first thing done and I don't touch it. Once the cushion is solid I'll look for a bigger flat, but only if a landlord accepts my income or my savings; until then I stay put. If I lose my job I cut spending straight away, and if cash ever gets thin I move somewhere cheaper. Only after the emergency fund is well past its target will I move surplus cash into investments.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once the cash cushion is solid",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2026-01",
+                  "until": "2032-12",
+                  "commitment": 0.6,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move cash above the buffer into investments",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "until": "2034-12",
+                  "commitment": 0.3,
+                  "cash_months_above": 9.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back spending if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Move to a cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 2.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "No master's: a full-time course would mean leaving the job, and keeping the job and income matters more to me.",
+                "Bigger flat only once cash covers about 6 months of outgoings, which also helps a landlord accept me (12 months' rent saved).",
+                "Investing surplus is delayed until after the 2029 emergency-savings deadline and needs a bigger cash buffer, because the goal counts cash only.",
+                "I stay in Lausanne; I'm not planning to move city."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first \u2014 the CHF 15'000 emergency fund in cash comes before anything else, and on my income that should be done well before 2029. I won't move spare cash into investments until that fund is safely built and I'm past the deadline. Once savings and pay allow, I'll look for a bigger flat, but only if a landlord will take me on the rent. If I lose my job I cut back straight away, and if cash ever gets thin I sell investments first and move somewhere cheaper if it comes to that.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once savings and income allow",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2027-01",
+                  "until": "2032-12",
+                  "commitment": 0.6
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "sell_if_short",
+                  "label": "Sell investments if cash runs low",
+                  "head": "assets",
+                  "option": "sell_to_buffer",
+                  "commitment": 0.6,
+                  "cash_months_below": 3.0
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash gets really thin",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 1.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Invest what's above the buffer, once the fund is done",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "commitment": 0.5,
+                  "cash_months_above": 9.0
+                }
+              ],
+              "spontaneity": 0.25,
+              "notes": [
+                "I'm not starting a master's \u2014 I want to keep my job, and moving up at work matters more to me than going back to study.",
+                "The bigger flat depends on a promotion or enough saved for a landlord to accept the rent; if it doesn't work out I try again the next January.",
+                "I stay in Lausanne.",
+                "Investing surplus only starts after the emergency-fund deadline, and only above nine months of outgoings, so it can't eat the cash buffer."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, trimming spending so the CHF 15'000 emergency fund is solid well before 2029 \u2014 that money stays in cash, not investments. Once that buffer is there, I move to a bigger flat within what a landlord will accept on my income, and only after the goal is met do I start moving surplus cash into investments. If I lose my job I cut back immediately, and if cash ever gets thin I move somewhere cheaper rather than touch the emergency fund.",
+              "steps": [
+                {
+                  "id": "trim_spending",
+                  "label": "Trim spending to build the emergency fund",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2027-12",
+                  "commitment": 0.6
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once the buffer is in place",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2027-01",
+                  "until": "2030-12",
+                  "commitment": 0.6
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Move cash above the buffer into investments, once the emergency goal is met",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "until": "2034-12",
+                  "commitment": 0.5,
+                  "cash_months_above": 5.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back hard if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Move somewhere cheaper if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 2.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "Assumes outgoings of roughly CHF 3'500 a month (rent CHF 1'500 plus living costs), so CHF 15'000 is about four months of cover.",
+                "No master's planned: full-time study would cut income and delay both the emergency fund and the bigger flat; I'd rather advance in the job.",
+                "Staying in Lausanne; I'm not planning to move city.",
+                "Bigger flat rent kept at or below about CHF 1'700 so a landlord accepts it on my income alone.",
+                "Investing surplus is deliberately held back until after the 2029 cash goal, so it can't eat into the emergency fund."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, trimming living costs for a few years so the emergency fund is solid and I have enough put aside for a landlord to say yes. Once that cushion is there, I move to a bigger flat, but not before. If I lose my job I cut back straight away, and if cash ever gets thin I move somewhere cheaper rather than touch the emergency money.",
+              "steps": [
+                {
+                  "id": "save_first",
+                  "label": "Trim living costs to build cash",
+                  "head": "spending",
+                  "option": "cut",
+                  "start": "2025-01",
+                  "until": "2027-12",
+                  "commitment": 0.6
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once the cushion is there",
+                  "head": "housing",
+                  "option": "bigger",
+                  "start": "2027-01",
+                  "until": "2030-12",
+                  "commitment": 0.6
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.5,
+                  "cash_months_below": 2.0
+                }
+              ],
+              "spontaneity": 0.25,
+              "notes": [
+                "I assume I stay in Lausanne and keep the same employer or an equivalent full-time job.",
+                "No master's or part-time switch: I want to keep my income and I don't want to trade income for free time.",
+                "A bigger flat needs rent at most a third of income or about 12 months' rent in savings, so I build cash first.",
+                "The emergency fund counts cash only, so I don't count investments toward the CHF 15'000."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I'll keep my full-time job and save first. I'll stay in my current flat until I have a solid cash cushion, then move to a bigger place. If I lose my job or cash gets low, I'll cut spending right away, and if things get really tight, I'll move somewhere cheaper. My emergency savings come first.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once I have a solid cash buffer",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.7,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.9,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cut_if_cash_low",
+                  "label": "Cut spending if cash gets low",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "cash_months_below": 2.0
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Move to a cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.8,
+                  "cash_months_below": 1.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "I assume my income stays roughly the same or grows with promotions.",
+                "I assume living costs around CHF 2'000 a month beyond rent.",
+                "I stay in Lausanne."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and save first, so my cash reaches CHF 15'000 well before 2029. I drop the full-time master's \u2014 two years on a student income would have meant debt and would have put my emergency savings at risk, and keeping my job matters more to me right now. Once the emergency fund is solid I look for a bigger flat, and if I lose my job or my cash runs low I cut back or move somewhere cheaper rather than touch the buffer.",
+              "steps": [
+                {
+                  "id": "bigger_flat",
+                  "label": "Bigger flat once my cash is solid",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut back if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "event": "job_loss"
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Cheaper flat if cash runs low",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "cash_months_below": 2.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Invest what is above the buffer",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "commitment": 0.5,
+                  "cash_months_above": 8.0
+                }
+              ],
+              "spontaneity": 0.3,
+              "notes": [
+                "I want to stay in Lausanne; the simulator cannot move me to another city.",
+                "Emergency savings counts cash only, so investments do not count toward the CHF 15'000.",
+                "I dropped the full-time master's because the simulation showed it caused debt in most lives and clashed with keeping my job; I would revisit part-time study if that ever became possible.",
+                "A bigger flat needs a landlord to accept my income or savings, so I wait until I have about six months of outgoings in cash (roughly twelve months' rent).",
+                "I assume my rent stays at CHF 1'500 until I move."
+              ]
+            }
+          },
+          {
+            "signed": true,
+            "plan": {
+              "narrative": "I keep my job and keep saving first, so the CHF 15'000 emergency fund is there in cash by 2029. I only move to a bigger flat once the cash buffer is comfortably in place, because a higher rent is the one thing that could undo the whole plan. If I lose my job or the cash gets thin, I cut back first and only move somewhere cheaper as a last resort. Once the buffer is full and the deadline has passed, I let the extra go into investments, since I can live with them dipping for a while.",
+              "steps": [
+                {
+                  "id": "cut_if_tight",
+                  "label": "Cut back if cash gets thin",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.7,
+                  "cash_months_below": 3.0
+                },
+                {
+                  "id": "bigger_flat",
+                  "label": "Move to a bigger flat once the buffer is built",
+                  "head": "housing",
+                  "option": "bigger",
+                  "commitment": 0.6,
+                  "cash_months_above": 6.0
+                },
+                {
+                  "id": "invest_surplus",
+                  "label": "Put cash above the buffer into investments after the goal deadline",
+                  "head": "assets",
+                  "option": "invest_surplus",
+                  "start": "2030-01",
+                  "until": "2034-12",
+                  "commitment": 0.4,
+                  "cash_months_above": 8.0
+                },
+                {
+                  "id": "cut_if_jobless",
+                  "label": "Cut spending if I lose my job",
+                  "head": "spending",
+                  "option": "cut",
+                  "commitment": 0.8,
+                  "event": "job_loss",
+                  "within_months": 6
+                },
+                {
+                  "id": "cheaper_if_short",
+                  "label": "Move somewhere cheaper if cash runs out",
+                  "head": "housing",
+                  "option": "cheaper",
+                  "commitment": 0.6,
+                  "cash_months_below": 1.0
+                }
+              ],
+              "spontaneity": 0.2,
+              "notes": [
+                "Outgoings assumed around CHF 3'000 a month (rent plus living costs), so 5 months' cash is roughly the CHF 15'000 goal.",
+                "Investing the surplus only starts after the 2029 emergency-fund deadline, because the goal counts cash only.",
+                "No master's or part-time move: she wants to keep her job and would not trade income for free time.",
+                "Staying in Lausanne; the simulator cannot move her elsewhere."
+              ]
+            }
+          }
+        ],
+        "step_presence_frequency": {
+          "assets:invest_surplus": {
+            "count": 8,
+            "frequency": 0.8,
+            "lower": 0.49016247153664183,
+            "upper": 0.9433178485456247
+          },
+          "assets:sell_to_buffer": {
+            "count": 2,
+            "frequency": 0.2,
+            "lower": 0.05668215145437519,
+            "upper": 0.5098375284633583
+          },
+          "housing:bigger": {
+            "count": 10,
+            "frequency": 1.0,
+            "lower": 0.7224672001371107,
+            "upper": 0.9999999999999999
+          },
+          "housing:cheaper": {
+            "count": 10,
+            "frequency": 1.0,
+            "lower": 0.7224672001371107,
+            "upper": 0.9999999999999999
+          },
+          "spending:cut": {
+            "count": 10,
+            "frequency": 1.0,
+            "lower": 0.7224672001371107,
+            "upper": 0.9999999999999999
+          }
+        }
+      }
+    ],
+    "presence_effects": {
+      "assets:invest_surplus": {
+        "change_pp": 0.0,
+        "lower_pp": -50.424841874198776,
+        "upper_pp": 50.424841874198776
+      },
+      "assets:sell_to_buffer": {
+        "change_pp": -40.0,
+        "lower_pp": -80.3625684042689,
+        "upper_pp": 27.114028710493542
+      },
+      "housing:bigger": {
+        "change_pp": 0.0,
+        "lower_pp": -33.43932538278085,
+        "upper_pp": 33.43932538278085
+      },
+      "housing:cheaper": {
+        "change_pp": 0.0,
+        "lower_pp": -33.43932538278085,
+        "upper_pp": 33.43932538278085
+      },
+      "spending:cut": {
+        "change_pp": 0.0,
+        "lower_pp": -33.43932538278085,
+        "upper_pp": 33.43932538278085
+      }
+    },
+    "note": "Frequencies are presence of a step anywhere in a generated plan, not monthly action probabilities. Repeated independently, full planner including simulation feedback. Wilson intervals describe Monte Carlo uncertainty for each frequency; combined conservative 97.5% Wilson bounds yield a 95% interval for independent-condition frequency differences. Small samples have high uncertainty. No causal claims."
+  },
+  "execution": {
+    "opening_state_intervention": {
+      "month": "2025-01",
+      "fixed_traits": {
+        "risk_tolerance": 0.4,
+        "frugality": 0.6,
+        "career_drive": 0.65,
+        "free_time": 0.3,
+        "housing_aspiration": 0.4,
+        "inertia": 0.7,
+        "impatience": 0.4,
+        "goal_focus": 0.6
+      },
+      "cash_comparisons": [
+        {
+          "cash_chf": 3000.0,
+          "habits": {
+            "cash_pressure": 0.5200307180340458,
+            "cash_months": 0.9599385639319085,
+            "probabilities": {
+              "status": [
+                0.9881252926386167,
+                0.010546015048549358,
+                0.0010679576306244036,
+                0.0,
+                0.00026073468220940777
+              ],
+              "housing": [
+                0.031062287599482857,
+                0.9686192403496654,
+                0.00031847205085165875
+              ],
+              "spending": [
+                0.2428549286954545,
+                0.7555415235525864,
+                0.0016035477519590737
+              ],
+              "assets": [
+                0.9731688184253342,
+                0.026831181574665807,
+                0.0
+              ]
+            },
+            "available": {
+              "status": [
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              "housing": [
+                true,
+                true,
+                true
+              ],
+              "spending": [
+                true,
+                true,
+                true
+              ],
+              "assets": [
+                true,
+                true,
+                false
+              ]
+            }
+          },
+          "with_plan": {
+            "cash_pressure": 0.5200307180340458,
+            "cash_months": 0.9599385639319085,
+            "probabilities": {
+              "status": [
+                0.996437587791585,
+                0.003163804514564808,
+                0.0003203872891873211,
+                0.0,
+                7.822040466282234e-05
+              ],
+              "housing": [
+                0.5046593431399224,
+                0.4952928860524498,
+                4.777080762774882e-05
+              ],
+              "spending": [
+                0.2428549286954545,
+                0.7555415235525864,
+                0.0016035477519590737
+              ],
+              "assets": [
+                0.9731688184253342,
+                0.026831181574665807,
+                0.0
+              ]
+            },
+            "available": {
+              "status": [
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              "housing": [
+                true,
+                true,
+                true
+              ],
+              "spending": [
+                true,
+                true,
+                true
+              ],
+              "assets": [
+                true,
+                true,
+                false
+              ]
+            }
+          }
+        },
+        {
+          "cash_chf": 12000.0,
+          "habits": {
+            "cash_pressure": 0.0,
+            "cash_months": 3.839754255727634,
+            "probabilities": {
+              "status": [
+                0.966552416334991,
+                0.029187353913836162,
+                0.0035386154340848997,
+                0.0,
+                0.0007216143170878925
+              ],
+              "housing": [
+                0.002781310902782747,
+                0.9951787450812579,
+                0.002039944015959435
+              ],
+              "spending": [
+                0.024432470083258915,
+                0.9543269608387249,
+                0.02124056907801608
+              ],
+              "assets": [
+                0.41677451588131276,
+                0.5832254841186871,
+                0.0
+              ]
+            },
+            "available": {
+              "status": [
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              "housing": [
+                true,
+                true,
+                true
+              ],
+              "spending": [
+                true,
+                true,
+                true
+              ],
+              "assets": [
+                true,
+                true,
+                false
+              ]
+            }
+          },
+          "with_plan": {
+            "cash_pressure": 0.0,
+            "cash_months": 3.839754255727634,
+            "probabilities": {
+              "status": [
+                0.9899657249004973,
+                0.00875620617415085,
+                0.00106158463022547,
+                0.0,
+                0.00021648429512636778
+              ],
+              "housing": [
+                0.0008343932708348242,
+                0.9985536235243774,
+                0.0006119832047878305
+              ],
+              "spending": [
+                0.024432470083258915,
+                0.9543269608387249,
+                0.02124056907801608
+              ],
+              "assets": [
+                0.41677451588131276,
+                0.5832254841186871,
+                0.0
+              ]
+            },
+            "available": {
+              "status": [
+                true,
+                true,
+                true,
+                false,
+                true
+              ],
+              "housing": [
+                true,
+                true,
+                true
+              ],
+              "spending": [
+                true,
+                true,
+                true
+              ],
+              "assets": [
+                true,
+                true,
+                false
+              ]
+            }
+          }
+        }
+      ],
+      "change_low_to_high": {
+        "status": {
+          "change_pp": [
+            -0.6471862891087699,
+            0.5592401659586043,
+            0.0741197341038149,
+            0.0,
+            0.013826389046354545
+          ]
+        },
+        "housing": {
+          "change_pp": [
+            -50.38249498690877,
+            50.32607374719276,
+            0.056421239716008174
+          ]
+        },
+        "spending": {
+          "change_pp": [
+            -21.84224586121956,
+            19.878543728613852,
+            1.9637021326057005
+          ]
+        },
+        "assets": {
+          "change_pp": [
+            -55.63943025440214,
+            55.639430254402136,
+            0.0
+          ]
+        }
+      },
+      "labels": {
+        "status": [
+          "Continue",
+          "Start master\u2019s",
+          "Part-time",
+          "Full-time",
+          "Stop working"
+        ],
+        "housing": [
+          "Cheaper",
+          "Stay",
+          "Bigger"
+        ],
+        "spending": [
+          "Cut",
+          "Keep",
+          "Raise"
+        ],
+        "assets": [
+          "Sell to buffer",
+          "Hold",
+          "Invest surplus"
+        ]
+      },
+      "note": "Exact conditional one-step policy probabilities, not simulated frequencies or LLM probabilities. Derived context and action masks are recomputed; opening memory and other state are fixed. The low-cash input is hypothetical."
+    },
+    "step_report": [
+      {
+        "id": "bigger_flat",
+        "label": "Bigger flat once settled in the new job",
+        "head": "housing",
+        "option": "bigger",
+        "taken_share": 0.586,
+        "typical_year": 2027,
+        "blocked_share": 0.001,
+        "declined_share": 0.394,
+        "turned_down_share": 0.019,
+        "trigger_share": 1.0
+      },
+      {
+        "id": "cut_if_jobless",
+        "label": "Cut back if I lose my job",
+        "head": "spending",
+        "option": "cut",
+        "taken_share": 0.204,
+        "typical_year": 2029,
+        "blocked_share": 0.011,
+        "declined_share": 0.084,
+        "turned_down_share": 0.0,
+        "trigger_share": 0.299
+      },
+      {
+        "id": "cheaper_if_short",
+        "label": "Cheaper flat if cash runs low",
+        "head": "housing",
+        "option": "cheaper",
+        "taken_share": 0.028,
+        "typical_year": 2031,
+        "blocked_share": 0.004,
+        "declined_share": 0.057,
+        "turned_down_share": 0.023,
+        "trigger_share": 0.112
+      }
+    ],
+    "off_plan_changes_per_life": 0.175
+  },
+  "outcomes": {
+    "plan": {
+      "shortfall_pct": 3.2,
+      "breach_pct": 2.8000000000000003,
+      "goal_pct": 94.69999999999999,
+      "median_min_cash_chf": 12000.0,
+      "median_final_wealth_chf": 321803.57799625874,
+      "mean_final_wealth_chf": 324743.7488206006,
+      "first_review_masters_pct": 0.4,
+      "first_review_work_search_pct": 0.0
+    },
+    "habits": {
+      "shortfall_pct": 7.8,
+      "breach_pct": 7.199999999999999,
+      "goal_pct": 88.3,
+      "median_min_cash_chf": 12000.0,
+      "median_final_wealth_chf": 350492.1987780476,
+      "mean_final_wealth_chf": 349817.74520412576,
+      "first_review_masters_pct": 2.3,
+      "first_review_work_search_pct": 0.0
+    },
+    "plan_minus_habits": {
+      "shortfall": {
+        "change_pp": -4.6,
+        "lower_pp": -6.866630728781685,
+        "upper_pp": -2.2873805603443502,
+        "discordant_plus": 8,
+        "discordant_minus": 54
+      },
+      "breach": {
+        "change_pp": -4.3999999999999995,
+        "lower_pp": -6.639831959192036,
+        "upper_pp": -2.116178839102433,
+        "discordant_plus": 8,
+        "discordant_minus": 52
+      },
+      "goal": {
+        "change_pp": 6.399999999999999,
+        "lower_pp": 3.9006824284558617,
+        "upper_pp": 8.835333278154273,
+        "discordant_plus": 71,
+        "discordant_minus": 7
+      },
+      "mean_wealth_chf": {
+        "mean": -25073.996383525147,
+        "lower": -30266.90519169153,
+        "upper": -19881.087575358764,
+        "se": 2646.281960106453
+      }
+    },
+    "offer_stress": [
+      {
+        "offer_factor": 0.5,
+        "summary": {
+          "shortfall_pct": 6.7,
+          "breach_pct": 5.5,
+          "goal_pct": 91.7,
+          "median_min_cash_chf": 12000.0,
+          "median_final_wealth_chf": 313016.67561994714,
+          "mean_final_wealth_chf": 306636.20733058546,
+          "first_review_masters_pct": 0.4,
+          "first_review_work_search_pct": 0.0
+        },
+        "difference_vs_plan_baseline": {
+          "shortfall": {
+            "change_pp": 3.5000000000000004,
+            "lower_pp": 1.912578802258156,
+            "upper_pp": 5.052429787294262,
+            "discordant_plus": 35,
+            "discordant_minus": 0
+          },
+          "breach": {
+            "change_pp": 2.7,
+            "lower_pp": 1.2664653404406219,
+            "upper_pp": 4.1065412857855295,
+            "discordant_plus": 27,
+            "discordant_minus": 0
+          },
+          "goal": {
+            "change_pp": -3.0,
+            "lower_pp": -4.46369812776066,
+            "upper_pp": -1.5063092347128406,
+            "discordant_plus": 0,
+            "discordant_minus": 30
+          },
+          "mean_wealth_chf": {
+            "mean": -18107.541490015083,
+            "lower": -22617.782164393942,
+            "upper": -13597.300815636223,
+            "se": 2298.3974826551057
+          }
+        }
+      },
+      {
+        "offer_factor": 1.5,
+        "summary": {
+          "shortfall_pct": 2.1999999999999997,
+          "breach_pct": 2.1,
+          "goal_pct": 95.6,
+          "median_min_cash_chf": 12000.0,
+          "median_final_wealth_chf": 327424.7080305611,
+          "mean_final_wealth_chf": 332625.13709314575,
+          "first_review_masters_pct": 0.4,
+          "first_review_work_search_pct": 0.0
+        },
+        "difference_vs_plan_baseline": {
+          "shortfall": {
+            "change_pp": -1.0,
+            "lower_pp": -1.98983856465943,
+            "upper_pp": -0.00016388949840365208,
+            "discordant_plus": 0,
+            "discordant_minus": 10
+          },
+          "breach": {
+            "change_pp": -0.7000000000000001,
+            "lower_pp": -1.5853425769802316,
+            "upper_pp": 0.19234085906974777,
+            "discordant_plus": 0,
+            "discordant_minus": 7
+          },
+          "goal": {
+            "change_pp": 0.8999999999999999,
+            "lower_pp": -0.2835715869131834,
+            "upper_pp": 2.074573795655234,
+            "discordant_plus": 11,
+            "discordant_minus": 2
+          },
+          "mean_wealth_chf": {
+            "mean": 7881.388272545136,
+            "lower": 5049.522840911224,
+            "upper": 10713.253704179047,
+            "se": 1443.105334990082
+          }
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "The saved plan is LLM-generated; its narrative and stated reasons are self-reports, not verified causal explanations.",
+    "The saved draft and revision respond to different messages and are not repeated samples of one state.",
+    "The opening intervention explains the rule policy conditioned on one state and the fixed saved plan, not the LLM; masks and triggers can change.",
+    "Exact one-step probabilities omit uncertainty about traits, state and model. Plan-step reports count different events over all paths and are not mutually exclusive.",
+    "Plan versus habits also changes spontaneity and multiple planned intentions, so it does not isolate individual steps or identify causal effects.",
+    "Financial uncertainty intervals quantify finite-path simulation error conditional on the model, not real-world forecast uncertainty.",
+    "Plan and baseline simulate same random seed, but path-dependent behaviour and events may diverge.",
+    "Saved plans revised as of a later date are simulated from January 2025; the results are counterfactual, not a reconstruction of what was known then.",
+    "All amounts nominal CHF; goal uses the simulator fixed December 2029 deadline and credit-breach rule.",
+    "The offer stress changes the simulated world with the plan fixed; it does not ask the LLM to replan."
+  ]
+}
