@@ -57,7 +57,7 @@ footer{border-top:1px solid var(--line);padding-top:18px;font-size:.8rem;color:v
 JS = r"""
 const D=JSON.parse(document.getElementById('data').textContent);
 const tt=document.getElementById('tt');const fmt=v=>(Math.abs(v)>=1e6?(v/1e6).toFixed(2)+'M':Math.abs(v)>=1e3?(v/1e3).toFixed(0)+'k':v.toFixed(0));
-const chf=v=>'CHF '+Math.round(v).toLocaleString('en-US').replace(/,/g,"'");
+const chf=v=>'CHF '+Math.round(v).toLocaleString('en-US');
 const el=(t,a={},txt)=>{const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e};
 function showTT(x,y,title,rows){tt.replaceChildren();const h=document.createElement('b');h.textContent=title;tt.append(h);
  for(const[k,v]of rows){const r=document.createElement('div');r.className='row';const a=document.createElement('span');a.textContent=k;const b=document.createElement('span');b.textContent=v;r.append(a,b);tt.append(r)}
@@ -105,7 +105,7 @@ def pct(x):
 
 
 def chf(x):
-    return f"CHF {x:,.0f}".replace(",", "'")
+    return f"CHF {x:,.0f}"
 
 
 def esc(s):

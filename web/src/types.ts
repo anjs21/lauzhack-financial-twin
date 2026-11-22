@@ -109,11 +109,11 @@ export function wholePercents(shares: number[]): number[] {
   }
   return out;
 }
-/** Amounts in model-written text as the app writes them: "CHF 2,028" becomes "CHF 2'028". */
-export const swiss = (text: string) => text.replace(/CHF\s?(\d{1,3}(?:,\d{3})+)/g, (_, n: string) => `CHF ${n.replace(/,/g, "'")}`);
-export const money = (value: number) => new Intl.NumberFormat('en-CH', { maximumFractionDigits: 0 }).format(value);
+/** Amounts in model-written text as the app writes them: "CHF 2'028" (Swiss style, e.g. in older saved plans) becomes "CHF 2,028". */
+export const chfText = (text: string) => text.replace(/CHF\s?(\d{1,3}(?:['’]\d{3})+)/g, (_, n: string) => `CHF ${n.replace(/['’]/g, ',')}`);
+export const money = (value: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
 export const percent = (value: number) => `${Math.round(value * 100)}%`;
-export const compact = (value: number) => new Intl.NumberFormat('en-CH', { notation: 'compact', maximumFractionDigits: Math.abs(value) >= 1e6 ? 1 : 0 }).format(value);
+export const compact = (value: number) => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: Math.abs(value) >= 1e6 ? 1 : 0 }).format(value);
 export const scenarioNames = { baseline: 'Staying on my path', part_time: 'Going part-time', spend_less: 'Spending less', cheaper_home: 'Moving to a cheaper home' };
 
 export async function api<T>(connection: Connection, path: string, body?: unknown, method = body ? 'POST' : 'GET'): Promise<T> {

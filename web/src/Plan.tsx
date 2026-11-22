@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LoaderCircle, PenLine, RotateCcw } from 'lucide-react';
 import type { PlanRound, PlanStep, PlanVersion, StepResult } from './types';
-import { compact, money, percent, swiss, wholePercents } from './types';
+import { compact, money, percent, chfText, wholePercents } from './types';
 
 const EVENTS: Record<string, string> = {
   job_loss: 'if I lose my job', offer: 'once I get a job offer', graduated: 'once I finish studying',
@@ -76,7 +76,7 @@ function Step({ step, result, steps }: { step: PlanStep; result?: StepResult; st
     <span className="what">
       <b>{step.label}</b>
       <small>{when(step, steps)} · {firmness(step.commitment)}</small>
-      {step.why && <span className="why">{swiss(step.why)}</span>}
+      {step.why && <span className="why">{chfText(step.why)}</span>}
       {result && <Outcome step={step} result={result} />}
     </span>
     <span className="share">{result ? lives(result.taken_share) : ''}</span>
@@ -85,7 +85,7 @@ function Step({ step, result, steps }: { step: PlanStep; result?: StepResult; st
 
 /** The planner's text as the person reads it: step ids (snake_case, maybe quoted) become their labels. */
 function plain(text: string, labels: Map<string, string>) {
-  return swiss(text).replace(/'?\b([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\b'?/g, (_, id: string) => `“${labels.get(id) ?? id.replace(/_/g, ' ')}”`);
+  return chfText(text).replace(/'?\b([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\b'?/g, (_, id: string) => `“${labels.get(id) ?? id.replace(/_/g, ' ')}”`);
 }
 /** A simulator warning: its first sentence (the rest is advice to the planner). */
 const plainWarning = (text: string, labels: Map<string, string>) => plain(text.split(/(?<=[.?!])\s+(?=[A-Z])/)[0], labels);
@@ -123,7 +123,7 @@ export function PlanCard({ version, previous, name, example }: { version: PlanVe
       <h2>{name}’s plan</h2>
       <span className="plan-meta">{`${example ? 'Example · ' : ''}Version ${version.version} · ${version.signed ? 'signed by your twin' : 'draft, not signed'}`}</span>
     </div>
-    <blockquote className="plan-narrative">{swiss(version.plan.narrative)}</blockquote>
+    <blockquote className="plan-narrative">{chfText(version.plan.narrative)}</blockquote>
     <div className="stats plan-compare">
       <span>Goal by 2029<b>{percent(c.high_goal_odds[1])}</b><span className="was">{percent(c.high_goal_odds[0])} on habits alone</span></span>
       <span>Credit-limit risk<b>{percent(c.credit_breach_odds[1])}</b><span className="was">from {percent(c.credit_breach_odds[0])}</span></span>

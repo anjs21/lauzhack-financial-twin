@@ -311,7 +311,7 @@ def test_assistant_tools_turn_words_into_simulation_changes(client, payload, mon
     assert [a["type"] for a in reply["actions"]] == ["rerun", "branch", "branch", "highlight"]
     assert reply["actions"][0]["evidence"]["person"]["income"] == 7000
     assert reply["actions"][2]["branch"]["parent"] == "b1" and reply["actions"][3] == {"type": "highlight", "path_id": "b2", "measure": "net_worth"}
-    assert reply["notes"][0].startswith("Updated age 31; income CHF 7'000; free time 0.2")
+    assert reply["notes"][0].startswith("Updated age 31; income CHF 7,000; free time 0.2")
     s = api.sessions[sid]
     assert s.request.person.age == 31 and s.request.traits["free_time"] == 0.2 and s.request.person.name == payload["person"]["name"]
     assert set(s.branches) == {"b1", "b2"}

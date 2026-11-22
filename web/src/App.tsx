@@ -13,7 +13,7 @@ import exampleExplanationData from './example-explanation.json';
 import { NudgeForm, PlanCard, WishesForm } from './Plan';
 import exampleData from './example.json';
 import examplePlanData from './example-plan.json';
-import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, swiss, withScenarioDefaults, withStudyDefaults } from './types';
+import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, chfText, withScenarioDefaults, withStudyDefaults } from './types';
 import type { BranchNode, ChatResult, ChoiceKey, Connection, Evidence, Measure, Message, PathNode, Person, PlanState, PlanVersion, Scenario } from './types';
 
 const PALETTE = ['#10b981', '#a855f7', '#ec4899', '#06b6d4', '#eab308', '#6366f1', '#f97316', '#14b8a6'];
@@ -406,7 +406,7 @@ export default function App() {
             {m.role === 'assistant' && <span className="spark" aria-hidden="true"><Sparkles size={18} /></span>}
             <div className="msg-body">
               {!!m.notes?.length && <ul className="msg-notes" aria-label="Changes made">{m.notes.map(n => <li key={n}><RefreshCw size={13} aria-hidden="true" />{n}</li>)}</ul>}
-              {swiss(m.content).split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}
+              {chfText(m.content).split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}
             </div>
           </div>)}
           {busy && busy !== 'plan' && <div className="thinking" role="status"><LoaderCircle size={17} className="spin" />{busy === 'run' ? 'Exploring 500 paths…' : 'Thinking…'}</div>}

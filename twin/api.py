@@ -244,8 +244,8 @@ decision was possible then. Compare a branch with its parent to say what the dec
 Only a tool call changes the simulation. Never claim a change you did not make with a tool; if no
 tool fits, say what the user can change in the controls. Stay within the supplied financial scenario.
 Keep responses warm, concrete, and under 220 words, using plain text paragraphs (no Markdown).
-Write amounts the way the app shows them: CHF 40'000, CHF 1'130'000 (apostrophe as the thousands
-separator), never with commas or abbreviations such as 40k or 1.13m.
+Write amounts the way the app shows them: CHF 40,000, CHF 1,130,000 (comma as the thousands
+separator), never with apostrophes or abbreviations such as 40k or 1.13m.
 Lead with the most relevant insight, cite 1-3 supplied figures when useful, explain uncertainty,
 and end with one useful question. Do not provide securities recommendations or guarantees.
 If the evidence has a "plan", it is the person's own long-term plan, written with their planner agent
@@ -481,8 +481,8 @@ def validation_message(e) -> str:
 
 
 def chf(x) -> str:
-    """An amount as the app writes it: CHF 40'000 (Swiss thousands separator)."""
-    return "CHF " + format(x, ",.0f").replace(",", "'")
+    """An amount as the app writes it: CHF 40,000."""
+    return "CHF " + format(x, ",.0f")
 
 
 def scenario_label(scenario: dict, student: bool = False) -> str:

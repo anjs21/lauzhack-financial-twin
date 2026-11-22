@@ -1,5 +1,5 @@
 import type { PlanStep, StepResult } from './types';
-import { compact, money, percent, swiss, wholePercents } from './types';
+import { compact, money, percent, chfText, wholePercents } from './types';
 import { Outcome, when } from './Plan';
 
 // The shape analysis/policy-explanations/run_explanations.py writes (web/src/example-explanation.json).
@@ -44,7 +44,7 @@ export default function Explained({ data }: { data: Explanation }) {
     <section>
       <span className="level">1 · The planner</span>
       <h3>What did the LLM plan?</h3>
-      <blockquote>{swiss(plan.narrative)}</blockquote>
+      <blockquote>{chfText(plan.narrative)}</blockquote>
       <ul className="explained-steps">{plan.steps.map(s => <li key={s.id}>
         <b>{s.label}</b>
         <small>{when(s, plan.steps)} · {percent(s.commitment)} committed</small>
