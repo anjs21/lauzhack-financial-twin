@@ -1,101 +1,122 @@
-# AI Financial Twin — LauzHack 2026
+# Parallel: one choice, thousands of lives
 
-**One choice. Many possible futures.**  
-**Don't predict the future. Make it explorable.**
+Parallel is an AI Financial Twin, built at LauzHack 2026 for the UBS challenge ([CHALLENGE.md](CHALLENGE.md)). For one fictional person, it simulates thousands of possible lives from January 2025 to December 2034. It then shows how a decision changes their odds of reaching a savings goal, of running out of cash, and the spread of their net worth. It does not forecast one future or recommend a choice: it makes the possible futures explorable.
 
-> **Challenge concept and framework:** Stefania Stan  
-> **Event:** LauzHack 2026  
-> **Status:** Educational hackathon challenge and reference materials
+**Try it:** [lauzhack-financial-twin.vercel.app](https://lauzhack-financial-twin.vercel.app/) · Team: Anooj Sathyan, Guillem Masdemont, Plabon Shaha, Jaycent Gunawan Ongris
 
-## The challenge
+## 1. A life as a Markov decision process
 
-Life decisions can reshape a person's financial circumstances. Should a student pursue a master's degree or begin working? What changes when someone relocates, starts a business, buys a home, takes a career break, or faces an economic shock?
+Next month depends on this month, your choices and luck. One step is one month, 120 steps in all:
 
-Build an **AI Financial Twin**: an interactive, computational representation of a fictional person's financial state that allows users to explore the *conditional consequences* of decisions, life events, and changing assumptions.
+$$x_{t+1} \sim P(\,\cdot \mid x_t, u_t), \qquad u_t \sim \pi(\,\cdot \mid x_t, h_t, z)$$
 
-A Financial Twin is **not** a claim to forecast one certain future. It can use simulation, optimization, causal reasoning, probabilistic methods, machine learning, generative AI, game mechanics, or other techniques—but none of those methods alone defines the twin. The essential experience is to represent a financial state, change something meaningful, recompute consequences, compare alternatives, and explain the trade-offs.
+$P$ is the world and $\pi$ is the person. The person sees the state $x_t$, their own path so far $h_t$ and their traits $z$. Nothing is optimised: we sample $\pi$ the way the person tends to decide.
 
-## Illustrative starting point: Alexia
+<img src="presentation/gifs/1-mdp.gif" width="720" alt="The Markov decision process">
 
-Alexia is a **fictional 20-year-old student in Lausanne**, with **CHF 8,000 in initial liquid savings**. She is considering three paths:
+## 2. State and actions
 
-1. Start working.
-2. Pursue a master's degree.
-3. Move abroad.
+The state is nine numbers: work mode, income, housing size, rent, household, lifestyle, economy, cash and investments. Clocks are added for time in the current situation, study left and open searches, so that next month depends on the state alone. We chose these by measuring the challenge data, and the details are in [pipeline/02](pipeline/02-state-and-actions.md):
+- Income explains 94% of the monthly cash flow, and 77–94% of the differences in outcomes.
+- Rent explains 4–12%.
+- Within each work status, income does not depend on age.
 
-Teams may use Alexia or create other entirely fictional profiles. No ten-year outcome is implied by the initial savings balance: meaningful comparisons require explicit assumptions about income, living costs, tuition, timing, taxes, and other factors.
+<img src="presentation/gifs/2-state.gif" width="720" alt="The state vector">
 
-## What to build
+Every January the person makes four choices: work, housing, lifestyle and savings. That gives 5·3·3·3 = 135 combinations, minus those the state forbids. We kept the levers that changed outcomes when we tested 29 candidates on all 1,200 profiles. Debt decisions changed under 2% of outcomes and were dropped.
 
-A compelling prototype should demonstrate:
+<img src="presentation/gifs/3-actions.gif" width="720" alt="The four choices">
 
-- A clearly defined **fictional financial state** (such as income, expenses, savings, assets, liabilities, goals, and constraints).
-- At least one **meaningful what-if intervention** or life-event decision.
-- A **baseline versus alternative** or before/after comparison grounded in calculations.
-- **Transparent assumptions**, units, limitations, and an explanation of why results differ.
-- An interactive experience that helps a user explore financial possibilities.
+## 3. The world, $P$
 
-Additional directions may include uncertainty and sensitivity analysis, multi-stage decisions, goal optimization, intelligent agents, serious games, immersive environments, or experimental computational approaches. The repository's 120-scenario library is **inspiration**, not a requirement to implement 120 scenarios.
+Each month runs in four stages:
+1. **The action is applied.**
+2. **Events are drawn:** job loss, promotion, family events, the economy.
+3. **The net cash flow is drawn** from a neural network trained on 28,800 person-months. It is a mixture of five Gaussians, $y \sim \sum_k w_k(x)\,\mathcal N(\mu_k(x), \sigma_k^2(x))$, so bonuses, bills and fees each get their own peak. Five copies of the network trained with different seeds measure the model's own uncertainty.
+4. **The books are updated exactly:** cash, investments, loans and credit.
 
-## Freedom to innovate
+The data never shows anyone getting a job, a study place or a flat. Those chances also depend on everyone else, $-i$, who competes for them:
 
-There is **no prescribed programming language, AI framework, model, interface, or technology stack**. Teams may build a conversational assistant, mathematical simulator, decision game, virtual environment, agent-based ecosystem, causal laboratory, reinforcement-learning system, optimization engine, quantum-classical research prototype, or a combination.
+$$P(x_i' \mid x_i, u_i, x_{-i}, u_{-i})$$
 
-**Monte Carlo simulation is optional**: it can explore uncertainty under assumed distributions, but it is not synonymous with forecasting and is not required for a Financial Twin.
+We simulate 195 Swiss societies, 90,000 people over 10 years, competing for limited jobs, study places and flats. The societies are calibrated to SECO and BFS statistics.
 
-## Repository guide
+<img src="presentation/gifs/4-society.gif" width="720" alt="A simulated society competing for openings">
 
-The [Parallel web app](web/README.md) adds a persona builder, scenario exploration,
-and LLM explanations. Its React frontend deploys to Vercel; the FastAPI service and
-simulation models stay on your laptop. See the setup guide for local startup,
-provider configuration, and the HTTPS tunnel connection.
+Everyone else enters through one number, the market tightness $\theta = \text{openings} / \text{applications}$: this is a mean-field approximation. We fit $P(x_i' \mid x_i, u_i, \theta)$ on 523,000 simulated applications. The person cannot see $\theta$, so we average it out over the economy $M$:
 
-| Location | Purpose |
+$$P(x_i' \mid x_i, u_i) = \mathbb E_{\theta \mid M}\big[P(x_i' \mid x_i, u_i, \theta)\big]$$
+
+<img src="presentation/gifs/5-mean-field.gif" width="720" alt="Removing the dependence on everyone else">
+
+## 4. The person, $\pi$
+
+The persona has eight traits: risk tolerance, frugality, career drive, free time, housing aspiration, inertia, impatience and goal focus. They come from the profile and a short questionnaire. At each review, every option $o$ gets a score $s_o(x, h, z)$, and the choice is sampled with $\pi(o) \propto \exp(s_o / T)$, where the temperature $T$ sets how random the person is.
+
+An LLM planner writes the person's own plan. It turns their words ("a master's next year, then a bigger flat") into yearly steps with fallbacks, tests them in 300 lives and revises them. When plans change it edits only what changed. The plan decides what it names, and habits decide the rest.
+
+<img src="presentation/gifs/6-planner.gif" width="720" alt="The LLM planner loop">
+
+## 5. Thousands of lives
+
+Each choice is simulated over 2,000 lives, which takes about 2 seconds. Baseline and alternative use the same random draws, so differences come from the decision, not from luck. An LLM explains the results using only the simulator's numbers.
+
+<img src="presentation/gifs/7-lives.gif" width="720" alt="Net wealth for three study choices">
+
+In the example, a 22-year-old weighs a PhD, a master's or starting work. The model can represent programme types but not countries, so the comparison runs in the Swiss-calibrated world.
+
+## Assumptions
+
+| | Assumption |
 |---|---|
-| [`pipeline/`](pipeline/) | How our Financial Twin works: data, states and actions, the transition function, the persona, validation, and what we tried |
-| [`docs/`](docs/) | Digital-twin foundations, financial mathematics, scenario modelling, and technical approaches |
-| [`examples/`](examples/) | Sample questions, interactions, experiences, and output structures |
-| [`data/`](data/) | Fictional profiles, synthetic financial records, and scenario inputs |
-| [`resources/`](resources/) | Optional downloadable public datasets, free technology tools, and usage guidance |
-| [`evaluation/`](evaluation/) | **Proposed** judging rubric and technical-validation references, pending organizer approval |
-| [`faq/`](faq/) | Frequently asked questions and troubleshooting |
+| Data | 1,200 synthetic Swiss profiles over 24 months, in CHF |
+| Effect of a choice | The person moves into a situation others already occupy, keeping their rank in pay and rent (nobody changes situation in the data) |
+| Long run | Pay grows 1.4% a year and prices 1.0%; years 3–10 rest on these trends |
+| Events and markets | Stated monthly rates, such as job loss 0.3% (1% in a recession); returns 6% ± 10 (normal), −15% ± 25 (recession); credit costs 8% a year, up to 3 × monthly pay |
+| Others | Mean field: one person does not move $\theta$ |
+| Behaviour | Traits, questionnaire and the person's own plan; the data contains no decisions to fit |
+| Out of scope | Other countries and currencies, taxes, pension pots, home ownership |
 
-Some linked documents may be added or revised as the challenge materials are finalized.
+Every assumed number is one line in [`twin/world/priors.yaml`](twin/world/priors.yaml), so it can be changed to create a scenario.
 
-## Data and responsible modelling
+## Does it work?
 
-- Use **synthetic or appropriately licensed public data**. Do not upload real confidential or identifiable personal financial records.
-- Treat generated profiles and transaction histories as **fictional**, not representative Swiss population statistics unless separately calibrated and validated.
-- Document sources, units, currencies, time periods, modelling assumptions, and data transformations.
-- Validate cash-flow identities, assets and liabilities, constraints, and scenario transitions.
-- Clearly distinguish **observations, assumptions, calculated outcomes, and uncertainty**.
-- Do not present simulated outcomes as guaranteed forecasts or personalized financial advice.
-- Review third-party data, model-weight, software, media, and API licenses independently.
+Each block is tested on data it was not fitted on.
 
-## Authorship, attribution, and intellectual-property notice
+**Cash-flow network.** On people held out of training, it beats a hand-calibrated model on 2026 monthly flows: CRPS 409 vs 421. It predicts 60.9 people running out of cash in 2026, against 61 observed, and it reproduces all seven patterns in the data.
 
-**Original challenge concept, challenge framing, and authored supporting framework:** **Stefania Stan**.
+**Monthly updating.** Predicting each 2026 month before revealing it flags 26 of 28 new cash shortfalls in advance.
 
-The AI Financial Twin challenge as presented here—including its educational framing, structured scenario-exploration approach, explanatory documentation, curated example materials, and the original selection and arrangement of repository content—is attributed to Stefania Stan, **to the extent those elements are her original contributions**.
+**Markets.** On societies never seen in training, of up to 5,000 people, calibration error stays within 3 points. The fitted effect of $\theta$ is 0.91, where theory predicts 1.
 
-This attribution is intended to identify the originator of the challenge and to preserve clear credit. It does **not** assert exclusive ownership of general ideas, mathematical formulas, publicly known digital-twin concepts, independently developed techniques, or third-party materials. Legal ownership and permitted institutional use may be subject to applicable law, employment or contractual arrangements, and any relevant event agreements.
+**Accounting and tests.** The accounting identities hold every month, and all 82 automated tests pass.
 
-### Rights and permissions
+**Where it fails.**
+- The synthetic data is simple, so fitting it well proves less than it would on real records.
+- What happens after a change of situation cannot be checked, because no one in the data changes situation.
+- Spells without work come out too short: 3.5 months, against 6.5 in the BFS figures.
+- Behaviour is plausible but not validated.
+- Most simulated students cross the credit limit, because family support isn't modelled.
 
-**No repository-wide open-source or open-data license is granted by this README.** Unless a specific file states otherwise, original authored text and other copyright-protected original repository materials are provided for review and participation in this challenge; **all rights are reserved to the applicable rights holder(s)**.
+The full evidence is in [pipeline/07](pipeline/07-validation.md) and [pipeline/09](pipeline/09-limitations.md).
 
-Do not assume that publicly visible repository content is licensed for copying, redistribution, modification, commercialization, or reuse in other events or projects. Obtain appropriate permission from the relevant rights holder(s) before such reuse. Participants may refer to and use these materials as permitted by the challenge organizers and applicable agreements.
+## Run it
 
-Third-party datasets, research, code, models, and assets retain **their own** licenses and attribution requirements. A link to a third-party resource does not transfer ownership or grant additional permissions.
+```bash
+pip install -e '.[api]'
+python -m twin train                       # fit the world model and run the acceptance tests (~3 min)
+python -m twin explore P00003              # 2,000 lives and what-ifs, as an HTML report
+python -m uvicorn twin.api:app --env-file .env    # API for the web app (see web/README.md)
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests -q
+```
 
-**Student submissions:** Teams retain whatever rights they have under applicable law and the official event rules. This repository does not claim ownership of student-created code, designs, or submissions merely because they participate. Teams are responsible for rights in materials they incorporate.
+| Folder | What |
+|---|---|
+| [`twin/`](twin/) | Simulator: world model, persona, planner agent, API |
+| [`twin_game_theory/`](twin_game_theory/) | Simulated Swiss society and the learned market models |
+| [`web/`](web/) | React app |
+| [`pipeline/`](pipeline/) | The whole pipeline explained, with validation and what we tried |
+| [`presentation/`](presentation/) | Manim presentation (`parallel.html`, built from `slides.py`) |
+| [`analysis/`](analysis/) | Data audit, state and action selection |
 
-For rights or attribution questions, contact the repository maintainer through the repository's available contact channels. Any formal licensing or ownership determination should be reviewed against relevant organizational and event policies before public release.
-
-## Evaluation and official rules
-
-The materials under [`evaluation/`](evaluation/) are **draft guidance** unless explicitly approved and published as official criteria. Submission deadlines, eligibility, team size, awards, and binding competition rules are determined by the event organizers and supersede illustrative guidance in this repository.
-
-## Final principle
-
-**Don't predict the future. Make it explorable.**
+Synthetic data only; not financial advice. The challenge concept and materials are by Stefania Stan ([CHALLENGE.md](CHALLENGE.md)).
