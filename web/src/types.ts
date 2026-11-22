@@ -2,19 +2,27 @@ export type Person = {
   name: string; age: number; city: string; status: string; household_type: string;
   income: number; rent: number; cash: number; investments: number; debt: number;
   rate: number; high_goal: string; high_target: number;
+  study_months_left: number; in_masters: boolean;
 };
-export type Scenario = { kind: 'baseline' | 'part_time' | 'spend_less' | 'cheaper_home'; salary: number };
+// Older evidence (and the bundled example) predates the study fields; append defaults in the API's key order.
+export const withStudyDefaults = (p: Omit<Person, 'study_months_left' | 'in_masters'> & Partial<Person>): Person =>
+  ({ ...p, study_months_left: p.study_months_left ?? 1, in_masters: p.in_masters ?? false });
+export type Scenario = { kind: 'baseline' | 'part_time' | 'spend_less' | 'cheaper_home'; salary: number; alongside_studies: boolean };
+export const withScenarioDefaults = (s: Omit<Scenario, 'alongside_studies'> & Partial<Scenario>): Scenario =>
+  ({ ...s, alongside_studies: s.alongside_studies ?? false });
 export type Summary = {
   months: string[]; fan_cash: number[][]; fan_net_worth: number[][];
   high_goal_odds: number; shortfall_odds: number; credit_breach_odds: number;
   final_net_worth: { p5: number; p50: number; p95: number };
   stories: { story: string; share: number; high_goal_odds: number }[];
+  key_moments?: { moment: string; kind: 'decision' | 'event'; share: number; typical_year: number; share_by_goal_deadline: number }[];
 };
 export type Evidence = {
   person: Person; traits: Record<string, number>; scenario: Scenario; n_paths: number; seed: number;
   baseline: Summary; alternative: Summary | null;
   comparison: { goal_change_pp: number; goal_change_mc95_pp: number[]; median_final_net_worth: number[] } | null;
   assumptions: string[];
+  deliberate?: boolean;
 };
 export type Message = { role: 'user' | 'assistant'; content: string };
 export type Connection = { url: string; key: string };

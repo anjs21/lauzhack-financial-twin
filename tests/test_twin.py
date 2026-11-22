@@ -304,3 +304,167 @@ def test_life_utility_follows_preferences(world):
     paths = simulate(world, rich, lean, n_paths=200, seed=2, horizon=120)
     assert np.allclose(u, life_utility(paths)) and np.isfinite(u).all()
     assert (u > paths.nw[:, -1] - 120 * 2500).all()                      # bounded monthly terms
+
+
+# --------------------------------------------------------------------------- study progress
+def test_data_students_keep_the_course_ending_at_the_opening_review():
+    prof = profiles()
+    students = prof["mode"] == C.STUDENT
+    assert students.any()
+    assert (prof.loc[students, "study_left0"] == 1).all() and (prof.loc[~students, "study_left0"] == 0).all()
+    assert not prof["masters0"].any()
+
+
+@needs_model
+def test_study_months_left_sets_the_study_clock(world):
+    default = custom(status="student", income=1200, rent=1500, cash=1000)
+    longer = custom(status="student", income=1200, rent=1500, cash=1000, study_months_left=24, in_masters=True)
+    worker = custom(study_months_left=24, in_masters=True)          # ignored unless studying
+    s = world.initial_state(longer, 3, Streams(1, 3))
+    assert (s.study_left == 24).all() and s.degree.all()
+    s = world.initial_state(worker, 3, Streams(1, 3))
+    assert (s.study_left == 0).all() and not s.degree.any()
+    masks = world.masks(world.initial_state(longer, 3, Streams(1, 3)))[0]
+    assert not masks[:, 1].any()                                    # no second master's while doing one
+    mid = world.initial_state(custom(status="student", study_months_left=12), 3, Streams(1, 3))
+    assert not world.masks(mid)[0][:, 1].any()                      # nor mid-course
+    assert world.masks(world.initial_state(default, 3, Streams(1, 3)))[0][:, 1].all()   # final month: allowed
+
+    n = 200                                     # comfortable finances, so no one drops out to pay the rent
+    comfy = dict(status="student", income=2500, rent=1000, cash=60000)
+    short = simulate(world, custom(**comfy), steady(career_drive=0.2), n, 3, horizon=30)
+    long = simulate(world, custom(**comfy, study_months_left=24, in_masters=True), steady(career_drive=0.2), n, 3,
+                    horizon=30)
+    assert (short.mode[:, 12] == C.STUDENT).mean() < 0.2
+    assert (long.mode[:, 12] == C.STUDENT).mean() > 0.6
+    first_grad = np.where(long.events["graduated"].any(1), long.events["graduated"].argmax(1), 10**6)
+    assert first_grad.min() >= 23                                   # no graduation before the course ends
+
+
+@needs_model
+def test_key_moments_say_when_big_decisions_happen(world):
+    from twin.explore import key_moments
+    from twin.timeline import Timeline
+    people = custom()
+    t = Timeline()
+    t.offers[0] = (C.PART_TIME, 4000)
+    paths = simulate(world, people, steady(), 200, 5, timeline=t)
+    moments = key_moments(paths)
+    first = moments[0]
+    assert first["moment"] == "Cuts back to part-time" and first["typical_year"] == C.START_YEAR
+    assert first["share"] == 1.0 and first["share_by_goal_deadline"] == 1.0 and first["kind"] == "decision"
+    assert all(m["share"] >= 0.10 for m in moments) and len(moments) <= 6
+    assert [m["typical_year"] for m in moments] == sorted(m["typical_year"] for m in moments)
+    assert all(m["share_by_goal_deadline"] <= m["share"] for m in moments)
+    assert all(m["kind"] in ("decision", "event") for m in moments)
+
+
+@needs_model
+def test_part_time_offer_alongside_studies_or_instead_of_them(world):
+    from twin.timeline import Timeline
+    student = custom(status="student", income=1200, rent=1000, cash=60000, study_months_left=24, in_masters=True)
+    # Accepting directly: alongside keeps the course and the pay rank; otherwise the course (and master's) is left.
+    s = world.initial_state(student, 4, Streams(1, 4))
+    rank = s.rank.copy()
+    job = world.accept_offer(s, (C.PART_TIME, 4000, True))
+    assert not job.any() and (s.mode == C.STUDENT).all() and (s.study_left == 24).all() and s.degree.all()
+    assert np.allclose(s.rank, rank) and np.allclose(s.income, 4000)
+    s = world.initial_state(student, 4, Streams(1, 4))
+    job = world.accept_offer(s, (C.PART_TIME, 4000))
+    assert job.all() and (s.mode == C.PART_TIME).all() and (s.study_left == 0).all() and not s.degree.any()
+    assert world.masks(s)[0][:, 1].all()                     # an unfinished master's can be started again
+    worker = world.initial_state(custom(), 4, Streams(1, 4))
+    assert world.accept_offer(worker, (C.PART_TIME, 4000, True)).all()   # the flag only matters for students
+
+    n, persona = 200, steady(career_drive=0.2)
+    t_along, t_leave = Timeline(), Timeline()
+    t_along.offers[0], t_leave.offers[0] = (C.PART_TIME, 4000, True), (C.PART_TIME, 4000, False)
+    base = simulate(world, student, persona, n, 3, horizon=48)
+    along = simulate(world, student, persona, n, 3, horizon=48, timeline=t_along)
+    leave = simulate(world, student, persona, n, 3, horizon=48, timeline=t_leave)
+    assert along.events["side_job"][:, 0].all() and not leave.events["side_job"].any()
+    assert (along.mode[:, 12] == C.STUDENT).mean() > 0.8 and (leave.mode[:, 12] == C.STUDENT).mean() < 0.05
+    assert np.median(along.income[:, 12]) > 3 * np.median(base.income[:, 12])          # earns the offer while studying
+    assert along.events["graduated"].any(1).mean() > 0.8 and leave.events["graduated"][:, :23].sum() == 0
+    late = np.median(along.income[:, 40]) / np.median(base.income[:, 40])               # same graduate pay afterwards
+    assert 0.85 < late < 1.15
+
+
+@needs_model
+def test_side_job_student_is_costed_as_a_part_timer_plus_tuition():
+    w = World.load(config=Config(events=False))
+    student = custom(status="student", income=1200, rent=1000, cash=60000, study_months_left=24, in_masters=True, tuition=4800)
+    s = w.initial_state(student, 6, Streams(2, 6))
+    w.accept_offer(s, (C.PART_TIME, 4000, True))
+    assert s.side_job.all() and (s.mode == C.STUDENT).all()
+    worker = w.initial_state(student, 6, Streams(2, 6))   # the same person, pay and rent, working part-time instead
+    w.accept_offer(worker, (C.PART_TIME, 4000))
+    assert np.allclose(worker.income, s.income) and not worker.side_job.any()
+    still = np.zeros((s.n, 4), int)
+    s1, a = w.step(s, still, Streams(3, 6))
+    _, b = w.step(worker, still, Streams(3, 6))
+    assert np.allclose(b["net"] - a["net"], 4800 / 12 * s.P)          # only the tuition differs
+    s = s1
+    for _ in range(30):                                               # the side job ends with the course
+        s, info = w.step(s, still, Streams(3, 6))
+    assert not s.side_job.any() and (s.mode != C.STUDENT).all()
+
+
+@needs_model
+def test_anchored_foresight_is_the_rule_persona_at_zero_and_tilts_above(world):
+    from twin.policy.foresight import PATH, anchored_at_level
+    if not PATH.exists():
+        pytest.skip("train first: python -m twin foresight")
+    people = custom()
+    persona = from_profile(people.iloc[0])
+    rules = simulate(world, people, persona, 150, 4, horizon=60)
+    zero = simulate(world, people, persona, 150, 4, horizon=60, policy_cls=anchored_at_level(0.0))
+    assert np.array_equal(rules.action, zero.action) and np.allclose(rules.nw, zero.nw)
+    tilted = simulate(world, people, persona, 150, 4, horizon=60, policy_cls=anchored_at_level(1.0))
+    assert not np.array_equal(rules.action, tilted.action)
+
+
+# ------------------------------------------------------------------ learned markets (twin_game_theory)
+def test_market_port_matches_twin_game_theory():
+    from dataclasses import asdict, replace
+    from twin.world.markets import Markets
+    gt_mod = pytest.importorskip("twin_game_theory.world.transition")
+    from twin_game_theory.world import spec as sp
+    gt, mk = gt_mod.TransitionModel(), Markets()
+    for draw in range(5):
+        for edu, u, k, M, W in [(1, 0, 1, 0, sp.N), (2, 5, 3, 2, sp.N), (3, 30, 5, 1, sp.S)]:
+            d = asdict(replace(gt_mod.alexia(), W=W, edu=edu, u=u, k=k, M=M))
+            mine = mk.p_job_offer(np.array([edu]), np.array([u]), np.array([(k - .5) / 5]), np.array([M]),
+                                  np.array([W == sp.S]), np.array([draw]))[0]
+            assert abs(mine - gt.p_job_offer(d, draw)) < 1e-12
+        assert abs(mk.p_master_admission(np.array([draw]))[0] - gt.p_admission(asdict(gt_mod.alexia()), sp.MASTER, draw)) < 1e-12
+
+
+def test_markets_rank_degrees_spells_and_landlords():
+    from twin.world.markets import Markets
+    mk = Markets()
+    one = lambda v: np.array([v])  # noqa: E731
+    bachelor, master = (mk.p_job_offer(one(e), one(0), one(.3), one(0), one(False), one(0))[0] for e in (1, 2))
+    fresh, long_out = (mk.p_job_offer(one(1), one(u), one(.3), one(0), one(False), one(0))[0] for u in (0, 18))
+    normal, recession = (mk.p_job_offer(one(1), one(0), one(.3), one(M), one(False), one(0))[0] for M in (0, 2))
+    assert master > bachelor and fresh > long_out and normal > 3 * recession
+    args = dict(target=one(2), tier=one(1), new_rent=one(3000.0), student=one(False), econ=one(0), draw=one(0))
+    assert mk.p_flat(income=one(6000.0), cash=one(5000.0), **args)[0] == 0      # rent > income / 3, little cash
+    assert mk.p_flat(income=one(6000.0), cash=one(40000.0), **args)[0] > 0      # 12 months of rent saved
+    assert mk.p_flat(income=one(9500.0), cash=one(0.0), **args)[0] > 0          # rent <= income / 3
+
+
+@needs_model
+def test_markets_switch_and_landlord_rule_in_the_world():
+    assert World.load().markets is not None and World.load(config=Config(markets=False)).markets is None
+    w = World.load(config=Config(events=False))
+    poor = custom(income=2500, rent=1200, cash=500, investments=0, household_type="single")
+    s = w.initial_state(poor, 50, Streams(9, 50))
+    assert (s.tier < 2).all()
+    up = np.zeros((s.n, 4), int)
+    up[:, 1] = 1                                                    # everyone asks for a bigger flat in January
+    s1, info = w.step(s, up, Streams(9, 50))
+    assert not info["moved"].any()                                  # no landlord accepts rent > income / 3
+    old = World.load(config=Config(events=False, markets=False))
+    _, info_old = old.step(old.initial_state(poor, 50, Streams(9, 50)), up, Streams(9, 50))
+    assert info_old["moved"].all()                                  # the old world always found a flat

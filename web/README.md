@@ -20,10 +20,11 @@ Fill in `.env` locally (never commit it):
 
 - `TWIN_API_KEY`: a random access key of at least 24 characters. Generate one with
   `python -c "import secrets; print(secrets.token_urlsafe(32))"` in your terminal.
-- `OPENAI_API_KEY`: your LLM provider key.
-- `OPENAI_MODEL`: a chat-completions model available to your account. There is no
-  hardcoded model ID. The existing OpenAI Python client handles explanations.
-- `OPENAI_BASE_URL`: optional, for an OpenAI-compatible provider.
+- `TOGETHER_API_KEY`: your Together AI key. All LLM calls go to Together AI.
+- `TOGETHER_MODEL`: a chat model id from your Together account
+  (https://api.together.ai/models). There is no hardcoded model ID. The openai Python client
+  talks to Together's OpenAI-compatible API.
+- `TOGETHER_BASE_URL`: optional, defaults to `https://api.together.xyz/v1`.
 - `TWIN_ALLOWED_ORIGINS`: comma-separated, exact frontend origins, with no trailing slash.
 
 Then start the laptop API with one worker (sessions live in that worker’s memory):

@@ -32,7 +32,7 @@ import torch
 from .. import config as C
 from ..world.env import STREAMS, State, Streams, World
 from .net import N_IN, SIZES, NeuralPolicy, PersonaNet, kl_loss, load_net, split_ids, teacher_data
-from .rules import HEADS, RulePolicy
+from .rules import HEADS, RulePolicy, sample, softmax_masked
 from .traits import from_profile
 
 PATH = C.ARTIFACTS / "foresight_net.pt"
@@ -211,6 +211,51 @@ class ForesightPolicy(NeuralPolicy):
 def at_level(f):
     """A ForesightPolicy class fixed at level f (for explore.simulate's policy_cls)."""
     return type(f"Foresight{int(round(100 * f))}", (ForesightPolicy,), {"foresight": f, "name": f"foresight {f:g}"})
+
+
+class AnchoredForesightPolicy(ForesightPolicy):
+    """The rule persona's own probabilities, tilted by what the foresight net learned at level f:
+
+        pi_f(o)  proportional to  pi_rules(o) * exp( net_f(o) - net_0(o) )
+
+    The net's f = 0 output stands in for its learned copy of the persona, so only its foresight
+    adjustment is applied. f = 0 is the rule persona exactly; the unanchored net can drift from
+    the rules at f = 0 on rare choices (e.g. part-time back to full-time) that compound over a life.
+    """
+    name = "anchored foresight persona"
+
+    def reset(self, s, streams):
+        super().reset(s, streams)
+        self.h0 = None
+
+    def act(self, s: State, streams: Streams):
+        c = self.context(s)
+        valid, masks, decide = self.clock_masks(s)
+        self.last_decide = decide
+        x = self.inputs(s, c, decide)
+        x0 = x.copy()
+        x0[:, -1] = 0.0
+        with torch.no_grad():
+            at_f, self.h = self.net(torch.as_tensor(x)[:, None, :], self.h)
+            at_0, self.h0 = self.net(torch.as_tensor(x0)[:, None, :], self.h0)
+        rules = self.logits(s, c)
+        u = streams.uniform("policy", s.t, 4 + len(self.intentions))
+        probs, choice = {}, {}
+        for i, h in enumerate(HEADS):
+            p = softmax_masked(rules[h], masks[h], self.temp)
+            tilt = (at_f[i][:, 0] - at_0[i][:, 0]).numpy().astype(float)
+            q = p * np.exp(tilt - tilt.max(1, keepdims=True)) * masks[h]
+            probs[h] = q / q.sum(1, keepdims=True)
+            choice[h] = sample(probs[h], u[i])
+        self._apply_intentions(s, c, valid, decide, choice, probs, u[4:])
+        action = np.stack([choice["status"], choice["housing"] - 1, choice["spending"] - 1, choice["assets"] - 1], 1)
+        return action, probs
+
+
+def anchored_at_level(f):
+    """An AnchoredForesightPolicy class fixed at level f (for explore.simulate's policy_cls)."""
+    return type(f"AnchoredForesight{int(round(100 * f))}", (AnchoredForesightPolicy,),
+                {"foresight": f, "name": f"anchored foresight {f:g}"})
 
 
 # ------------------------------------------------------------------------------ training

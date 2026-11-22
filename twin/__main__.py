@@ -10,8 +10,8 @@
       --plan '{"head": "status", "option": 1, "prob": 0.6, "when": "2026-01"}'   (repeatable)
       --custom person.json    a person who is not in the data (see twin/examples)
       --out report.html --json result.json --no-what-ifs --no-spread --no-foresight
-  llm-demos                   ask an LLM (OpenAI; needs OPENAI_API_KEY) to role-play personas at decision points
-      --calls 300 --model gpt-4o-mini --workers 8 --dry-run
+  llm-demos                   ask an LLM (Together AI; needs TOGETHER_API_KEY) to role-play personas at decision points
+      --calls 300 --model <Together model id> --workers 8 --dry-run
   replay                      score monthly updates on the held-out 2026 ledger
   clone [--llm] [--llm-sharpen 1,2,2,1]  train the neural persona on the rule persona (plus the LLM answers) and compare
   foresight                   train the foresight knob on top of the neural persona and compare

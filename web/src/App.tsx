@@ -2,14 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUp, Check, Compass, Home, Leaf, LoaderCircle, Sparkles, Wallet, X } from 'lucide-react';
 import Chart from './Chart';
 import Dialog from './Dialog';
+import Moments from './Moments';
 import PersonaBuilder from './PersonaBuilder';
 import exampleData from './example.json';
-import { api, compact, money, percent, scenarioNames } from './types';
+import { api, compact, money, percent, scenarioNames, withScenarioDefaults, withStudyDefaults } from './types';
 import type { Connection, Evidence, Message, Person, Scenario } from './types';
 
-const example = exampleData as Evidence;
+const example: Evidence = { ...(exampleData as unknown as Evidence), person: withStudyDefaults(exampleData.person), scenario: withScenarioDefaults(exampleData.scenario as Scenario) };
 const initialExplanation = `In this example, ${percent(example.baseline.high_goal_odds)} of simulated paths reach Mia’s CHF ${money(example.person.high_target)} emergency fund by December 2029, and ${percent(example.alternative!.high_goal_odds)} with the part-time offer.\n\nThe bigger difference comes later: median net worth at the end of 2034 falls from CHF ${money(example.baseline.final_net_worth.p50)} to CHF ${money(example.alternative!.final_net_worth.p50)}. How much would more time today matter to you?`;
-const starterMessages: Message[] = [{ role: 'assistant', content: initialExplanation }];
+const backToFullTime = example.alternative!.key_moments?.find(m => m.moment === 'Starts a full-time job');
+const whenExplanation = backToFullTime ? `\n\nThe big decision comes first: every life cuts back to part-time in January 2025. Going back to full-time work is rarer and later, in ${percent(backToFullTime.share)} of lives, usually around ${backToFullTime.typical_year}.` : '';
+const starterMessages: Message[] = [{ role: 'assistant', content: initialExplanation.replace('\n\nThe bigger difference', whenExplanation + '\n\nThe bigger difference') }];
 const choices = [
   { kind: 'baseline', icon: Compass, title: 'Stay on my path' },
   { kind: 'part_time', icon: Leaf, title: 'Go part-time' },
@@ -26,7 +29,7 @@ function ConnectionForm({ connection, onConnect }: { connection: Connection; onC
     e.preventDefault(); setBusy(true); setError('');
     try {
       const health = await api<{ llm_ready: boolean }>(draft, '/health');
-      if (!health.llm_ready) throw new Error('Your laptop is reachable. Set OPENAI_API_KEY and OPENAI_MODEL there to enable the assistant, then reconnect.');
+      if (!health.llm_ready) throw new Error('Your laptop is reachable. Set TOGETHER_API_KEY and TOGETHER_MODEL there to enable the assistant, then reconnect.');
       onConnect(draft);
     } catch (err) { setError((err as Error).message); } finally { setBusy(false); }
   }
@@ -44,7 +47,8 @@ function ConnectionForm({ connection, onConnect }: { connection: Connection; onC
 export default function App() {
   const [person, setPerson] = useState<Person>(example.person);
   const [traits, setTraits] = useState(example.traits);
-  const [scenario, setScenario] = useState<Scenario>(example.scenario);
+  const [scenario, setScenario] = useState<Scenario>({ ...example.scenario, alongside_studies: true });
+  const [deliberate, setDeliberate] = useState(false);
   const [evidence, setEvidence] = useState<Evidence>(example);
   const [messages, setMessages] = useState<Message[]>(starterMessages);
   const [session, setSession] = useState<string | null>(null);
@@ -58,8 +62,11 @@ export default function App() {
   const [question, setQuestion] = useState('');
   const chatEnd = useRef<HTMLDivElement>(null);
   const current = evidence.alternative ?? evidence.baseline;
-  const changed = JSON.stringify({ person, traits, scenario }) !== JSON.stringify({ person: evidence.person, traits: evidence.traits, scenario: evidence.scenario });
-  const stale = changed || edited;
+  // Working alongside studies only applies to a student choosing the part-time offer.
+  const canKeepStudying = person.status === 'student' && scenario.kind === 'part_time';
+  const request = { ...scenario, alongside_studies: canKeepStudying && scenario.alongside_studies };
+  const changed = JSON.stringify({ person, traits, scenario: request }) !== JSON.stringify({ person: evidence.person, traits: evidence.traits, scenario: evidence.scenario });
+  const stale = changed || edited || deliberate !== (evidence.deliberate ?? false);
   const salaryInvalid = scenario.kind === 'part_time' && (!Number.isFinite(scenario.salary) || scenario.salary <= 0 || scenario.salary > 100000);
 
   useEffect(() => { if (messages.length > 1 || busy) chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages.length, busy]);
@@ -69,11 +76,11 @@ export default function App() {
     setBusy('run'); setError('');
     try {
       const result = await api<{ session_id: string; evidence: Evidence; answer: string }>(connection, '/sessions', {
-        person, traits, scenario, n_paths: 500,
-        question: `Help me understand ${scenarioNames[scenario.kind].toLowerCase()}, how it affects my goal, and the trade-offs for what I value.`,
+        person, traits, scenario: request, deliberate, n_paths: 500,
+        question: `Help me understand ${request.alongside_studies ? 'working part-time alongside my studies' : scenarioNames[scenario.kind].toLowerCase()}, how it affects my goal, when the big decisions in this life typically happen, and the trade-offs for what I value.`,
       });
       const previous = session;
-      setEvidence(result.evidence); setSession(result.session_id); setExampleMode(false); setEdited(false);
+      setEvidence({ ...result.evidence, person: withStudyDefaults(result.evidence.person), scenario: withScenarioDefaults(result.evidence.scenario) }); setSession(result.session_id); setExampleMode(false); setEdited(false);
       setMessages([{ role: 'assistant', content: result.answer }]); setQuestion('');
       if (previous) void api(connection, `/sessions/${previous}`, undefined, 'DELETE').catch(() => {});
     } catch (err) { setError((err as Error).message); } finally { setBusy(null); }
@@ -119,18 +126,27 @@ export default function App() {
       </div>
       <div className="explore-row">
         {scenario.kind === 'part_time' && <label className="salary">CHF<input aria-label="Part-time monthly take-home pay" type="number" min="1" max="100000" value={scenario.salary || ''} onChange={e => setScenario(s => ({ ...s, salary: Number(e.target.value) }))} disabled={!!busy} />/ month</label>}
+        {canKeepStudying && <button type="button" role="switch" aria-checked={scenario.alongside_studies} className="switch" disabled={!!busy} onClick={() => { setScenario(s => ({ ...s, alongside_studies: !s.alongside_studies })); setError(''); }}
+          title="On: work the part-time job next to your course, then look for a graduate job when it ends. Off: leave the course for the job.">
+          <span className="track" aria-hidden="true"><span /></span>Keep studying
+        </button>}
+        <button type="button" role="switch" aria-checked={deliberate} className="switch" disabled={!!busy} onClick={() => { setDeliberate(d => !d); setError(''); }}
+          title="Your persona weighs each yearly choice by what it is worth over the next five years, instead of following habit.">
+          <span className="track" aria-hidden="true"><span /></span>Decide deliberately
+        </button>
         <button className="primary" disabled={!!busy || salaryInvalid} onClick={() => void explore()}>{busy === 'run' ? <><LoaderCircle className="spin" size={16} />Exploring…</> : 'Explore this path'}</button>
       </div>
       {stale && <p className="stale" role="status">Your choices have changed. Explore again to update.</p>}
 
       <section className={`results ${stale ? 'dim' : ''}`}>
-        <h2 className="results-label">{evidence.person.name}’s outlook <span>· {exampleMode ? 'example' : stale ? 'previous run' : `${evidence.n_paths} paths`}</span></h2>
+        <h2 className="results-label">{evidence.person.name}’s outlook <span>· {exampleMode ? 'example' : stale ? 'previous run' : `${evidence.n_paths} paths`}{evidence.deliberate ? ' · deliberate' : ''}</span></h2>
         <p className="headline"><b>{percent(current.high_goal_odds)}</b>chance of reaching {goal} by Dec 2029{evidence.alternative && <span className="was">{percent(evidence.baseline.high_goal_odds)} on your current path</span>}</p>
         <div className="stats">
           <span>Net worth 2034<b>CHF {compact(current.final_net_worth.p50)}</b>{evidence.alternative && <span className="was">from {compact(evidence.baseline.final_net_worth.p50)}</span>}</span>
           <span>Credit-limit risk<b>{percent(current.credit_breach_odds)}</b>{evidence.alternative && <span className="was">from {percent(evidence.baseline.credit_breach_odds)}</span>}</span>
         </div>
         <Chart evidence={evidence} />
+        <Moments evidence={evidence} />
       </section>
 
       <section className="thread" aria-label="Conversation" aria-live="polite" aria-relevant="additions">
@@ -164,6 +180,7 @@ export default function App() {
         <div><h3>You set the starting point</h3><p>Balances, situation, goal and preferences shape the decisions your twin makes.</p></div>
         <div><h3>Your laptop simulates 500 paths</h3><p>January 2025 to December 2034. Choices happen each January; events and cash flows evolve monthly. A fixed historical start, not a forecast from today.</p></div>
         <div><h3>An assistant explains the results</h3><p>It receives persona details (not your name), the results and your messages. Change your choices and explore again for a new comparison.</p></div>
+        <div><h3>Habit or deliberate</h3><p>By default your twin decides like people tend to: mostly sticking with what they do. “Decide deliberately” nudges every yearly choice toward what is worth more to you over the next five years.</p></div>
         <div><h3>What “goal success” means</h3><p>Reaching the target by December 2029 without exceeding the credit limit before then. Emergency savings counts cash; other goals use net worth.</p></div>
       </div>
       <p className="note">Research prototype on synthetic data. No bank connection. Sessions live in laptop memory for up to an hour.</p>

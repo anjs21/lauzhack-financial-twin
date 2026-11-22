@@ -19,9 +19,9 @@ export default function PersonaBuilder({ person, traits, onSave, onClose }: { pe
   const [values, setValues] = useState({ ...traits });
   const [step, setStep] = useState(0);
   const [advanced, setAdvanced] = useState(false);
-  const set = (key: keyof Person, value: string | number) => setDraft(p => ({ ...p, [key]: value }));
+  const set = (key: keyof Person, value: string | number | boolean) => setDraft(p => ({ ...p, [key]: value }));
   function number(key: keyof Person, label: string, min = 0, max = 10000000, increment = '1') {
-    return <label className="field">{label}<div className="money-input"><span>{key === 'age' ? 'Years' : key === 'rate' ? 'Rate' : 'CHF'}</span><input type="number" required min={min} max={max} step={increment} value={draft[key]} onChange={e => set(key, e.target.value === '' ? '' : Number(e.target.value))} /></div></label>;
+    return <label className="field">{label}<div className="money-input"><span>{key === 'age' ? 'Years' : key === 'rate' ? 'Rate' : key === 'study_months_left' ? 'Months' : 'CHF'}</span><input type="number" required min={min} max={max} step={increment} value={draft[key] as number | string} onChange={e => set(key, e.target.value === '' ? '' : Number(e.target.value))} /></div></label>;
   }
   return <form onSubmit={e => { e.preventDefault(); if (step < 2) setStep(step + 1); else onSave(draft, values); }}>
     <div className="modal-heading"><h2>Your persona</h2></div>
@@ -32,6 +32,12 @@ export default function PersonaBuilder({ person, traits, onSave, onClose }: { pe
       <label className="field">Where do you live?<select value={draft.city} onChange={e => set('city', e.target.value)}>{cities.map(c => <option key={c}>{c}</option>)}</select></label>
       <label className="field">Your household<select value={draft.household_type} onChange={e => set('household_type', e.target.value)}>{Object.entries({ single: 'Living on my own', shared_housing: 'Sharing a home', couple: 'Living with a partner', family: 'Family with children' }).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label>
       <label className="field full">Your work situation<select value={draft.status} onChange={e => set('status', e.target.value)}>{Object.entries({ employed: 'Working full-time', part_time: 'Working part-time', self_employed: 'Self-employed', student: 'Studying', unemployed: 'Not currently working', retired: 'Retired' }).map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label>
+      {draft.status === 'student' && <>
+        {number('study_months_left', 'Months until you finish', 1, 72)}
+        <label className="check">
+          <input type="checkbox" checked={draft.in_masters} onChange={e => set('in_masters', e.target.checked)} />It’s a master’s degree
+        </label>
+      </>}
     </div>}
     {step === 1 && <div className="form-grid">
       <p className="full note">Figures for January 2025. Estimates are fine.</p>

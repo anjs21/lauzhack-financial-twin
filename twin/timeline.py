@@ -10,7 +10,7 @@ from .world.flow import SCALE, features
 
 @dataclass
 class Timeline:
-    offers: dict = field(default_factory=dict)         # month -> (work mode, net CHF)
+    offers: dict = field(default_factory=dict)         # month -> (work mode, net CHF[, alongside studies])
     observations: dict = field(default_factory=dict)   # consecutive month ends
 
 
@@ -19,9 +19,7 @@ def observed_month(world, s, observation, offer, count, bias):
     # Only the model's expected regular flow enters the bias update. The optional
     # observed flow explicitly excludes transfers, debt service and other overlays.
     if offer:
-        s.mode[:], s.self_employed[:], s.pensioner[:] = offer[0], False, False
-        s.tau[:], s.search[:], s.study_left[:] = 0, 0, 0
-        world.set_salary(s, offer[1])
+        world.accept_offer(s, offer)
     flow_key = "avg_net_flow" if "avg_net_flow" in observation else "net_flow"
     if flow_key in observation:
         # Same historical state for every path. Use the ensemble expectation: of this month for a
@@ -57,6 +55,7 @@ def observed_month(world, s, observation, offer, count, bias):
         s.tau[changed], s.search[changed], s.wage_adjustment[changed] = 0, 0, 0
         s.mode[:], s.pensioner[:], s.self_employed[:] = mode, status == "retired", status == "self_employed"
         s.study_left[:] = 1 if mode == C.STUDENT else 0
+        s.side_job &= s.mode == C.STUDENT
     world._set_income(s)
     if "income" in observation:
         world.set_salary(s, observation["income"])

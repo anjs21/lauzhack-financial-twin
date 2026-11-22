@@ -18,8 +18,8 @@ AUTH = {"Authorization": f"Bearer {KEY}"}
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setenv("TWIN_API_KEY", KEY)
-    monkeypatch.setenv("OPENAI_API_KEY", "test-provider-key")
-    monkeypatch.setenv("OPENAI_MODEL", "test-model")
+    monkeypatch.setenv("TOGETHER_API_KEY", "test-provider-key")
+    monkeypatch.setenv("TOGETHER_MODEL", "test-model")
     api.sessions.clear()
     with TestClient(api.app) as client:
         yield client
@@ -48,7 +48,8 @@ def test_auth_and_cors(client, monkeypatch):
     assert client.get("/health", headers=AUTH).status_code == 503
 
 
-@pytest.mark.parametrize("field,value", [("income", -1), ("city", "London"), ("age", 200), ("name", "  "), ("rent", 0)])
+@pytest.mark.parametrize("field,value", [("income", -1), ("city", "London"), ("age", 200), ("name", "  "), ("rent", 0),
+                                         ("study_months_left", 0), ("study_months_left", 100), ("in_masters", "maybe")])
 def test_person_validation(client, payload, field, value):
     payload["person"][field] = value
     assert client.post("/sessions", json=payload, headers=AUTH).status_code == 422
@@ -61,7 +62,7 @@ def test_trait_validation(client, payload, traits):
 
 
 def test_llm_required_before_simulation(client, payload, monkeypatch):
-    monkeypatch.delenv("OPENAI_API_KEY")
+    monkeypatch.delenv("TOGETHER_API_KEY")
     monkeypatch.setattr(api, "run_projection", lambda _: pytest.fail("Must not simulate without an explanation provider"))
     assert client.post("/sessions", json=payload, headers=AUTH).status_code == 503
 
@@ -113,8 +114,8 @@ def test_provider_receives_sanitized_context_and_history(monkeypatch):
         def create(self, **kwargs):
             seen.update(kwargs)
             return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="A grounded explanation."))])
-    monkeypatch.setenv("OPENAI_API_KEY", "test")
-    monkeypatch.setenv("OPENAI_MODEL", "test-model")
+    monkeypatch.setenv("TOGETHER_API_KEY", "test")
+    monkeypatch.setenv("TOGETHER_MODEL", "test-model")
     monkeypatch.setattr(api, "OpenAI", Client)
     evidence = {"person": {"name": "Private nickname", "income": 5000},
                 "baseline": {"months": ["2025-01"], "fan_cash": [[1]], "high_goal_odds": .5}, "alternative": None}
@@ -146,3 +147,69 @@ def test_housing_intervention_respects_existing_model_limits(payload):
     with pytest.raises(api.HTTPException) as error:
         api.run_projection(api.SessionRequest(**payload))
     assert error.value.status_code == 422
+
+
+def test_deliberate_persona_uses_foresight_on_both_paths(payload):
+    habitual = api.run_projection(api.SessionRequest(**payload))
+    deliberate = api.run_projection(api.SessionRequest(**payload, deliberate=True))
+    assert habitual["decision_style"] == "habitual" and not habitual["deliberate"]
+    assert deliberate["decision_style"] == "deliberate" and deliberate["deliberate"]
+    assert deliberate["baseline"]["final_net_worth"] != habitual["baseline"]["final_net_worth"]
+    assert deliberate["alternative"]["final_net_worth"] != habitual["alternative"]["final_net_worth"]
+    assert any("deliberate" in a for a in deliberate["assumptions"])
+    with pytest.raises(ValueError):
+        api.SessionRequest(**payload, deliberate="maybe")
+
+
+def test_part_time_alongside_studies_is_validated_and_used(payload):
+    payload["person"].update(status="student", study_months_left=24, in_masters=True)
+    payload["scenario"]["alongside_studies"] = True
+    result = api.run_projection(api.SessionRequest(**payload))
+    assert result["scenario"]["alongside_studies"] is True
+    assert result["alternative"]["key_moments"][0]["moment"] == "Takes a job alongside studies"
+    payload["scenario"]["alongside_studies"] = "maybe"
+    with pytest.raises(ValueError):
+        api.SessionRequest(**payload)
+
+
+def test_llm_calls_go_to_together(monkeypatch):
+    from twin import llm_provider
+    monkeypatch.setenv("TOGETHER_API_KEY", "k")
+    monkeypatch.setenv("TOGETHER_MODEL", "some/model")
+    monkeypatch.delenv("TOGETHER_BASE_URL", raising=False)
+    seen = {}
+    class Client:
+        def __init__(self, **kwargs):
+            seen["init"] = kwargs
+            self.chat = SimpleNamespace(completions=self)
+        def __enter__(self):
+            return self
+        def __exit__(self, *args):
+            pass
+        def create(self, **kwargs):
+            seen["create"] = kwargs
+            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="ok"))])
+    monkeypatch.setattr(api, "OpenAI", Client)
+    api.explain({"person": {"name": "x"}, "baseline": {}, "alternative": None}, [], "Why?")
+    assert seen["init"]["base_url"] == llm_provider.BASE_URL == "https://api.together.xyz/v1"
+    assert seen["init"]["api_key"] == "k" and seen["create"]["model"] == "some/model"
+    assert "max_tokens" in seen["create"] and "max_completion_tokens" not in seen["create"]
+    monkeypatch.delenv("TOGETHER_MODEL")
+    assert not api.llm_ready()
+
+
+def test_persona_demos_fall_back_without_json_mode(tmp_path, monkeypatch):
+    from twin.policy.llm import Client, parse_json
+    attempts = []
+    class NoJsonMode:
+        chat = property(lambda self: self)
+        completions = property(lambda self: self)
+        def create(self, **kw):
+            attempts.append(sorted(kw))
+            if "response_format" in kw:
+                raise ValueError("This model does not support response_format json mode")
+            msg = SimpleNamespace(content='Sure: ```json\n{"status": {"0": 1}}\n```')
+            return SimpleNamespace(choices=[SimpleNamespace(message=msg)])
+    c = Client("some/model", cache=tmp_path / "c.jsonl", sdk_client=NoJsonMode())
+    assert c.ask("hello") == {"status": {"0": 1}} and len(attempts) == 2
+    assert parse_json("no json here") == {}

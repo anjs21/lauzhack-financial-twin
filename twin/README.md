@@ -73,7 +73,7 @@ reconsidered at the January review; spending and assets every month.
 * **Neural persona** ([`policy/net.py`](policy/net.py)): a GRU policy cloned from the rule
   persona's probabilities over 2,400 sampled lives, tested on unseen profiles
   (`twin/artifacts/persona_net.json`). `--policy neural` in the explorer.
-* **LLM persona** ([`policy/llm.py`](policy/llm.py)): an OpenAI model role-plays the person at
+* **LLM persona** ([`policy/llm.py`](policy/llm.py)): a Together AI model role-plays the person at
   decision points of the clone's training lives (situation, goals and traits in words) and answers
   how *this person* would likely act, as probabilities. Those answers replace the rule targets at
   those points, with 10x weight, when the neural persona is cloned. Answers are cached on disk, so
@@ -89,8 +89,8 @@ reconsidered at the January review; spending and assets every month.
 ### LLM persona and foresight
 
 ```bash
-export OPENAI_API_KEY=sk-...             # read from the environment only; never written to files
-export OPENAI_MODEL=gpt-4o-mini          # optional (default gpt-4o-mini)
+export TOGETHER_API_KEY=...             # read from the environment only; never written to files
+export TOGETHER_MODEL=<model id>         # a chat model from https://api.together.ai/models (or --model)
 python -m twin llm-demos --dry-run       # see one prompt, no call
 python -m twin llm-demos --calls 300     # ~0.3M tokens; answers in twin/artifacts/llm_demos.json
 python -m twin clone --llm               # retrain the neural persona with the LLM answers

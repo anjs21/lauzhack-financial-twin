@@ -23,7 +23,7 @@ from .policy.traits import Persona, from_profile, sample_traits
 from .world.env import Streams, World
 from .timeline import Timeline, observed_month
 
-EVENTS = ["job_loss", "offer", "graduated", "partner", "child", "separation", "forced_move", "windfall"]
+EVENTS = ["job_loss", "offer", "graduated", "partner", "child", "separation", "forced_move", "windfall", "side_job"]
 
 
 @dataclass
@@ -64,7 +64,9 @@ def person_table(profile_id: str | None = None, custom: dict | None = None) -> p
                inv0=float(d.get("investments", 0)), debt0=float(d.get("debt", 0)), rate0=float(d.get("rate", 0)),
                high_goal=d.get("high_goal", "Emergency savings"), high_target=float(d.get("high_target", 20000)),
                med_goal=d.get("med_goal"), med_target=float(d.get("med_target", np.nan)),
-               tuition=float(d.get("tuition", np.nan)))
+               tuition=float(d.get("tuition", np.nan)),
+               study_left0=max(1, int(d.get("study_months_left", 1))) if status == "student" else 0,
+               masters0=bool(d.get("in_masters", False)) and status == "student")
     return pd.DataFrame([row], index=[d.get("id", "custom")])
 
 
@@ -109,7 +111,7 @@ def simulate(world: World, people: pd.DataFrame, personas, n_paths=2000, seed=C.
             keep(t + 1, s)
             below[:, t] = s.cash < 0
             if offer:
-                action[:, t, 0] = 2 if offer[0] == C.PART_TIME else 3
+                action[:, t, 0] = np.where(s.mode == offer[0], 2 if offer[0] == C.PART_TIME else 3, 0)
             continue
         a, _ = policy.act(s, streams)
         if offer:
@@ -224,6 +226,54 @@ def turning_points(paths: Paths, top=6):
     return rows[:top]
 
 
+def moment_masks(paths: Paths) -> dict:
+    """(N, T) masks, one per big decision or life event, true in the month it happens."""
+    m0, m1 = paths.mode[:, :-1], paths.mode[:, 1:]
+    idle = np.isin(m0, [C.STUDENT, C.NOT_WORKING])
+    work0, work1 = np.isin(m0, [C.PART_TIME, C.FULL_TIME]), np.isin(m1, [C.PART_TIME, C.FULL_TIME])
+    ev, age = paths.events, paths.age[:, :-1]
+    stop = work0 & (m1 == C.NOT_WORKING) & ~ev["job_loss"]
+    tier0, tier1 = paths.tier[:, :-1], paths.tier[:, 1:]
+    return {
+        ("decision", "Starts a master's"): paths.action[:, :, 0] == 1,
+        ("decision", "Takes a job alongside studies"): ev["side_job"],
+        ("event", "Finishes studies"): ev["graduated"],
+        ("decision", "Starts a full-time job"): idle & (m1 == C.FULL_TIME),
+        ("decision", "Starts a part-time job"): idle & (m1 == C.PART_TIME),
+        ("decision", "Moves up to full-time"): (m0 == C.PART_TIME) & (m1 == C.FULL_TIME),
+        ("decision", "Cuts back to part-time"): (m0 == C.FULL_TIME) & (m1 == C.PART_TIME),
+        ("event", "Loses a job"): ev["job_loss"],
+        ("decision", "Stops working"): stop & (age < 60),
+        ("decision", "Retires"): stop & (age >= 60),
+        ("decision", "Moves to a bigger home"): tier1 > tier0,
+        ("decision", "Moves somewhere cheaper"): tier1 < tier0,
+        ("event", "Partner moves in"): ev["partner"],
+        ("event", "Has a child"): ev["child"],
+        ("event", "Separates"): ev["separation"],
+    }
+
+
+def key_moments(paths: Paths, top=6, min_share=0.10) -> list:
+    """The big decisions and life events that happen in at least `min_share` of lives: how often and when.
+
+    share: lives where it happens at least once; typical_year: median year it first happens;
+    share_by_goal_deadline: lives where it has happened by December 2029. Ordered by typical year.
+    """
+    deadline = C.T_HIGH_GOAL + 1
+    rows = []
+    for (kind, label), mask in moment_masks(paths).items():
+        ever = mask.any(1)
+        share = float(ever.mean())
+        if share < min_share:
+            continue
+        first = mask.argmax(1)[ever]
+        rows.append(dict(moment=label, kind=kind, share=round(share, 4),
+                         typical_year=int(C.START_YEAR + np.median(first) // 12),
+                         share_by_goal_deadline=round(float((mask[:, :deadline].any(1)).mean()), 4)))
+    rows = sorted(rows, key=lambda r: -r["share"])[:top]
+    return sorted(rows, key=lambda r: (r["typical_year"], -r["share"]))
+
+
 def yearly_action_rates(paths: Paths) -> dict:
     """Share of paths taking each kind of action per year (for plausibility checks)."""
     a = paths.action
@@ -255,6 +305,7 @@ def summarize(paths: Paths) -> dict:
         "mode_share_by_year": {MODE_WORD[m]: [round(float((paths.mode[:, 12 * y] == m).mean()), 4) for y in range(11)]
                                for m in range(4)},
         "stories": stories(paths),
+        "key_moments": key_moments(paths),
         "turning_points": turning_points(paths),
         "action_rates_per_year": yearly_action_rates(paths),
     }

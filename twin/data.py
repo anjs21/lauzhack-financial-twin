@@ -58,6 +58,9 @@ def profiles() -> pd.DataFrame:
     out["med_target"] = md.target_amount_chf.reindex(p.index)
     tuition = s001[s001.parameter == "annual_tuition_chf"].set_index("profile_id").value
     out["tuition"] = tuition.reindex(p.index)
+    # The data identify students but not how far along they are: assume the course ends at the opening review.
+    out["study_left0"] = np.where(out["mode"] == C.STUDENT, 1, 0)
+    out["masters0"] = False
     return out
 
 

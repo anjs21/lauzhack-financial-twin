@@ -1,7 +1,7 @@
-"""LLM persona demonstrations: an LLM (OpenAI API) role-plays the person at decision points.
+"""LLM persona demonstrations: an LLM (Together AI) role-plays the person at decision points.
 
-    export OPENAI_API_KEY=sk-...                 # read from the environment, never stored
-    export OPENAI_MODEL=gpt-4o-mini              # optional; or --model
+    export TOGETHER_API_KEY=...                  # read from the environment, never stored
+    export TOGETHER_MODEL=<model id>             # a chat model from your Together account; or --model
     python -m twin llm-demos --calls 300         # ask; answers cached in twin/artifacts/llm_cache.jsonl
     python -m twin llm-demos --dry-run           # print one prompt, no API call
     python -m twin clone --llm                   # rule targets everywhere, LLM answers where asked
@@ -24,13 +24,13 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 
 from .. import config as C
+from .. import llm_provider as provider
 from .net import SIZES, teacher_data
 from .rules import HEADS
 from .traits import QUESTIONS, TRAITS
 
 DEMOS = C.ARTIFACTS / "llm_demos.json"
 CACHE = C.ARTIFACTS / "llm_cache.jsonl"
-DEFAULT_MODEL = "gpt-4o-mini"
 OFFSET = [0, sum(SIZES[:1]), sum(SIZES[:2]), sum(SIZES[:3])]
 
 SYSTEM = ("You role-play one specific person deciding about their own work, home, spending and savings. "
@@ -142,10 +142,10 @@ def parse(answer: dict, valid: dict):
 
 
 class Client:
-    """Thin wrapper over the OpenAI SDK with a disk cache keyed by (model, prompt)."""
+    """Thin wrapper over the openai SDK, pointed at Together AI, with a disk cache keyed by (model, prompt)."""
 
     def __init__(self, model=None, cache=CACHE, sdk_client=None):
-        self.model = model or os.environ.get("OPENAI_MODEL", DEFAULT_MODEL)
+        self.model = model or provider.model()
         self.cache_path = cache
         self.cache = {}
         if cache.exists():
@@ -159,10 +159,12 @@ class Client:
     @property
     def sdk(self):
         if self._sdk is None:
-            if not os.environ.get("OPENAI_API_KEY"):
-                raise SystemExit("Set OPENAI_API_KEY in your environment first (export OPENAI_API_KEY=...).")
+            if not provider.connection()["api_key"]:
+                raise SystemExit("Set TOGETHER_API_KEY in your environment first (export TOGETHER_API_KEY=...).")
+            if not self.model:
+                raise SystemExit("Choose a Together chat model: export TOGETHER_MODEL=<model id> (or --model).")
             from openai import OpenAI
-            self._sdk = OpenAI(max_retries=5, timeout=60)
+            self._sdk = OpenAI(**provider.connection(), max_retries=5, timeout=60)
         return self._sdk
 
     def key(self, prompt):
@@ -174,24 +176,28 @@ class Client:
             return self.cache[k]
         msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}]
         try:
-            try:
-                r = self.sdk.chat.completions.create(model=self.model, messages=msgs, temperature=0.2,
-                                                     response_format={"type": "json_object"})
-            except Exception as e:          # some models only accept the default temperature
-                if "temperature" not in str(e):
-                    raise
-                r = self.sdk.chat.completions.create(model=self.model, messages=msgs,
-                                                     response_format={"type": "json_object"})
+            kwargs = dict(model=self.model, messages=msgs, temperature=0.2, response_format={"type": "json_object"})
+            for _ in range(3):
+                try:
+                    r = self.sdk.chat.completions.create(**kwargs)
+                    break
+                except Exception as e:      # not every model accepts JSON mode or a set temperature
+                    text = str(e)
+                    if "response_format" in text or ("json" in text.lower() and "mode" in text.lower()):
+                        kwargs.pop("response_format", None)
+                    elif "temperature" in text:
+                        kwargs.pop("temperature", None)
+                    else:
+                        raise
+            else:
+                raise RuntimeError("the model rejected the request settings")
         except SystemExit:
             raise
         except Exception as e:
             raise SystemExit(explain(e, self.model)) from e
         with self.lock:
             self.calls += 1
-        try:
-            answer = json.loads(r.choices[0].message.content)
-        except (json.JSONDecodeError, TypeError):
-            answer = {}
+        answer = parse_json(r.choices[0].message.content)
         with self.lock:
             self.cache[k] = answer
             with self.cache_path.open("a") as f:
@@ -199,20 +205,34 @@ class Client:
         return answer
 
 
+def parse_json(content):
+    """The JSON object in a reply; models without JSON mode may wrap it in prose or a code fence."""
+    if not content:
+        return {}
+    try:
+        return json.loads(content)
+    except (json.JSONDecodeError, TypeError):
+        start, end = content.find("{"), content.rfind("}")
+        try:
+            return json.loads(content[start:end + 1]) if 0 <= start < end else {}
+        except json.JSONDecodeError:
+            return {}
+
+
 def explain(e, model):
-    """Turn an OpenAI error into a message that says what to do."""
+    """Turn a Together AI error into a message that says what to do."""
     name, text = type(e).__name__, str(e)
     if name == "AuthenticationError" or "401" in text:
-        return "OpenAI rejected the key (401). Check OPENAI_API_KEY in the same terminal: echo ${OPENAI_API_KEY:0:7}"
-    if "insufficient_quota" in text:
-        return "The OpenAI account behind this key has no credit or quota left (429 insufficient_quota)."
-    if name == "NotFoundError" or "model_not_found" in text or "does not exist" in text:
-        return f"Model '{model}' is not available to this key. Pick another: export OPENAI_MODEL=gpt-4o-mini (or --model)."
+        return "Together AI rejected the key (401). Check TOGETHER_API_KEY in the same terminal: echo ${TOGETHER_API_KEY:0:6}"
+    if name == "PermissionDeniedError" or "402" in text or "credit" in text.lower():
+        return "The Together AI account behind this key has no credit left, or no access to this model."
+    if name == "NotFoundError" or "model_not_found" in text or "does not exist" in text or "Unable to access model" in text:
+        return f"Model '{model}' is not available on Together AI. Pick a chat model from https://api.together.ai/models (TOGETHER_MODEL or --model)."
     if name in ("APIConnectionError", "APITimeoutError"):
-        return f"Could not reach the OpenAI API ({name}). Check the network or a proxy / OPENAI_BASE_URL."
+        return f"Could not reach Together AI ({name}). Check the network, a proxy, or TOGETHER_BASE_URL."
     if name == "RateLimitError":
-        return "OpenAI rate limit hit even after retries. Rerun with fewer workers: --workers 2 (answers so far are cached)."
-    return f"OpenAI call failed: {name}: {text[:300]}"
+        return "Together AI rate limit hit even after retries. Rerun with fewer workers: --workers 2 (answers so far are cached)."
+    return f"Together AI call failed: {name}: {text[:300]}"
 
 
 def pick_points(ctx, n, seed=C.SEED):
