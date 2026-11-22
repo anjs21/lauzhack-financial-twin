@@ -1,9 +1,0 @@
-intervention,applicable_profiles,baseline_shortfall_profiles,replay_shortfall_profiles,shortfalls_prevented,new_shortfalls,median_final_cash_delta_chf,total_funding_gap_chf,assumptions
-baseline,1200,61,61,0,0,0.0,1859633.69,Recorded month-end cash; no behavioural change
-monthly_net_plus_250,1200,61,55,6,0,6000.0,1516337.25,Assumed extra net income OR expense reduction from month 1; no implementation cost
-monthly_net_plus_500,1200,61,47,14,0,12000.0,1202452.41,Assumed extra net income OR expense reduction from month 1; no implementation cost
-monthly_net_plus_1000,1200,61,34,27,0,24000.0,721513.05,Assumed extra net income OR expense reduction from month 1; no implementation cost
-rent_reduction_10pct,1200,61,55,6,0,4658.85,1569828.88,"Assumed recurring rent saving; no move cost, deposit, eligibility or income change"
-rent_reduction_20pct,1200,61,51,10,0,9317.69,1302269.87,"Assumed recurring rent saving; no move cost, deposit, eligibility or income change"
-liquidate_all_opening_investments,1200,61,42,19,0,31940.37,1199130.0,Convert opening investment snapshot to cash at month 0; zero fees/returns; wealth unchanged
-add_assumed_60m_debt_payments,283,11,15,0,4,-16655.66,502812.26,"Loan profiles only; hypothetical 60-month repayment, nominal APR/12; recorded cash excludes repayment"

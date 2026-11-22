@@ -1,9 +1,0 @@
-{
-  "profiles": 1200,
-  "tests": 181,
-  "significant": 81,
-  "scipy": "1.16.3",
-  "pandas": "2.3.3",
-  "numpy": "2.2.6",
-  "seed": 20261121
-}

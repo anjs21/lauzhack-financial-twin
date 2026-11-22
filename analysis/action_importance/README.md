@@ -4,7 +4,7 @@ Answers one question: **which actions, shocks and state variables does the MDP n
 
 `action_importance.py` recovers the rule behind the synthetic ledger and calibrates a stochastic monthly simulator from it. It back-tests that simulator on 2026 using 2025 data only. It then applies 29 candidate decisions and shocks to all 1,200 profiles over 2025-01..2034-12 (200 paths each, common random numbers) and ranks them by how often they materially change a profile's outcome.
 
-It complements `../analyze_mdp.py`, which replays the recorded ledger, and keeps the accounting contract in `../mdp_design.json`.
+It keeps the accounting contract in `../mdp_design.json`.
 
 ```bash
 python analysis/action_importance/action_importance.py   # ~2.5 min; numpy, pandas, scipy, scikit-learn
