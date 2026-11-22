@@ -311,7 +311,7 @@ def test_assistant_tools_turn_words_into_simulation_changes(client, payload, mon
     assert [a["type"] for a in reply["actions"]] == ["rerun", "branch", "branch", "highlight"]
     assert reply["actions"][0]["evidence"]["person"]["income"] == 7000
     assert reply["actions"][2]["branch"]["parent"] == "b1" and reply["actions"][3] == {"type": "highlight", "path_id": "b2", "measure": "net_worth"}
-    assert reply["notes"][0].startswith("Updated age 31; income CHF 7,000; free time 0.2")
+    assert reply["notes"][0].startswith("Updated age 31; income CHF 7'000; free time 0.2")
     s = api.sessions[sid]
     assert s.request.person.age == 31 and s.request.traits["free_time"] == 0.2 and s.request.person.name == payload["person"]["name"]
     assert set(s.branches) == {"b1", "b2"}
@@ -351,3 +351,21 @@ def test_compare_runs_a_second_scenario_as_its_own_path(payload):
     session = api.Session(evidence=both, history=[], request=request)
     labels = {p["id"]: p["label"] for p in api.paths_of(session)}
     assert labels["alternative"].startswith("Job alongside studies") and labels["compare"].startswith("Job instead of studies")
+
+
+def test_plan_explanation_runs_for_the_sessions_plan(client, payload):
+    from twin.plan.schema import LifePlan
+    example = json.loads(Path("web/src/example.json").read_text())
+    versions = json.loads(Path("web/src/example-plan.json").read_text())["history"]
+    request = api.SessionRequest(person=example["person"], traits=example["traits"], n_paths=100)
+    plan = LifePlan.from_dict(versions[-1]["plan"])[0]
+    with_plan = api.Session(evidence={}, request=request, plan=plan, plan_versions=versions)
+    api.sessions.update(with_plan=with_plan, without=api.Session(evidence={}, request=request))
+    report = api.run_explanation(with_plan, n_paths=100)
+    assert report["paths"] == 100 and report["person"]["name"] == "P0067"
+    assert [s["id"] for s in report["execution"]["step_report"]] == [s.id for s in plan.steps]
+    assert {"plan", "habits", "plan_minus_habits", "offer_stress"} <= set(report["outcomes"])
+    assert report["execution"]["opening_state_intervention"]["cash_comparisons"][0]["cash_chf"] == 3000
+    with_plan.explanation = report                                         # computed once, then served
+    assert client.get("/sessions/with_plan/explanation", headers=AUTH).json()["paths"] == 100
+    assert client.get("/sessions/without/explanation", headers=AUTH).status_code == 409

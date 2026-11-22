@@ -1,5 +1,5 @@
 import type { PlanStep, StepResult } from './types';
-import { compact, money, percent } from './types';
+import { compact, money, percent, swiss, wholePercents } from './types';
 import { Outcome, when } from './Plan';
 
 // The shape analysis/policy-explanations/run_explanations.py writes (web/src/example-explanation.json).
@@ -21,7 +21,6 @@ export type Explanation = {
     plan_minus_habits: { shortfall: Interval; breach: Interval; goal: Interval; mean_wealth_chf: { mean: number; lower: number; upper: number } };
     offer_stress: { offer_factor: number; summary: Summary; difference_vs_plan_baseline: { shortfall: Interval; goal: Interval; mean_wealth_chf: { mean: number; lower: number; upper: number } } }[];
   };
-  limitations: string[];
 };
 
 const HEADS: Record<string, string> = { status: 'Work and study', housing: 'Home', spending: 'Lifestyle', assets: 'Savings' };
@@ -39,13 +38,13 @@ export default function Explained({ data }: { data: Explanation }) {
   return <article className="explained" aria-label="Plan explained">
     <header>
       <h2>From plan to outcomes</h2>
-      <p className="muted">{data.person.name} · {data.paths.toLocaleString('en')} paired simulated lives · plan version {data.provenance.version}{data.provenance.model ? ` by ${data.provenance.model}` : ''}</p>
+      <p className="muted">{data.person.name} · {money(data.paths)} paired simulated lives · plan version {data.provenance.version}{data.provenance.model ? ` by ${data.provenance.model}` : ''}</p>
     </header>
 
     <section>
       <span className="level">1 · The planner</span>
       <h3>What did the LLM plan?</h3>
-      <blockquote>{plan.narrative}</blockquote>
+      <blockquote>{swiss(plan.narrative)}</blockquote>
       <ul className="explained-steps">{plan.steps.map(s => <li key={s.id}>
         <b>{s.label}</b>
         <small>{when(s, plan.steps)} · {percent(s.commitment)} committed</small>
@@ -67,14 +66,14 @@ export default function Explained({ data }: { data: Explanation }) {
       <p className="muted">The same person and plan with CHF {money(low.cash_chf)} instead of CHF {money(start.cash_chf)}: the chance of each choice at that first review. Exact probabilities of the decision rules, not simulated frequencies.</p>
       {Object.keys(HEADS).map(head => {
         const labels = ex.opening_state_intervention.labels[head];
-        const rows = labels.map((label, i) => ({ label, i,
-          a: low.with_plan.probabilities[head][i], b: start.with_plan.probabilities[head][i],
-          ha: low.habits.probabilities[head][i], hb: start.habits.probabilities[head][i],
+        // Each column is one choice's probabilities: rounded together, so a column adds up to 100%.
+        const [a, b, ha, hb] = [low.with_plan, start.with_plan, low.habits, start.habits].map(v => wholePercents(v.probabilities[head]));
+        const rows = labels.map((label, i) => ({ label, i, a: a[i], b: b[i], ha: ha[i], hb: hb[i],
           open: low.with_plan.available[head][i] || start.with_plan.available[head][i] }))
-          .filter(r => r.open && Math.max(r.a, r.b, r.ha, r.hb) >= 0.005);
+          .filter(r => r.open && Math.max(r.a, r.b, r.ha, r.hb) > 0);
         return <div className="table" key={head}><table>
           <thead><tr><th>{HEADS[head]}</th><th>CHF {compact(low.cash_chf)}</th><th>CHF {compact(start.cash_chf)}</th><th>Habits alone</th></tr></thead>
-          <tbody>{rows.map(r => <tr key={r.i}><td>{r.label}</td><td>{percent(r.a)}</td><td>{percent(r.b)}</td><td className="muted">{percent(r.ha)} / {percent(r.hb)}</td></tr>)}</tbody>
+          <tbody>{rows.map(r => <tr key={r.i}><td>{r.label}</td><td>{r.a}%</td><td>{r.b}%</td><td className="muted">{r.ha}% / {r.hb}%</td></tr>)}</tbody>
         </table></div>;
       })}
     </section>
@@ -106,9 +105,5 @@ export default function Explained({ data }: { data: Explanation }) {
       </table></div>
     </section>
 
-    <details className="explained-limits">
-      <summary>What this does and does not show</summary>
-      <ul>{data.limitations.map(l => <li key={l}>{l}</li>)}</ul>
-    </details>
   </article>;
 }

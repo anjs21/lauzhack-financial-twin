@@ -92,6 +92,9 @@ test('connect, explore, ask a grounded follow-up, invalidate stale chat', async 
   await page.getByRole('button', { name: 'Go part-time', exact: true }).click();
   await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
   await expect(page.getByRole('switch', { name: 'Decide deliberately' })).toHaveCount(0);   // removed
+  await page.getByRole('tab', { name: 'Plan explained' }).click();                          // no plan yet: offer to make one
+  await expect(page.getByRole('button', { name: 'Make a long-term plan' }).last()).toBeVisible();
+  await page.getByRole('tab', { name: 'Paths' }).click();
 });
 
 test('unreachable workspace has a recoverable error', async ({ page }) => {
@@ -216,8 +219,8 @@ test('the assistant changes the persona and grows branches from a chat message',
       const rerun = { ...example, person: { ...example.person, age: 31, income: 7000 } };
       const branch = { id: 'b1', parent: 'alternative', root: 'alternative', from: 36, label: 'Work full-time · 2028', applied: 0.95, decisions: [{ month: 36, choice: 'full_time' }],
                        summary: { ...example.alternative, high_goal_odds: 0.96 } };
-      json = { answer: 'Done: you are now 31 on CHF 7,000, and the full-time branch is on the chart.',
-               notes: ['Updated age 31; income CHF 7,000 · re-ran 500 lives', 'Grew a branch: Work full-time · 2028'],
+      json = { answer: 'Done: you are now 31 on CHF 7\'000, and the full-time branch is on the chart.',
+               notes: ['Updated age 31; income CHF 7\'000 · re-ran 500 lives', 'Grew a branch: Work full-time · 2028'],
                actions: [{ type: 'rerun', evidence: rerun }, { type: 'branch', branch }, { type: 'highlight', path_id: 'b1', measure: 'net_worth' }] };
     } else if (request.method() === 'POST') json = { session_id: 'chat', evidence: example, answer: 'Ready.' };
     await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
@@ -230,7 +233,7 @@ test('the assistant changes the persona and grows branches from a chat message',
   await expect(page.getByText('Ready.')).toBeVisible();
   await page.getByLabel('Ask about your financial future').fill('I am 31 and take home 7k. What if I go full-time in 2028?');
   await page.getByRole('button', { name: 'Send message' }).click();
-  await expect(page.getByRole('list', { name: 'Changes made' })).toContainText('Updated age 31; income CHF 7,000');
+  await expect(page.getByRole('list', { name: 'Changes made' })).toContainText('Updated age 31; income CHF 7\'000');
   const tree = page.getByRole('region', { name: 'Paths' });
   await expect(tree.getByRole('button', { name: /^Work full-time · 2028/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Net worth', exact: true })).toHaveAttribute('aria-pressed', 'true');

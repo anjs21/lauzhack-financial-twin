@@ -8,6 +8,7 @@ for an open workspace that needs no key (anyone with the URL can then use it, an
 from __future__ import annotations
 
 import copy
+import importlib.util
 import json
 import logging
 import os
@@ -243,6 +244,8 @@ decision was possible then. Compare a branch with its parent to say what the dec
 Only a tool call changes the simulation. Never claim a change you did not make with a tool; if no
 tool fits, say what the user can change in the controls. Stay within the supplied financial scenario.
 Keep responses warm, concrete, and under 220 words, using plain text paragraphs (no Markdown).
+Write amounts the way the app shows them: CHF 40'000, CHF 1'130'000 (apostrophe as the thousands
+separator), never with commas or abbreviations such as 40k or 1.13m.
 Lead with the most relevant insight, cite 1-3 supplied figures when useful, explain uncertainty,
 and end with one useful question. Do not provide securities recommendations or guarantees.
 If the evidence has a "plan", it is the person's own long-term plan, written with their planner agent
@@ -459,6 +462,8 @@ class Session:
     next_branch: int = 0
     plan: LifePlan | None = None                              # the person's long-term plan, followed on every path
     plan_evaluation: dict | None = None
+    plan_versions: list = field(default_factory=list)          # every version of that plan, oldest first
+    explanation: dict | None = None                           # the "Plan explained" report, once computed
     expires: float = field(default_factory=lambda: time.monotonic() + 3600)
     lock: threading.Lock = field(default_factory=threading.Lock)
 
@@ -475,11 +480,16 @@ def validation_message(e) -> str:
     return str(e)
 
 
+def chf(x) -> str:
+    """An amount as the app writes it: CHF 40'000 (Swiss thousands separator)."""
+    return "CHF " + format(x, ",.0f").replace(",", "'")
+
+
 def scenario_label(scenario: dict, student: bool = False) -> str:
     kind = scenario["kind"]
     if kind == "part_time":
         what = ("Job alongside studies" if scenario.get("alongside_studies") else "Job instead of studies") if student else "Part-time"
-        return f"{what} at CHF {scenario['salary']:,.0f}"
+        return f"{what} at {chf(scenario['salary'])}"
     return {"spend_less": "Spend less", "cheaper_home": "Cheaper home"}.get(kind, "Current path")
 
 
@@ -562,7 +572,7 @@ def _changes_note(args: dict) -> str:
     parts = []
     for k, v in (args.get("person") or {}).items():
         money = k in ("income", "rent", "cash", "investments", "debt", "high_target")
-        parts.append(f"{k.replace('_', ' ')} {'CHF ' + format(v, ',.0f') if money else v}")
+        parts.append(f"{k.replace('_', ' ')} {chf(v) if money else v}")
     parts += [f"{k.replace('_', ' ')} {v:g}" for k, v in (args.get("traits") or {}).items()]
     if args.get("scenario"):
         parts.append("scenario " + ", ".join(f"{k} {v}" for k, v in args["scenario"].items()))
@@ -580,7 +590,7 @@ def tool_update(session, args: dict):
     before = {p["id"]: {k: v for k, v in p.items() if k in ("goal_odds", "credit_breach_odds", "median_net_worth_2034")}
               for p in paths_of(session) if p["id"] in ("baseline", "alternative", "compare")}
     evidence = run_projection(new, session.plan, session.plan_evaluation)
-    session.request, session.evidence, session.branches = new, evidence, {}
+    session.request, session.evidence, session.branches, session.explanation = new, evidence, {}, None
     after = {p["id"]: p for p in paths_of(session)}
     result = {"changed": args, "before": before, "after": after, "branches_cleared": True}
     return result, {"type": "rerun", "evidence": evidence}, _changes_note(args) + f" · re-ran {new.n_paths} lives"
@@ -697,19 +707,20 @@ def health():
 def create_session(request: SessionRequest):
     if not llm_ready():
         raise HTTPException(503, provider.SETUP)
-    plan, plan_eval = None, None
+    plan, plan_eval, versions = None, None, []
     if request.plan_id is not None:
         record = live_plan(request.plan_id)
         if not record.versions:
             raise HTTPException(409, "The plan is not ready yet.")
         plan, plan_eval = LifePlan.from_dict(record.versions[-1]["plan"])[0], record.versions[-1]["evaluation"]
+        versions = list(record.versions)
     try:
         evidence = run_projection(request, plan, plan_eval)
     except FileNotFoundError:
         raise HTTPException(503, "The trained model artifacts are missing on the laptop.") from None
     answer = explain(evidence, [], request.question)
     session = Session(evidence, [{"role": "user", "content": request.question}, {"role": "assistant", "content": answer}],
-                      request=request, plan=plan, plan_evaluation=plan_eval)
+                      request=request, plan=plan, plan_evaluation=plan_eval, plan_versions=versions)
     with sessions_lock:
         now = time.monotonic()
         for key in list(sessions):
@@ -753,6 +764,46 @@ def live_session(session_id: str) -> Session:
             sessions.pop(session_id, None)
             raise HTTPException(404, "This exploration has expired. Explore the scenario again to start a new one.")
     return session
+
+
+EXPLAIN_PATHS = 1000          # lives for the "Plan explained" report (a few seconds on a laptop)
+
+
+@lru_cache(maxsize=1)
+def explanations():
+    """analysis/policy-explanations/run_explanations.py: the three-level plan explanation, loaded as it is."""
+    path = C.ROOT / "analysis" / "policy-explanations" / "run_explanations.py"
+    spec = importlib.util.spec_from_file_location("twin_policy_explanations", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def run_explanation(session: Session, n_paths: int | None = None) -> dict:
+    """What the planner wrote, how the persona carries it out, and what follows: for this session's plan."""
+    request, versions = session.request, session.plan_versions
+    people, persona = persona_for(request.person, request.traits)        # the plan is applied inside the analysis
+    cash = float(request.person.cash)
+    low = min(3000.0, round(cash / 3, -2))                                  # the "less cash in January 2025" comparison
+    provenance = {"file": None, "description": "This session's plan, made by the planner on the laptop.",
+                  "model": provider.model(), "version": len(versions), "profile": "session",
+                  "as_of": versions[-1].get("as_of")}
+    return explanations().analyse(people, persona, session.plan, versions[-1], versions, provenance,
+                                  n_paths or EXPLAIN_PATHS, C.SEED, low, 0, "")
+
+
+@app.get("/sessions/{session_id}/explanation", dependencies=[Depends(authorize), Depends(workload)])
+def explanation(session_id: str):
+    session = live_session(session_id)
+    with session.lock:
+        if session.plan is None or not session.plan_versions:
+            raise HTTPException(409, "There is no plan to explain: make a long-term plan and explore with it first.")
+        if session.explanation is None:
+            try:
+                session.explanation = run_explanation(session)
+            except FileNotFoundError:
+                raise HTTPException(503, "The explanation analysis or the model artifacts are missing on the laptop.") from None
+        return session.explanation
 
 
 @app.post("/sessions/{session_id}/branches", dependencies=[Depends(authorize), Depends(workload)])

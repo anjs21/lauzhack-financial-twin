@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LoaderCircle, PenLine, RotateCcw } from 'lucide-react';
 import type { PlanRound, PlanStep, PlanVersion, StepResult } from './types';
-import { compact, money, percent } from './types';
+import { compact, money, percent, swiss, wholePercents } from './types';
 
 const EVENTS: Record<string, string> = {
   job_loss: 'if I lose my job', offer: 'once I get a job offer', graduated: 'once I finish studying',
@@ -50,20 +50,22 @@ function changesBetween(before: PlanVersion, after: PlanVersion) {
 function outcomeParts(step: PlanStep, r: StepResult) {
   const worldNo = step.head === 'housing' ? 'no flat found' : step.option === 'start_masters' ? 'not admitted' : 'no job offer came';
   const notDue = contingent(step) ? 'never needed' : step.after ? 'the step before never happened' : 'never came up';
-  return [
+  const parts = [
     { key: 'done', share: r.taken_share, text: 'did it' },
     { key: 'declined', share: r.declined_share, text: 'chose not to' },
     { key: 'refused', share: r.turned_down_share, text: `tried, ${worldNo}` },
     { key: 'blocked', share: r.blocked_share, text: 'not possible' },
     { key: 'idle', share: Math.max(0, 1 - r.trigger_share), text: notDue },
-  ].filter(p => p.share >= 0.005);
+  ];
+  const whole = wholePercents(parts.map(p => p.share));                   // rounded together: they add up to 100
+  return parts.map((p, i) => ({ ...p, pct: whole[i] })).filter(p => p.pct > 0);
 }
 
 export function Outcome({ step, result }: { step: PlanStep; result: StepResult }) {
   const parts = outcomeParts(step, result);
   return <div className="outcome">
-    <span className="outcome-bar" aria-hidden="true">{parts.map(p => <i key={p.key} className={p.key} style={{ flexGrow: p.share }} />)}</span>
-    <small>{parts.map(p => `${p.text} ${percent(p.share)}`).join(' · ')}</small>
+    <span className="outcome-bar" aria-hidden="true">{parts.map(p => <i key={p.key} className={p.key} style={{ flexGrow: p.pct }} />)}</span>
+    <small>{parts.map(p => `${p.text} ${p.pct}%`).join(' · ')}</small>
     {result.blocked_because && <small className="flag">Not possible in {percent(result.blocked_share)}: {result.blocked_because}</small>}
   </div>;
 }
@@ -74,7 +76,7 @@ function Step({ step, result, steps }: { step: PlanStep; result?: StepResult; st
     <span className="what">
       <b>{step.label}</b>
       <small>{when(step, steps)} · {firmness(step.commitment)}</small>
-      {step.why && <span className="why">{step.why}</span>}
+      {step.why && <span className="why">{swiss(step.why)}</span>}
       {result && <Outcome step={step} result={result} />}
     </span>
     <span className="share">{result ? lives(result.taken_share) : ''}</span>
@@ -83,7 +85,7 @@ function Step({ step, result, steps }: { step: PlanStep; result?: StepResult; st
 
 /** The planner's text as the person reads it: step ids (snake_case, maybe quoted) become their labels. */
 function plain(text: string, labels: Map<string, string>) {
-  return text.replace(/'?\b([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\b'?/g, (_, id: string) => `“${labels.get(id) ?? id.replace(/_/g, ' ')}”`);
+  return swiss(text).replace(/'?\b([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\b'?/g, (_, id: string) => `“${labels.get(id) ?? id.replace(/_/g, ' ')}”`);
 }
 /** A simulator warning: its first sentence (the rest is advice to the planner). */
 const plainWarning = (text: string, labels: Map<string, string>) => plain(text.split(/(?<=[.?!])\s+(?=[A-Z])/)[0], labels);
@@ -121,7 +123,7 @@ export function PlanCard({ version, previous, name, example }: { version: PlanVe
       <h2>{name}’s plan</h2>
       <span className="plan-meta">{`${example ? 'Example · ' : ''}Version ${version.version} · ${version.signed ? 'signed by your twin' : 'draft, not signed'}`}</span>
     </div>
-    <blockquote className="plan-narrative">{version.plan.narrative}</blockquote>
+    <blockquote className="plan-narrative">{swiss(version.plan.narrative)}</blockquote>
     <div className="stats plan-compare">
       <span>Goal by 2029<b>{percent(c.high_goal_odds[1])}</b><span className="was">{percent(c.high_goal_odds[0])} on habits alone</span></span>
       <span>Credit-limit risk<b>{percent(c.credit_breach_odds[1])}</b><span className="was">from {percent(c.credit_breach_odds[0])}</span></span>

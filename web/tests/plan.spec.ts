@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 
 const example = JSON.parse(readFileSync(new URL('../src/example.json', import.meta.url), 'utf8'));
 const examplePlan = JSON.parse(readFileSync(new URL('../src/example-plan.json', import.meta.url), 'utf8'));
+const exampleExplanation = JSON.parse(readFileSync(new URL('../src/example-explanation.json', import.meta.url), 'utf8'));
 const [draft, nudged] = examplePlan.history;
 const KEY = 'test-workspace-key-not-a-real-secret';
 
@@ -49,6 +50,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
   const sessions: Record<string, unknown>[] = [];
   const planRequests: { url: string; body: Record<string, unknown> }[] = [];
   let polls = 0, version: typeof draft | null = null;
+  const explanations: string[] = [];
   await page.route('http://127.0.0.1:8000/**', async route => {
     const request = route.request();
     const url = request.url();
@@ -57,6 +59,7 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
     let json: unknown = {};
     let status = 200;
     if (url.endsWith('/health')) json = { status: 'ok', llm_ready: true };
+    else if (url.endsWith('/explanation')) { explanations.push(url); json = { ...exampleExplanation, paths: 1000 }; }
     else if (request.method() === 'DELETE') json = { deleted: true };
     else if (url.endsWith('/plans') || url.endsWith('/nudges')) {
       planRequests.push({ url, body: request.postDataJSON() });
@@ -88,6 +91,13 @@ test('make a plan, follow it, nudge it, and stop following it', async ({ page })
   expect(sessions[0].plan_id).toBe('p1');
   expect(String(sessions[0].question)).toContain('my plan');
   await expect(page.getByText('· following your plan', { exact: false })).toBeVisible();
+  // The "Plan explained" tab runs the analysis on the laptop for this session, once.
+  await page.getByRole('tab', { name: 'Plan explained' }).click();
+  await expect(page.getByRole('heading', { name: 'From plan to outcomes' })).toBeVisible();
+  await page.getByRole('tab', { name: 'Paths' }).click();
+  await page.getByRole('tab', { name: 'Plan explained' }).click();
+  expect(explanations).toEqual(['http://127.0.0.1:8000/sessions/s1/explanation']);
+  await page.getByRole('tab', { name: 'Paths' }).click();
   const follow = page.getByRole('switch', { name: 'Follow my plan' });
   await expect(follow).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();

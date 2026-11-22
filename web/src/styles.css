@@ -225,6 +225,7 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 
 /* Right pane: Paths / Plan explained */
 .canvas-tabs { width: fit-content; margin-bottom: 16px; }
+.explained-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; max-width: 520px; padding: 24px 0; color: var(--muted); line-height: 1.55; }
 .explained { font-size: .9375rem; line-height: 1.55; }
 .explained header h2 { font-size: 1.25rem; font-weight: 500; letter-spacing: -.01em; }
 .explained .muted { color: var(--muted); font-size: .875rem; }
@@ -249,9 +250,7 @@ main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 7vh 20px
 .explained table { table-layout: fixed; }
 .explained th:first-child, .explained td:first-child { width: 40%; }
 .explained .ci { display: block; font-size: .75rem; color: var(--faint); }
-.explained-limits { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--line); }
-.explained-limits summary, .assumptions summary { cursor: pointer; font-weight: 500; }
-.explained-limits ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: .875rem; }
+.assumptions summary { cursor: pointer; font-weight: 500; }
 
 /* Assumptions dialog */
 .assumptions { font-size: .9375rem; line-height: 1.55; }

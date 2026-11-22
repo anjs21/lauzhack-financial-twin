@@ -13,7 +13,7 @@ import exampleExplanationData from './example-explanation.json';
 import { NudgeForm, PlanCard, WishesForm } from './Plan';
 import exampleData from './example.json';
 import examplePlanData from './example-plan.json';
-import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, withScenarioDefaults, withStudyDefaults } from './types';
+import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNames, swiss, withScenarioDefaults, withStudyDefaults } from './types';
 import type { BranchNode, ChatResult, ChoiceKey, Connection, Evidence, Measure, Message, PathNode, Person, PlanState, PlanVersion, Scenario } from './types';
 
 const PALETTE = ['#10b981', '#a855f7', '#ec4899', '#06b6d4', '#eab308', '#6366f1', '#f97316', '#14b8a6'];
@@ -96,6 +96,8 @@ export default function App() {
   const [edited, setEdited] = useState(false);
   const [modal, setModal] = useState<'persona' | 'connection' | 'method' | 'assumptions' | null>(null);
   const [view, setView] = useState<'paths' | 'explained'>('paths');   // the right pane: chart or plan explained
+  // The live "Plan explained" report for a session, computed on the laptop the first time the tab opens.
+  const [explained, setExplained] = useState<{ session: string; data?: Explanation; error?: string } | null>(null);
   const [busy, setBusy] = useState<'run' | 'chat' | 'plan' | null>(null);
   const [error, setError] = useState('');
   const [question, setQuestion] = useState('');
@@ -134,6 +136,29 @@ export default function App() {
   const salaryInvalid = scenario.kind === 'part_time' && (!Number.isFinite(scenario.salary) || scenario.salary <= 0 || scenario.salary > 100000);
 
   useEffect(() => { if (messages.length > 1 || busy) chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, [messages.length, busy]);
+
+  // Open the "Plan explained" tab on your own results: the laptop runs the analysis once per session (a few seconds).
+  const explainable = !exampleMode && !!session && !stale && !!evidence.plan;
+  useEffect(() => {
+    if (view !== 'explained' || !explainable || !session || explained?.session === session) return;
+    setExplained({ session });
+    api<Explanation>(connection, `/sessions/${session}/explanation`)
+      .then(data => setExplained(e => e?.session === session ? { session, data } : e))
+      .catch((err: Error) => setExplained(e => e?.session === session ? { session, error: err.message } : e));
+  }, [view, explainable, session, explained, connection]);
+
+  function explainedPane() {
+    if (exampleMode) return <Explained data={exampleExplanation} />;
+    const empty = (text: string, action?: React.ReactNode) => <div className="explained-empty"><p>{text}</p>{action}</div>;
+    if (stale) return empty('Your choices have changed. Explore them first, then the plan is explained for the new results.');
+    if (!evidence.plan) return ownPlan
+      ? empty('These results don’t follow your plan. Turn on “Follow my plan” and explore again to see it explained.')
+      : empty('This tab explains a long-term plan: what the planner wrote, how your twin carries it out, and what follows financially. Make a plan to see yours.',
+          <button className="secondary" disabled={!!busy} onClick={() => setComposing(true)}><PenLine size={16} />Make a long-term plan</button>);
+    if (explained?.data) return <Explained data={explained.data} />;
+    if (explained?.error) return empty(explained.error, <button className="secondary" onClick={() => setExplained(null)}><RefreshCw size={16} />Try again</button>);
+    return <div className="canvas-loading" role="status"><LoaderCircle size={22} className="spin" />Running the analysis on your laptop: 1,000 lives, your plan against your habits, and two job markets…</div>;
+  }
 
   // `choice` overrides the controls for one run (the landing page's compare button sets them at the same time).
   async function explore(withPlan?: { id: string; key: string } | null, choice?: { scenario: Scenario; compare: Scenario | null }) {
@@ -248,7 +273,7 @@ export default function App() {
     setEvidence(next); setPerson(next.person); setTraits(next.traits);
     setScenario(s => ({ ...next.scenario, alongside_studies: next.scenario.alongside_studies || (next.person.status !== 'student' && s.alongside_studies) }));
     setComparing(!!next.compare_scenario);
-    setBranches([]); setPick(null); setActiveId(next.alternative ? 'alternative' : 'baseline'); setEdited(false);
+    setBranches([]); setPick(null); setActiveId(next.alternative ? 'alternative' : 'baseline'); setEdited(false); setExplained(null);
   }
 
   function addBranch(node: BranchNode) {
@@ -381,7 +406,7 @@ export default function App() {
             {m.role === 'assistant' && <span className="spark" aria-hidden="true"><Sparkles size={18} /></span>}
             <div className="msg-body">
               {!!m.notes?.length && <ul className="msg-notes" aria-label="Changes made">{m.notes.map(n => <li key={n}><RefreshCw size={13} aria-hidden="true" />{n}</li>)}</ul>}
-              {m.content.split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}
+              {swiss(m.content).split('\n\n').map((paragraph, j) => <p key={j}>{paragraph}</p>)}
             </div>
           </div>)}
           {busy && busy !== 'plan' && <div className="thinking" role="status"><LoaderCircle size={17} className="spin" />{busy === 'run' ? 'Exploring 500 paths…' : 'Thinking…'}</div>}
@@ -403,11 +428,11 @@ export default function App() {
       </div>
 
       <section className="pane canvas" aria-label="Your paths">
-        {exampleMode && !loading && <div className="toggle canvas-tabs" role="tablist" aria-label="Results view">
+        {!loading && <div className="toggle canvas-tabs" role="tablist" aria-label="Results view">
           {([['paths', 'Paths'], ['explained', 'Plan explained']] as const).map(([key, label]) =>
             <button key={key} role="tab" aria-selected={view === key} onClick={() => { setView(key); setPick(null); }}>{label}</button>)}
         </div>}
-        {exampleMode && !loading && view === 'explained' ? <Explained data={exampleExplanation} />
+        {!loading && view === 'explained' ? explainedPane()
           : loading
           ? <div className="canvas-loading" aria-hidden="true"><LoaderCircle size={22} className="spin" />Simulating 500 lives, 2025 to 2034…</div>
           : <div className={stale ? 'dim' : ''}>

@@ -97,6 +97,20 @@ export type ChatAction =
   | { type: 'highlight'; path_id: string; measure: 'cash' | 'net_worth' | null };
 export type ChatResult = { answer: string; actions?: ChatAction[]; notes?: string[] };
 export type Connection = { url: string; key: string };
+/** Whole percentages for the parts of one whole that add up to exactly 100 (largest-remainder rounding). */
+export function wholePercents(shares: number[]): number[] {
+  const raw = shares.map(s => Math.max(0, s) * 100);
+  const out = raw.map(Math.floor);
+  if (raw.reduce((a, b) => a + b, 0) < 50) return raw.map(Math.round);      // not parts of a whole
+  let left = 100 - out.reduce((a, b) => a + b, 0);
+  for (const [, i] of raw.map((r, i) => [r - out[i], i] as const).sort((a, b) => b[0] - a[0])) {
+    if (left <= 0) break;
+    out[i] += 1; left -= 1;
+  }
+  return out;
+}
+/** Amounts in model-written text as the app writes them: "CHF 2,028" becomes "CHF 2'028". */
+export const swiss = (text: string) => text.replace(/CHF\s?(\d{1,3}(?:,\d{3})+)/g, (_, n: string) => `CHF ${n.replace(/,/g, "'")}`);
 export const money = (value: number) => new Intl.NumberFormat('en-CH', { maximumFractionDigits: 0 }).format(value);
 export const percent = (value: number) => `${Math.round(value * 100)}%`;
 export const compact = (value: number) => new Intl.NumberFormat('en-CH', { notation: 'compact', maximumFractionDigits: Math.abs(value) >= 1e6 ? 1 : 0 }).format(value);

@@ -139,7 +139,7 @@ def feedback(plan: LifePlan, ev: dict) -> list[str]:
     if o["credit_breach_odds"] > 0.25 and trouble:
         where = ", ".join(f"{share:.0%} {mode}" for mode, share in sorted(trouble["while"].items(), key=lambda x: -x[1]))
         notes.append(f"In {o['credit_breach_odds']:.0%} of lives cash fell past the credit limit, typically in "
-                     f"{trouble['typical_year']}, while {where}, on an income of about CHF {trouble['income_then']:,.0f} "
+                     f"{trouble['typical_year']}, while {where}, on an income of about CHF {format(trouble['income_then'], ',.0f').replace(',', "'")} "
                      f"a month in {trouble['home_then']}. Investing does not help here: only more income, lower rent "
                      "(a cheaper home), a leaner lifestyle, more cash before that point, or changing that step does; "
                      "a fallback triggered by cash_months_below (e.g. 1) can say what this person does when cash runs "
