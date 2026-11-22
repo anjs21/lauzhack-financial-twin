@@ -20,7 +20,7 @@ test('the example plan shows its steps, how often they happen and what a nudge c
   await page.goto('/');
   await page.getByRole('button', { name: 'See an example' }).click();
   const plan = page.getByRole('region', { name: 'Your plan' });
-  await expect(plan.getByRole('heading', { name: 'Mia’s plan' })).toBeVisible();
+  await expect(plan.getByRole('heading', { name: 'P0067’s plan' })).toBeVisible();
   await expect(plan.getByText(/^Example · Version 2 · /)).toBeVisible();
   await expect(plan.getByText(nudged.plan.narrative)).toBeVisible();
   await expect(plan.getByRole('heading', { name: /What changed/ })).toBeVisible();
@@ -31,7 +31,7 @@ test('the example plan shows its steps, how often they happen and what a nudge c
   await plan.getByRole('button', { name: 'Make my own plan' }).click();
   await expect(plan.getByLabel('In your own words, what are your plans?')).toBeVisible();
   await plan.getByRole('button', { name: 'Back to the example' }).click();
-  await expect(plan.getByRole('heading', { name: 'Mia’s plan' })).toBeVisible();
+  await expect(plan.getByRole('heading', { name: 'P0067’s plan' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: `/tmp/parallel-plan-${test.info().project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);

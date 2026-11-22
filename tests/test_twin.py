@@ -394,6 +394,13 @@ def test_part_time_offer_alongside_studies_or_instead_of_them(world):
     assert along.events["graduated"].any(1).mean() > 0.8 and leave.events["graduated"][:, :23].sum() == 0
     late = np.median(along.income[:, 40]) / np.median(base.income[:, 40])               # same graduate pay afterwards
     assert 0.85 < late < 1.15
+    # Losing the side job counts as a job loss (key moments, branch share) and the course goes on.
+    t_cut = Timeline(events={12: ["lose_job"]})
+    t_cut.offers[0] = (C.PART_TIME, 4000, True)
+    cut = simulate(world, student, persona, n, 3, horizon=24, timeline=t_cut)
+    working = along.events["side_job"][:, 0] & (along.mode[:, 12] == C.STUDENT)
+    assert cut.events["job_loss"][working, 12].all() and (cut.mode[working, 13] == C.STUDENT).mean() > 0.9
+    assert np.median(cut.income[working, 13]) < 0.5 * np.median(along.income[working, 13])
 
 
 @needs_model

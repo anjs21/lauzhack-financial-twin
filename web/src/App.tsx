@@ -12,7 +12,7 @@ import { api, compact, MAX_DECISIONS, money, percent, REVIEW_MONTHS, scenarioNam
 import type { BranchNode, ChatResult, ChoiceKey, Connection, Evidence, Measure, Message, PathNode, Person, PlanState, PlanVersion, Scenario } from './types';
 
 const PALETTE = ['#10b981', '#a855f7', '#ec4899', '#06b6d4', '#eab308', '#6366f1', '#f97316', '#14b8a6'];
-const scenarioLabel = (s: Scenario) => s.kind === 'part_time' ? `${s.alongside_studies ? 'Part-time while studying' : 'Part-time'} · CHF ${compact(s.salary)}`
+const scenarioLabel = (s: Scenario) => s.kind === 'part_time' ? `${s.alongside_studies ? 'Part-time while studying' : 'Part-time'} · CHF ${money(s.salary)}`
   : s.kind === 'spend_less' ? 'Spend less' : s.kind === 'cheaper_home' ? 'Cheaper home' : 'Current path';
 /** The two paths every run has: the current path, and the selected scenario branching from it in January 2025. */
 const rootsOf = (ev: Evidence): PathNode[] => [
@@ -21,10 +21,15 @@ const rootsOf = (ev: Evidence): PathNode[] => [
 ];
 
 const example: Evidence = { ...(exampleData as unknown as Evidence), person: withStudyDefaults(exampleData.person), scenario: withScenarioDefaults(exampleData.scenario as Scenario) };
-const initialExplanation = `In this example, ${percent(example.baseline.high_goal_odds)} of simulated paths reach Mia’s CHF ${money(example.person.high_target)} emergency fund by December 2029, and ${percent(example.alternative!.high_goal_odds)} with the part-time offer.\n\nThe bigger difference comes later: median net worth at the end of 2034 falls from CHF ${money(example.baseline.final_net_worth.p50)} to CHF ${money(example.alternative!.final_net_worth.p50)}. How much would more time today matter to you?`;
-const backToFullTime = example.alternative!.key_moments?.find(m => m.moment === 'Starts a full-time job');
-const whenExplanation = backToFullTime ? `\n\nThe big decision comes first: every life cuts back to part-time in January 2025. Going back to full-time work is rarer and later, in ${percent(backToFullTime.share)} of lives, usually around ${backToFullTime.typical_year}.` : '';
-const starterMessages: Message[] = [{ role: 'assistant', content: initialExplanation.replace('\n\nThe bigger difference', whenExplanation + '\n\nThe bigger difference') }];
+// The example: P0067, a fictional master's student offered a part-time job (examples/demo-character-elif.md).
+const exampleAlt = example.alternative!;
+const exampleMoment = (name: string) => exampleAlt.key_moments?.find(m => m.moment === name);
+const finishes = exampleMoment('Finishes studies'), fullTime = exampleMoment('Starts a full-time job');
+const starterMessages: Message[] = [{ role: 'assistant', content: [
+  `In this example, ${percent(example.baseline.high_goal_odds)} of simulated lives reach ${example.person.name}’s CHF ${money(example.person.high_target)} ${example.person.high_goal.toLowerCase()} by December 2029 on studies alone, and ${percent(exampleAlt.high_goal_odds)} with the part-time offer alongside the master’s.`,
+  ...(finishes && fullTime ? [`The big decision comes first: every life takes the job in January 2025. Most then finish the master’s (${percent(finishes.share)}) and start full-time work (${percent(fullTime.share)}), usually in ${fullTime.typical_year}.`] : []),
+  `Studying on CHF ${money(example.person.income)} a month is tight: ${percent(example.baseline.credit_breach_odds)} of lives hit the credit limit before 2029, against ${percent(exampleAlt.credit_breach_odds)} with the job. Would you keep studying, or take the job full-time and leave the course?`,
+].join('\n\n') }];
 const choices = [
   { kind: 'baseline', icon: Compass, title: 'Stay on my path' },
   { kind: 'part_time', icon: Leaf, title: 'Go part-time' },

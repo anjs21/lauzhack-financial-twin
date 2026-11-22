@@ -78,9 +78,11 @@ to Vite, **Build Command** to `npm run build`, and **Output Directory** to `dist
 The checked-in `vercel.json` also declares these build settings. Vercel does not need
 any LLM or API secrets; connection details are supplied through the UI.
 
-The initial screen is an explicitly labeled example: Mia’s fictional profile,
-500 actual simulation paths, a CHF 4,000 part-time offer, and an illustrative
-conversation script. It does not call an LLM or the laptop until connected.
+The landing screen offers an explicitly labeled example ("See an example"): P0067, a
+fictional master's student in Zurich (see `examples/demo-character-elif.md`), 500 actual
+simulation paths, a CHF 3,200 part-time offer alongside the studies, and an illustrative
+explanation. It does not call an LLM or the laptop until connected. Regenerate it with
+`python -m twin.plan.make_example`.
 
 ## Interaction and data flow
 

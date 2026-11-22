@@ -361,14 +361,15 @@ class World:
 
             working = np.isin(s.mode, [C.PART_TIME, C.FULL_TIME])
             lost = working & ((ev[1] < self.p_loss[s.econ]) | ("lose_job" in forced))
-            if "lose_job" in forced:                             # a student's side job ends too
-                s.wage_adjustment[s.side_job] = 0
-                s.side_job[:] = False
+            side_lost = s.side_job & ("lose_job" in forced)       # a student's side job ends too (still a student)
+            if side_lost.any():
+                s.wage_adjustment[side_lost] = 0
+                s.side_job[side_lost] = False
             pension_age = pr["retirement"]["pension_age"]
             s.search[lost] = np.where(s.age[lost] < pension_age, np.where(s.mode[lost] == C.FULL_TIME, 2, 1), 0)
             s.mode[lost], s.tau[lost] = C.NOT_WORKING, 0
             s.pensioner[lost] = s.age[lost] >= pension_age
-            info["job_loss"] = lost
+            info["job_loss"] = lost | side_lost
 
             looking = (s.search > 0) & np.isin(s.mode, [C.STUDENT, C.NOT_WORKING]) & ~lost
             if markets:

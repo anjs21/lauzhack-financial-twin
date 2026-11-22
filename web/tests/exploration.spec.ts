@@ -7,7 +7,7 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Hi Mia' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Hi P0067' })).toBeVisible();
   // A clean landing: only the first actions, no chart or conversation yet.
   await expect(page.getByRole('region', { name: 'Your paths' })).toHaveCount(0);
   await expect(page.getByLabel('Ask about your financial future')).toHaveCount(0);
@@ -17,10 +17,10 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
   await page.getByRole('button', { name: 'Net worth', exact: true }).click();
   const moments = page.getByRole('region', { name: 'Key moments' });
-  await expect(moments.getByText('Cuts back to part-time')).toBeVisible();
+  await expect(moments.getByText('Takes a job alongside studies')).toBeVisible();
   await expect(moments.getByText('every life')).toBeVisible();
   await page.getByRole('region', { name: 'Paths' }).getByRole('button', { name: /^Current path/ }).click();
-  await expect(moments.getByText('Cuts back to part-time')).toBeHidden();
+  await expect(moments.getByText('Takes a job alongside studies')).toBeHidden();
   const year = page.getByLabel('Explore a year');
   await year.focus(); await year.press('ArrowRight');
   await expect(year).toHaveValue('72');
@@ -40,7 +40,7 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   await dialog.getByRole('button', { name: 'Save my persona' }).click();
   await expect(page.getByText('Your choices have changed.', { exact: false })).toBeVisible();
   // Results must remain explicitly attached to the old fictional persona until explored.
-  await expect(page.getByRole('heading', { name: /Mia’s outlook/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /P0067’s outlook/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
   await page.screenshot({ path: `/tmp/parallel-${test.info().project.name}.png`, fullPage: true });
   await page.getByRole('button', { name: 'parallel, home' }).click();
@@ -125,13 +125,18 @@ test('a student can keep studying alongside the part-time offer', async ({ page 
   });
   await page.goto('/');
   const keepStudying = page.getByRole('switch', { name: 'Keep studying' });
-  await expect(keepStudying).toHaveCount(0);                     // Mia is employed
-  await page.getByRole('button', { name: 'Build my persona', exact: true }).click();
-  const dialog = page.getByRole('dialog');
-  await dialog.getByLabel('Your work situation').selectOption('student');
-  await dialog.getByLabel('Months until you finish').fill('24');
-  for (const step of ['Continue', 'Continue']) await dialog.getByRole('button', { name: step, exact: true }).click();
-  await dialog.getByRole('button', { name: 'Save my persona' }).click();
+  await expect(keepStudying).toHaveAttribute('aria-checked', 'true');   // P0067 is a master's student
+  const situation = async (status: string) => {
+    await page.getByRole('button', { name: 'Build my persona', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Your work situation').selectOption(status);
+    if (status === 'student') await dialog.getByLabel('Months until you finish').fill('24');
+    for (const step of ['Continue', 'Continue']) await dialog.getByRole('button', { name: step, exact: true }).click();
+    await dialog.getByRole('button', { name: 'Save my persona' }).click();
+  };
+  await situation('employed');
+  await expect(keepStudying).toHaveCount(0);                     // only for students
+  await situation('student');
   await expect(keepStudying).toHaveAttribute('aria-checked', 'true');
   await page.getByRole('button', { name: 'Connect', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
