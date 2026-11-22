@@ -27,6 +27,7 @@ REQUEST = dict(
     traits=dict(risk_tolerance=0.55, frugality=0.6, career_drive=0.85, free_time=0.35, housing_aspiration=0.6,
                 inertia=0.3, impatience=0.45, goal_focus=0.7),
     scenario=dict(kind="part_time", salary=3200, alongside_studies=True),
+    compare=dict(kind="part_time", salary=3200, alongside_studies=False),     # the same job, leaving the course
     n_paths=500)
 WISHES = ("I'll keep the start-up job at 60% while I finish my master's, then go full-time there. My partner and I "
           "want to move in together in 2027 and find something bigger once we both earn properly. I want the "

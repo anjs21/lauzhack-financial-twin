@@ -12,7 +12,7 @@ const lives = (share: number) => share >= 0.995 ? 'every life' : `${percent(shar
 const firmness = (c: number) => `${c >= 0.85 ? 'firm' : c >= 0.6 ? 'likely' : 'maybe'}, ${percent(c)} sure`;
 export const contingent = (s: PlanStep) => s.event != null || s.cash_months_below != null;
 
-function when(step: PlanStep, steps: PlanStep[]) {
+export function when(step: PlanStep, steps: PlanStep[]) {
   if (step.event) return EVENTS[step.event] ?? `after ${step.event}`;
   if (step.cash_months_below != null) return `if cash falls below ${step.cash_months_below} month${step.cash_months_below === 1 ? '' : 's'} of costs`;
   const parts: string[] = [];
@@ -59,7 +59,7 @@ function outcomeParts(step: PlanStep, r: StepResult) {
   ].filter(p => p.share >= 0.005);
 }
 
-function Outcome({ step, result }: { step: PlanStep; result: StepResult }) {
+export function Outcome({ step, result }: { step: PlanStep; result: StepResult }) {
   const parts = outcomeParts(step, result);
   return <div className="outcome">
     <span className="outcome-bar" aria-hidden="true">{parts.map(p => <i key={p.key} className={p.key} style={{ flexGrow: p.share }} />)}</span>

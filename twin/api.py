@@ -7,6 +7,7 @@ for an open workspace that needs no key (anyone with the URL can then use it, an
 """
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import os
@@ -96,6 +97,13 @@ class SessionRequest(StrictModel):
     n_paths: int = Field(default=500, ge=100, le=2000)
     deliberate: bool = False
     plan_id: str | None = Field(default=None, max_length=64)   # follow a long-term plan from POST /plans
+    compare: Scenario | None = None      # a second scenario, shown as its own path ("compare") next to "alternative"
+
+    @model_validator(mode="after")
+    def different_scenarios(self):
+        if self.compare is not None and (self.compare.kind == "baseline" or self.compare == self.scenario):
+            raise ValueError("compare must be a different scenario from the selected one, and not the current path")
+        return self
 
     @field_validator("traits")
     @classmethod
@@ -177,7 +185,7 @@ class Decision(StrictModel):
 
 
 class BranchRequest(StrictModel):
-    root: Literal["baseline", "alternative"] = "baseline"
+    root: Literal["baseline", "alternative", "compare"] = "baseline"
     decisions: list[Decision] = Field(min_length=1, max_length=4)
 
     @field_validator("decisions")
@@ -227,7 +235,8 @@ pay boost). If scenario.alongside_studies is true and the person is a student, t
 and earn the offer next to the course; that job ends when the course ends, and they then look for
 a graduate job as on the current path.
 "paths" lists every path on the chart: "baseline" (current path), "alternative" (the selected
-scenario at the January 2025 review) and what-if branches. A branch starts from its parent path and
+scenario at the January 2025 review), "compare" (a second scenario at that review, if the user asked
+to compare two) and what-if branches. A branch starts from its parent path and
 forces the listed decisions at later January reviews on the same random draws, so before its first
 decision it equals its parent; possible_in_share_of_lives is the share of lives where its last
 decision was possible then. Compare a branch with its parent to say what the decision changed, and when.
@@ -254,7 +263,7 @@ def evidence_context(evidence, paths=None) -> str:
     context = dict(evidence)
     context.pop("branches", None)
     context["person"] = {k: v for k, v in evidence["person"].items() if k != "name"}
-    for key in ("baseline", "alternative"):
+    for key in ("baseline", "alternative", "compare"):
         if context.get(key):
             context[key] = {k: v for k, v in context[key].items()
                             if k not in ("months", "fan_cash", "fan_net_worth", "fan_income")}
@@ -355,19 +364,19 @@ def setup(request: SessionRequest, plan: LifePlan | None = None):
     if plan is not None:
         persona = with_plan(persona, plan)
     model = world()
-    kind = request.scenario.kind
-    if kind == "part_time" and request.person.age >= model.pr["jobs"]["forced_retirement_age"]:
+    kinds = {request.scenario.kind} | ({request.compare.kind} if request.compare else set())
+    if "part_time" in kinds and request.person.age >= model.pr["jobs"]["forced_retirement_age"]:
         raise HTTPException(422, "A part-time offer is unavailable at or beyond the model's retirement age.")
-    if kind == "cheaper_home" and request.person.household_type == "shared_housing":
+    if "cheaper_home" in kinds and request.person.household_type == "shared_housing":
         raise HTTPException(422, "This household is already at the model's minimum housing tier.")
     return people, persona, model, DeliberatePolicy if request.deliberate else RulePolicy
 
 
-def apply_scenario(request: SessionRequest, persona, timeline: Timeline):
-    """The selected scenario at the opening January review (the 'alternative' path)."""
-    kind = request.scenario.kind
+def apply_scenario(scenario: Scenario, persona, timeline: Timeline):
+    """A scenario at the opening January review: the 'alternative' path (or 'compare', the second one)."""
+    kind = scenario.kind
     if kind == "part_time":
-        timeline.offers[0] = (C.PART_TIME, request.scenario.salary, request.scenario.alongside_studies)
+        timeline.offers[0] = (C.PART_TIME, scenario.salary, scenario.alongside_studies)
     elif kind != "baseline":
         persona.intentions.append(Intention("spending" if kind == "spend_less" else "housing", -1, when=C.month_label(0)))
 
@@ -379,7 +388,7 @@ def run_projection(request: SessionRequest, plan: LifePlan | None = None, plan_e
     result = dict(person=request.person.model_dump(), traits=persona.traits, scenario=request.scenario.model_dump(),
                   n_paths=request.n_paths, seed=C.SEED, baseline=summarize(baseline),
                   deliberate=request.deliberate, decision_style="deliberate" if request.deliberate else "habitual",
-                  alternative=None, comparison=None,
+                  alternative=None, comparison=None, compare=None, compare_scenario=None,
                   assumptions=["Synthetic model · January 2025–December 2034", "Goal deadline: December 2029",
                                "Annual decisions; monthly events and cash flows", "Shared random draws for scenario comparisons",
                                "Model uncertainty is not covered by the sampling interval",
@@ -390,11 +399,16 @@ def run_projection(request: SessionRequest, plan: LifePlan | None = None, plan_e
         result["plan"] = {"narrative": plan.narrative, "spontaneity": plan.spontaneity,
                           "steps": [s.describe() for s in plan.steps],
                           "carried_out": (plan_evaluation or {}).get("steps")}
+    def scenario_paths(scenario):
+        timeline, own = Timeline(), copy.deepcopy(persona)        # a scenario's intentions stay on its own path
+        apply_scenario(scenario, own, timeline)
+        return simulate(model, people, own, request.n_paths, C.SEED, timeline=timeline, policy_cls=policy)
+
     if kind != "baseline":
-        timeline = Timeline()
-        apply_scenario(request, persona, timeline)
-        alternative = simulate(model, people, persona, request.n_paths, C.SEED, timeline=timeline, policy_cls=policy)
+        alternative = scenario_paths(request.scenario)
         result.update(alternative=summarize(alternative), comparison=compare(baseline, alternative))
+    if request.compare is not None:
+        result.update(compare=summarize(scenario_paths(request.compare)), compare_scenario=request.compare.model_dump())
     return result
 
 
@@ -408,7 +422,11 @@ def run_branch(request: SessionRequest, branch: BranchRequest, plan: LifePlan | 
     if branch.root == "alternative":
         if request.scenario.kind == "baseline":
             raise HTTPException(422, "This run has no alternative path to branch from.")
-        apply_scenario(request, persona, timeline)
+        apply_scenario(request.scenario, persona, timeline)
+    elif branch.root == "compare":
+        if request.compare is None:
+            raise HTTPException(422, "This run has no second scenario to branch from.")
+        apply_scenario(request.compare, persona, timeline)
     for d in branch.decisions:
         head, option, _ = CHOICES[d.choice]
         if head == "event":
@@ -457,10 +475,11 @@ def validation_message(e) -> str:
     return str(e)
 
 
-def scenario_label(scenario: dict) -> str:
+def scenario_label(scenario: dict, student: bool = False) -> str:
     kind = scenario["kind"]
     if kind == "part_time":
-        return f"Part-time at CHF {scenario['salary']:,.0f}" + (" while studying" if scenario.get("alongside_studies") else "")
+        what = ("Job alongside studies" if scenario.get("alongside_studies") else "Job instead of studies") if student else "Part-time"
+        return f"{what} at CHF {scenario['salary']:,.0f}"
     return {"spend_less": "Spend less", "cheaper_home": "Cheaper home"}.get(kind, "Current path")
 
 
@@ -470,7 +489,7 @@ def path_brief(summary: dict) -> dict:
 
 
 def summary_of(session, path_id: str) -> dict | None:
-    if path_id in ("baseline", "alternative"):
+    if path_id in ("baseline", "alternative", "compare"):
         return session.evidence.get(path_id)
     node = session.branches.get(path_id)
     return node["summary"] if node else None
@@ -480,9 +499,13 @@ def paths_of(session) -> list:
     """Every path on the chart, as the model refers to them."""
     ev = session.evidence
     out = [{"id": "baseline", "label": "Current path", **path_brief(ev["baseline"])}]
+    student = ev["person"]["status"] == "student"
     if ev.get("alternative"):
-        out.append({"id": "alternative", "parent": "baseline", "label": scenario_label(ev["scenario"]) + " (January 2025)",
+        out.append({"id": "alternative", "parent": "baseline", "label": scenario_label(ev["scenario"], student) + " (January 2025)",
                     **path_brief(ev["alternative"])})
+    if ev.get("compare"):
+        out.append({"id": "compare", "parent": "baseline", "label": scenario_label(ev["compare_scenario"], student) + " (January 2025)",
+                    **path_brief(ev["compare"])})
     for b in session.branches.values():
         out.append({"id": b["id"], "parent": b["parent"], "label": b["label"],
                     "decisions": [{"year": C.START_YEAR + d["month"] // 12, "choice": d["choice"]} for d in b["decisions"]],
@@ -498,6 +521,10 @@ def grow_branch(session, parent: str, month: int, choice: str) -> dict:
         if not session.evidence.get("alternative"):
             raise HTTPException(422, "This run has no alternative path to branch from.")
         root, prior = "alternative", []
+    elif parent == "compare":
+        if not session.evidence.get("compare"):
+            raise HTTPException(422, "This run has no second scenario to branch from.")
+        root, prior = "compare", []
     elif parent in session.branches:
         root, prior = session.branches[parent]["root"], session.branches[parent]["decisions"]
     else:
@@ -544,12 +571,14 @@ def _changes_note(args: dict) -> str:
 
 def tool_update(session, args: dict):
     old = session.request.model_dump()
+    scenario = {**old["scenario"], **(args.get("scenario") or {})}
+    keep = old["compare"] and old["compare"] != scenario        # the second scenario stays unless it is now the first
     new = SessionRequest(person={**old["person"], **(args.get("person") or {})},
                          traits={**old["traits"], **(args.get("traits") or {})},
-                         scenario={**old["scenario"], **(args.get("scenario") or {})},
+                         scenario=scenario, compare=old["compare"] if keep else None,
                          n_paths=old["n_paths"], deliberate=old["deliberate"])
     before = {p["id"]: {k: v for k, v in p.items() if k in ("goal_odds", "credit_breach_odds", "median_net_worth_2034")}
-              for p in paths_of(session)[:2]}
+              for p in paths_of(session) if p["id"] in ("baseline", "alternative", "compare")}
     evidence = run_projection(new, session.plan, session.plan_evaluation)
     session.request, session.evidence, session.branches = new, evidence, {}
     after = {p["id"]: p for p in paths_of(session)}
@@ -655,7 +684,7 @@ def workload():
 app = FastAPI(title="Financial Twin · local API", version="0.1.0")
 app.add_middleware(CORSMiddleware,
                    allow_origins=[s.strip() for s in os.environ.get("TWIN_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if s.strip()],
-                   allow_methods=["GET", "POST", "DELETE"], allow_headers=["Authorization", "Content-Type"],
+                   allow_methods=["GET", "POST", "DELETE"], allow_headers=["Authorization", "Content-Type", "ngrok-skip-browser-warning"],
                    allow_credentials=False)
 
 

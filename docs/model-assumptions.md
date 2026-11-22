@@ -184,14 +184,18 @@ statistical models are fitted to the result.
 | Habit | People rarely change anything at a review; inertia weighs strongly toward "continue" | Assumed |
 | Stated plans | A plan ("at January 2028, work full-time") is carried out with the stated probability where it is possible | Assumed |
 
-## 14. "Decide deliberately"
+## 14. The long-term plan (LLM planner)
 
 | Assumption | Value | Source |
 |---|---|---|
-| Method | The persona's own probabilities, tilted toward options worth more over the next five years (anchored foresight, strength 0.5); at strength 0 it is exactly the persona | Assumed |
-| What "worth more" means (CHF-equivalent a month) | Lifestyle −300 / 0 / +200; free time: part-time +1,500, not working +2,000; cash below zero −2,000; any change −300; home value by household and flat size; goals counted at their value when met on time; plus net worth at the end | Spec |
-| Look-ahead | 60 months, 6 simulated futures per option, learned from 2,000 decision points | Assumed |
-| Limitation | The foresight network was trained before the learned markets replaced the fixed job and flat rates | Known |
+| Who writes it | An LLM (Together AI) speaking as the person's planning self, from their own words, persona and goal; it is told not to optimise | Assumed |
+| What a plan is | 2–10 steps (work, home, lifestyle, savings), each with a window or trigger, a commitment (chance of following through) and a one-sentence reason | Assumed |
+| Testing | Each draft is carried out in 300 simulated lives; the planner sees which steps happen, which are blocked and why, and how often cash runs out | Assumed |
+| Revising | Up to 4 rounds; the plan counts as signed only if the planner says "ready" after seeing at least one simulation | Assumed |
+| Outside the steps | Habits still decide; *spontaneity* sets how often unplanned changes of work or home happen anyway | Assumed |
+| What a step cannot say | Accept a specific job offer, or move to another city; the plan is tested on the current path, without the scenario's offer | Known |
+| A change of plans (nudge) | Revises only what the update touches; steps whose window ended before the update stay as they were | Assumed |
+| The reasons shown | The planner's own statements, checked against the simulation only where the simulation can check them | Known |
 
 ## 15. Scenarios, what-if branches and imposed events
 
@@ -202,7 +206,7 @@ statistical models are fitted to the result.
 | Spend less / cheaper home | A lifestyle cut / a one-step cheaper flat at the January 2025 review (the flat still has to be found) | Assumed |
 | A branch | Its parent path with one more decision or event at a January review; identical to the parent before it | Assumed |
 | A forced decision | Happens with certainty in every life where it is possible that January (the share is shown) | Assumed |
-| A life event (lose my job, recession, child, partner, separation) | Imposed that month in every life where it can happen; everything that normally follows it (search, leave pay, forced move, recovery) is unchanged | Assumed |
+| A life event (lose my job, recession, child, partner, separation) | Imposed that month in every life where it can happen; everything that normally follows it (search, leave pay, forced move, recovery) is unchanged. A working student losing the side job counts as a job loss and keeps studying | Assumed |
 | Timing | Events from January 2025 ("now"), decisions from January 2026; decisions come before events in the same month | Assumed |
 | Depth | Up to 4 stacked decisions or events per branch | Assumed |
 | Key moments | Decisions and events that happen in at least 10% of lives; the year shown is the median year it first happens | Assumed |
@@ -213,7 +217,7 @@ statistical models are fitted to the result.
 |---|---|---|
 | Provider and model | Together AI, `deepseek-ai/DeepSeek-V4.1-Flash` (set in `.env`) | Assumed |
 | What it receives | Persona details without the name, result summaries, the list of paths, the conversation; never the monthly arrays | Assumed |
-| What it may change | Only through its tools: persona facts and traits, scenario, decision style, branches, what the chart shows | Assumed |
+| What it may change | Only through its tools: persona facts and traits, scenario, branches, what the chart shows | Assumed |
 | Translating words to settings | Amounts are monthly take-home CHF ("7k" = 7,000); rates are fractions; "now" means January 2025 | Assumed |
 | Grounding | Instructed to use only the simulation's numbers; this is an instruction to the model, not a guarantee | Assumed |
 
@@ -234,4 +238,3 @@ statistical models are fitted to the result.
 - **Assumed education.** The data does not say who holds a degree; it is drawn from an assumed prior.
 - **One work mode at a time.** Studying and working only combine through the side-job option, which ends with the course.
 - **Fixed start.** The timeline starts in January 2025 whatever today's date is.
-- **Foresight network predates the learned markets.** Retrain with `python -m twin foresight` to update it.

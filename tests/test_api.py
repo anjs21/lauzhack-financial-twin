@@ -332,3 +332,22 @@ def test_life_events_branch_from_now_and_decisions_from_2026(client, payload, mo
     result, action, note = api.run_tool(api.sessions[sid], "explore_decision",
                                         json.dumps({"from_path": "baseline", "year": 2025, "choice": "lose_job"}))
     assert action["type"] == "branch" and note == "Grew a branch: Lose my job · 2025"
+
+
+def test_compare_runs_a_second_scenario_as_its_own_path(payload):
+    payload["person"].update(status="student", study_months_left=14, in_masters=True, income=2000, rent=950)
+    payload["scenario"] = {"kind": "part_time", "salary": 3200, "alongside_studies": True}
+    alone = api.run_projection(api.SessionRequest(**payload))
+    request = api.SessionRequest(**payload, compare={"kind": "part_time", "salary": 3200, "alongside_studies": False})
+    both = api.run_projection(request)
+    assert both["alternative"]["final_net_worth"] == alone["alternative"]["final_net_worth"]   # untouched by the second
+    assert both["compare_scenario"]["alongside_studies"] is False
+    assert both["compare"]["final_net_worth"]["p50"] < both["alternative"]["final_net_worth"]["p50"]   # leaving the course
+    branch = api.run_branch(request, api.BranchRequest(root="compare", decisions=[{"month": 24, "choice": "full_time"}]))
+    assert branch["root"] == "compare"
+    for bad in ({"kind": "part_time", "salary": 3200, "alongside_studies": True}, {"kind": "baseline"}):
+        with pytest.raises(api.ValidationError):
+            api.SessionRequest(**payload, compare=bad)
+    session = api.Session(evidence=both, history=[], request=request)
+    labels = {p["id"]: p["label"] for p in api.paths_of(session)}
+    assert labels["alternative"].startswith("Job alongside studies") and labels["compare"].startswith("Job instead of studies")

@@ -42,7 +42,7 @@ export type Decision = { month: number; choice: ChoiceKey };
 export type BranchResult = Summary & { applied_share: number; root: 'baseline' | 'alternative'; decisions: (Decision & { when: string; label: string })[] };
 // One path in the tree: a root (current path or the selected scenario) or a branch grown from the chart.
 export type PathNode = {
-  id: string; parent: string | null; root: 'baseline' | 'alternative'; label: string; color: string;
+  id: string; parent: string | null; root: 'baseline' | 'alternative' | 'compare'; label: string; color: string;
   from: number; decisions: Decision[]; summary: Summary; applied?: number;
 };
 export const MAX_DECISIONS = 4;
@@ -51,6 +51,7 @@ export const yearOf = (month: number) => 2025 + Math.floor(month / 12);
 export type Evidence = {
   person: Person; traits: Record<string, number>; scenario: Scenario; n_paths: number; seed: number;
   baseline: Summary; alternative: Summary | null;
+  compare?: Summary | null; compare_scenario?: Scenario | null;    // a second scenario, as its own path
   comparison: { goal_change_pp: number; goal_change_mc95_pp: number[]; median_final_net_worth: number[] } | null;
   assumptions: string[];
   deliberate?: boolean;
@@ -109,7 +110,7 @@ export async function api<T>(connection: Connection, path: string, body?: unknow
   let response: Response;
   try {
     response = await fetch(`${url.origin}${path}`, {
-      method, headers: { ...(connection.key ? { Authorization: `Bearer ${connection.key}` } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      method, headers: { 'ngrok-skip-browser-warning': '1', ...(connection.key ? { Authorization: `Bearer ${connection.key}` } : {}), ...(body ? { 'Content-Type': 'application/json' } : {}) },
       body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(120000), cache: 'no-store', redirect: 'error',
     });
   } catch {

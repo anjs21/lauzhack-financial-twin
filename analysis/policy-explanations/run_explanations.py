@@ -35,10 +35,10 @@ LABELS = {'status':['Continue','Start master’s','Part-time','Full-time','Stop 
 def read_input(profile, plan_path, version):
     if profile == 'example':
         raw = json.loads((ROOT / 'web/src/example.json').read_text())
-        people = person_table(custom={**raw['person'], 'study_months_left': 1, 'in_masters': False})
+        people = person_table(custom=raw['person'])          # as the web app shows it (study fields included)
         persona = from_profile(people.iloc[0]); persona.traits.update(raw['traits'])
         path = plan_path or ROOT / 'web/src/example-plan.json'
-        source = 'Bundled Mia example; LLM-generated plan, matched to web/src/example.json.'
+        source = f"Bundled web example ({raw['person']['name']}); LLM-generated plan, matched to web/src/example.json."
     else:
         people = person_table(profile); persona = from_profile(people.iloc[0])
         path = plan_path or C.ARTIFACTS / 'plans' / f'{profile}.json'
@@ -231,7 +231,7 @@ def render_live(result):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--profile',default='example',help='example (Mia), or synthetic profile ID')
+    p.add_argument('--profile',default='example',help='example (the web app\'s example persona), or synthetic profile ID')
     p.add_argument('--plan-file',type=Path,help='Plan history JSON (default bundled example or saved profile plan)')
     p.add_argument('--version',type=int,default=0,help='1-based full plan version; default latest')
     p.add_argument('--paths',type=int,default=1000);p.add_argument('--seed',type=int,default=20261122)
@@ -253,11 +253,13 @@ def main():
     except (FileNotFoundError,KeyError,ValueError,json.JSONDecodeError) as exc: p.error(str(exc))
     res=analyse(people,persona,plan,entry,entries,prov,args.paths,args.seed,args.low_cash,args.live_samples,args.wishes)
     args.out.mkdir(parents=True,exist_ok=True)
-    name='mia' if args.profile=='example' else args.profile
+    name=res['person']['name'].lower() if args.profile=='example' else args.profile
     (args.out/f'{name}_explanation.json').write_text(json.dumps(res,indent=2,allow_nan=False)+'\n')
     (args.out/f'{name}_explanation.html').write_text(render(res))
     if res['live_planner_experiment']:
         (args.out/f'{name}_live_planner.html').write_text(render_live(res))
+    if args.profile=='example' and args.out==OUT:      # the web app's "Plan explained" tab reads this copy
+        (ROOT/'web/src/example-explanation.json').write_text(json.dumps(res,separators=(',',':'),allow_nan=False))
     print('Report:',args.out/f'{name}_explanation.html',flush=True)
 
 if __name__=='__main__': main()

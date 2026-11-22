@@ -8,6 +8,12 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Hi P0067' })).toBeVisible();
+  // The landing explains who this is before any numbers.
+  const who = page.getByRole('region', { name: 'Who this is' });
+  await expect(who).toContainText('master’s student, 14 months left');
+  await expect(who).toContainText("CHF 40'000 housing deposit");
+  await expect(who).toContainText('ambitious about career and studies');
+  await expect(who).toContainText('The decision, January 2025');
   // A clean landing: only the first actions, no chart or conversation yet.
   await expect(page.getByRole('region', { name: 'Your paths' })).toHaveCount(0);
   await expect(page.getByLabel('Ask about your financial future')).toHaveCount(0);
@@ -19,7 +25,7 @@ test('example, persona creation, and keyboard-accessible chart', async ({ page }
   const moments = page.getByRole('region', { name: 'Key moments' });
   await expect(moments.getByText('Takes a job alongside studies')).toBeVisible();
   await expect(moments.getByText('every life')).toBeVisible();
-  await page.getByRole('region', { name: 'Paths' }).getByRole('button', { name: /^Current path/ }).click();
+  await page.getByRole('region', { name: 'Paths' }).getByRole('button', { name: /^Studies only/ }).click();
   await expect(moments.getByText('Takes a job alongside studies')).toBeHidden();
   const year = page.getByLabel('Explore a year');
   await year.focus(); await year.press('ArrowRight');
@@ -119,7 +125,7 @@ test('a student can keep studying alongside the part-time offer', async ({ page 
   const keepStudying = page.getByRole('switch', { name: 'Keep studying' });
   await expect(keepStudying).toHaveAttribute('aria-checked', 'true');   // P0067 is a master's student
   const situation = async (status: string) => {
-    await page.getByRole('button', { name: 'Build my persona', exact: true }).click();
+    await page.getByRole('button', { name: 'Edit this person', exact: true }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Your work situation').selectOption(status);
     if (status === 'student') await dialog.getByLabel('Months until you finish').fill('24');
@@ -185,7 +191,7 @@ test('grow a tree of branches from decision points on the chart', async ({ page 
   expect(bodies[1]).toEqual({ parent: 'b1', month: 48, choice: 'spend_less' });
 
   // "Now" (January 2025) takes life events only.
-  await tree.getByRole('button', { name: /^Current path/ }).click();
+  await tree.getByRole('button', { name: /^Studies only/ }).click();
   await page.getByRole('button', { name: 'Decide in January 2025' }).click();
   const now = page.getByRole('region', { name: 'Decision in January 2025' });
   await expect(now).toContainText('Now, in January 2025');
@@ -196,7 +202,7 @@ test('grow a tree of branches from decision points on the chart', async ({ page 
   // Removing a branch removes what grew from it.
   await tree.getByRole('button', { name: 'Remove Work full-time · 2027' }).click();
   await expect(tree.getByRole('button', { name: /^Spend less · 2029/ })).toHaveCount(0);
-  await expect(tree.getByRole('button', { name: /^Part-time/ })).toHaveAttribute('aria-pressed', 'false');
+  await expect(tree.getByRole('button', { name: /^Job alongside studies/ })).toHaveAttribute('aria-pressed', 'false');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
 });
 
@@ -232,4 +238,68 @@ test('the assistant changes the persona and grows branches from a chat message',
   await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();
   await page.getByRole('button', { name: 'Edit your persona' }).click();
   await expect(page.getByRole('dialog').getByLabel('Age at the start of 2025')).toHaveValue('31');
+});
+
+test('assumptions dialog and the plan-explained tab', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Assumptions', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Assumptions' });
+  await dialog.getByText('1. Time, scope and runs').click();
+  await expect(dialog.getByRole('cell', { name: /January 2025 to December 2034/ })).toBeVisible();
+  await expect(dialog.getByText('14. The long-term plan (LLM planner)')).toBeVisible();
+  await expect(dialog.getByText('Decide deliberately')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+
+  await page.getByRole('button', { name: 'See an example' }).click();
+  await page.getByRole('tab', { name: 'Plan explained' }).click();
+  const explained = page.getByRole('article', { name: 'Plan explained' });
+  await expect(explained.getByRole('heading', { name: 'From plan to outcomes' })).toBeVisible();
+  for (const h of ['What did the LLM plan?', 'How is the plan carried out?', 'What happens financially?'])
+    await expect(explained.getByRole('heading', { name: h })).toBeVisible();
+  await expect(page.getByLabel('Explore a year')).toHaveCount(0);          // the chart is behind the other tab
+  await page.getByRole('tab', { name: 'Paths' }).click();
+  await expect(page.getByLabel('Explore a year')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  expect(errors).toEqual([]);
+});
+
+test('compare taking the job alongside the studies or instead of them', async ({ page }) => {
+  const sessions: { scenario: { alongside_studies: boolean }; compare?: { kind: string; alongside_studies: boolean } }[] = [];
+  await page.route('http://127.0.0.1:8000/**', async route => {
+    const request = route.request();
+    if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization,content-type', 'access-control-allow-methods': 'GET,POST,DELETE' } });
+    let json: unknown = {};
+    if (request.url().endsWith('/health')) json = { status: 'ok', llm_ready: true };
+    else if (request.method() === 'POST') {
+      const body = request.postDataJSON();
+      sessions.push(body);
+      json = { session_id: 'cmp', evidence: { ...example, scenario: body.scenario, compare_scenario: body.compare ?? null, compare: body.compare ? example.compare : null }, answer: 'Compared.' };
+    }
+    await route.fulfill({ json, headers: { 'access-control-allow-origin': '*' } });
+  });
+  await page.goto('/');
+  // Offline, the example already holds both choices.
+  await page.getByRole('button', { name: /^Compare both choices/ }).click();
+  const tree = page.getByRole('region', { name: 'Paths' });
+  for (const path of [/^Studies only/, /^Job alongside studies/, /^Job instead of studies/]) await expect(tree.getByRole('button', { name: path })).toBeVisible();
+  const table = page.getByRole('table', { name: 'The paths side by side' });
+  await expect(table).toContainText(`${Math.round(example.compare.high_goal_odds * 100)}%`);
+  await table.getByText(/^Job instead of studies/).click();
+  await expect(tree.getByRole('button', { name: /^Job instead of studies/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('switch', { name: 'Compare both' })).toHaveAttribute('aria-checked', 'true');
+
+  // Connected, the button runs both scenarios in one exploration.
+  await page.getByRole('button', { name: 'parallel, home' }).click();
+  await page.getByRole('button', { name: 'Connect', exact: true }).click();
+  await page.getByRole('dialog').getByLabel('Workspace access key').fill('test-workspace-key-not-a-real-secret');
+  await page.getByRole('dialog').getByRole('button', { name: 'Connect workspace', exact: true }).click();
+  await page.getByRole('button', { name: /^Compare both choices/ }).click();
+  await expect(page.getByText('Compared.')).toBeVisible();
+  expect(sessions[0].scenario.alongside_studies).toBe(true);
+  expect(sessions[0].compare).toEqual({ kind: 'part_time', salary: 3200, alongside_studies: false });
+  await expect(page.getByLabel('Ask about your financial future')).toBeEnabled();          // results match the controls
+  await page.getByRole('switch', { name: 'Compare both' }).click();                        // turning it off needs a new run
+  await expect(page.getByLabel('Ask about your financial future')).toBeDisabled();
 });
